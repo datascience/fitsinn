@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fits xmlns="http://hul.harvard.edu/ois/xml/ns/fits/fits_output" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd" version="0.6.0" timestamp="12/27/11 11:57 AM">
+  <identification status="CONFLICT">
+    <identity format="HTML Transitional" mimetype="text/html" toolname="FITS" toolversion="0.6.0">
+      <tool toolname="Jhove" toolversion="1.5" />
+      <version toolname="Jhove" toolversion="1.5">HTML 4.01</version>
+    </identity>
+    <identity format="Hypertext Markup Language" mimetype="text/html" toolname="FITS" toolversion="0.6.0">
+      <tool toolname="Exiftool" toolversion="7.74" />
+      <tool toolname="Droid" toolversion="3.0" />
+      <tool toolname="NLNZ Metadata Extractor" toolversion="3.4GA" />
+      <tool toolname="ffident" toolversion="0.2" />
+      <version toolname="Droid" toolversion="3.0">4.01</version>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/100</externalIdentifier>
+    </identity>
+  </identification>
+  <fileinfo>
+    <size toolname="Jhove" toolversion="1.5">13251</size>
+    <lastmodified toolname="Exiftool" toolversion="7.74" status="SINGLE_RESULT">2011:12:27 10:44:26+01:00</lastmodified>
+    <filepath toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">/home/petrov/taverna/tmp/002/002526.html</filepath>
+    <filename toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">/home/petrov/taverna/tmp/002/002526.html</filename>
+    <md5checksum toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">78f6a66409da9663c42006891d596754</md5checksum>
+    <fslastmodified toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">1324979066000</fslastmodified>
+  </fileinfo>
+  <filestatus>
+    <well-formed toolname="Jhove" toolversion="1.5" status="SINGLE_RESULT">true</well-formed>
+    <valid toolname="Jhove" toolversion="1.5" status="SINGLE_RESULT">true</valid>
+  </filestatus>
+  <metadata>
+    <text>
+      <charset toolname="Jhove" toolversion="1.5" status="SINGLE_RESULT">iso-8859-1</charset>
+      <markupBasis toolname="Jhove" toolversion="1.5" status="SINGLE_RESULT">HTML</markupBasis>
+      <markupBasisVersion toolname="Jhove" toolversion="1.5" status="SINGLE_RESULT">HTML 4.01</markupBasisVersion>
+    </text>
+  </metadata>
+</fits>
+

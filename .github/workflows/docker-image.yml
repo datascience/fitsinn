@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [master, new_generation, new_generation_springboot]
+    branches: [main, dev, release/*]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:

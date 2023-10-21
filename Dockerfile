@@ -6,7 +6,7 @@ RUN mvn -pl !web clean install -Pprod
 FROM openjdk:21-jdk-slim
 WORKDIR /app
 RUN printenv
-COPY --from=builder /app/main/target/procontent-main-*.jar ./app.jar
+COPY --from=builder /app/main/target/fitsinn-main-*.jar ./app.jar
 
 RUN chown 1001 ./app.jar \
     && chmod "g+rwX" ./app.jar

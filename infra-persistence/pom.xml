@@ -62,8 +62,8 @@
         </dependency>
         <dependency>
             <groupId>rocks.artur</groupId>
-            <artifactId>procontent-core</artifactId>
-            <version>0.0.1</version>
+            <artifactId>fitsinn-core</artifactId>
+            <version>0.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

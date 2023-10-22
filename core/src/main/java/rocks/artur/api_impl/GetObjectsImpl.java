@@ -26,4 +26,12 @@ public class GetObjectsImpl implements GetObjects {
         Iterable<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getCharacterisationResultsByFilepath(filePath);
         return characterisationResultsByFilepath;
     }
+
+    @Override
+    public Iterable<CharacterisationResult> getConflictsFromObject(String filePath) {
+        Iterable<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getConflictsByFilepath(filePath);
+        return characterisationResultsByFilepath;
+    }
+
+
 }

@@ -42,6 +42,13 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath);
 
+    /**
+     * gets a list of characterisation results with conflicts for a given digital object.
+     *
+     * @return an iterable of characterisation results.
+     */
+    List<CharacterisationResult> getConflictsByFilepath(String filepath);
+
     Map<String, Object> getSizeStatistics();
 
     List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter);

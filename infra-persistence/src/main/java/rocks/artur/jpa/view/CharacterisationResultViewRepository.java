@@ -2,6 +2,7 @@ package rocks.artur.jpa.view;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import rocks.artur.jpa.table.CharacterisationResultJPA;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface CharacterisationResultViewRepository extends JpaRepository<Char
     @Query("select property, count(*) as count from CharacterisationResultViewJPA group by property")
     List<Object[]> getPropertyDistribution();
 
-
+    List<CharacterisationResultViewJPA> findAllByFilePath(String filePath);
 
 
 

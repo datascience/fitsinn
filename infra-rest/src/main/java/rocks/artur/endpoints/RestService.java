@@ -84,6 +84,16 @@ public class RestService {
         return objects;
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/objectconflicts")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Iterable<CharacterisationResult> getConflictsPerObject(
+            @RequestParam(name = "filepath", required = true) @Parameter(name = "filepath", description = "Filepath of a digital object", example = "/home/user/file1") String filepath) {
+        Iterable<CharacterisationResult> objects = getObjects.getConflictsFromObject(filepath);
+        return objects;
+    }
+
+
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/statistics")
     public Map<String, Object> getCollectionStatistics() {

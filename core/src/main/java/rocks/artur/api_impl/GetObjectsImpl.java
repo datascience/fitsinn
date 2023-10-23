@@ -28,8 +28,8 @@ public class GetObjectsImpl implements GetObjects {
     }
 
     @Override
-    public Iterable<CharacterisationResult> getConflictsFromObject(String filePath) {
-        Iterable<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getConflictsByFilepath(filePath);
+    public List<CharacterisationResult> getConflictsFromObject(String filePath) {
+        List<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getConflictsByFilepath(filePath);
         return characterisationResultsByFilepath;
     }
 

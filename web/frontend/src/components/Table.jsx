@@ -4,7 +4,7 @@ import { tokens } from "../theme";
 
 import { useTheme } from "@mui/material";
 
-const Table = ({ data, columns, initialState, onRowClick }) => {
+const Table = ({ data, columns, initialState, onRowClick, rowFunction }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -39,6 +39,10 @@ const Table = ({ data, columns, initialState, onRowClick }) => {
         "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
           color: `${colors.grey[100]} !important`,
         },
+          '& .conflict': {
+              backgroundColor: colors.redAccent[700],
+              color: colors.greenAccent[300],
+          },
       }}
     >
       <DataGrid
@@ -47,6 +51,8 @@ const Table = ({ data, columns, initialState, onRowClick }) => {
         columns={columns}
         components={{ Toolbar: GridToolbar }}
         initialState={initialState}
+
+        getRowClassName={rowFunction}
       />
     </Box>
   );

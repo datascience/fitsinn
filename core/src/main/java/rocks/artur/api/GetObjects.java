@@ -13,5 +13,5 @@ public interface GetObjects {
     List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria);
     Iterable<CharacterisationResult> getObject(String filePath);
 
-    Iterable<CharacterisationResult> getConflictsFromObject(String filePath);
+    List<CharacterisationResult> getConflictsFromObject(String filePath);
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @CrossOrigin
@@ -83,6 +84,17 @@ public class RestService {
         Iterable<CharacterisationResult> objects = getObjects.getObject(filepath);
         return objects;
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/objectconflicts")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Property> getConflictsPerObject(
+            @RequestParam(name = "filepath", required = true) @Parameter(name = "filepath", description = "Filepath of a digital object", example = "/home/user/file1") String filepath) {
+        List<CharacterisationResult> objects = getObjects.getConflictsFromObject(filepath);
+        List<Property> collect = objects.stream().map(item -> item.getProperty()).collect(Collectors.toList());
+        return collect;
+    }
+
+
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/statistics")

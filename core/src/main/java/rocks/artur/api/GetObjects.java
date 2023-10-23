@@ -12,4 +12,6 @@ import java.util.List;
 public interface GetObjects {
     List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria);
     Iterable<CharacterisationResult> getObject(String filePath);
+
+    List<CharacterisationResult> getConflictsFromObject(String filePath);
 }

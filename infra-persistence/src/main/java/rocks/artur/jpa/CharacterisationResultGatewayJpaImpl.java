@@ -11,6 +11,7 @@ import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
 import rocks.artur.jpa.table.CharacterisationResultJPA;
 import rocks.artur.jpa.table.CharacterisationResultRepository;
+import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 import rocks.artur.jpa.view.CharacterisationResultViewRepository;
 
 import java.util.Comparator;
@@ -117,6 +118,14 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
+
+    public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
+        List<CharacterisationResultViewJPA> allJPAByFilePath = characterisationResultViewRepository.findAllByFilePath(filepath);
+        List<CharacterisationResult> result = allJPAByFilePath.stream().filter(item -> item.getValue().equals("CONFLICT")).map(item -> new CharacterisationResult(Property.valueOf(item.getProperty()), item.getValue(),
+                ValueType.valueOf(item.getValueType()), null, item.getFilePath())).collect(Collectors.toList());
+        return result;
+    }
+
     @Override
     public Map<String, Object> getSizeStatistics() {
         Map<String, Object> result = new HashMap<>();
@@ -133,6 +142,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
         Long totalCount = characterisationResultViewRepository.getTotalCount();
         result.put("totalCount", totalCount);
+
+        Long conflictRate = characterisationResultViewRepository.getConflictCount();
+        result.put("conflictRate", conflictRate);
 
         List<Object[]> sizeDistribution = characterisationResultViewRepository.getSizeDistribution();
 
@@ -199,5 +211,12 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
         LOG.debug("saving " + collect);
         characterisationResultRepository.saveAll(collect);
+    }
+
+    @Override
+    public double getConflictRate() {
+        Long totalCount = characterisationResultViewRepository.getTotalCount();
+        Long conflictCount = characterisationResultViewRepository.getConflictCount();
+        return conflictCount/(double)totalCount;
     }
 }

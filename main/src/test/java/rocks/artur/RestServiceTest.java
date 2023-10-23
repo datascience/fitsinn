@@ -155,6 +155,16 @@ class RestServiceTest {
     }
 
     @Test
+    void getObjectConflictsTest() {
+        String str = given().port(port).param("filepath","/home/artur/file1")
+                .when().post("/objectconflicts")
+                .then()
+                .statusCode(200).extract().asString();
+        System.out.println("Result: " + str);
+    }
+
+
+    @Test
     void getPropertyDistributionWithFilterTest() {
         String str = given().port(port)
                 .param("filter", "FORMAT=\"Portable Document Format\"")

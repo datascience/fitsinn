@@ -96,6 +96,7 @@ class CharacterisationResultGatewayImplTest {
     void getCollectionStatisticsTest() {
         Map<String, Object> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics();
         Assert.assertEquals(10047L, Long.valueOf(sizeStatistics.get("totalSize").toString()).longValue());
+        System.out.println(sizeStatistics);
     }
 
 
@@ -113,5 +114,12 @@ class CharacterisationResultGatewayImplTest {
         properties.add(Property.FORMAT);
         List<String[]> samples = characterisationResultGatewaySqlImpl.getSamples(null, SamplingAlgorithms.SELECTIVE_FEATURE_DISTRIBUTION, properties);
         Assert.assertEquals(2, samples.size());
+    }
+
+    @Test
+    void getConflictRateTest() {
+
+        double conflictRate = characterisationResultGatewaySqlImpl.getConflictRate();
+        Assert.assertEquals(0.333333333333,conflictRate, 0.01);
     }
 }

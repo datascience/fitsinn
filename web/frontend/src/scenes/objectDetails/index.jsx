@@ -49,14 +49,31 @@ const ObjectDetails = () => {
         );
         const data = await response.json();
 
+
+        const response2 = await fetch(
+            BACKEND_URL +
+            "/objectconflicts?" +
+            new URLSearchParams({
+              filepath: state.objectdetails,
+            }),
+            requestOptions
+        );
+        const conflictedProps = await response2.json();
+
+
+
         let id = 0;
         var tmp = data.map((stat) => {
           var res = stat;
           res.id = id++;
+          if (conflictedProps.includes(res.property)) {
+            res.conflict=true
+          }
           return res;
         });
-
+        console.log(tmp)
         setData(tmp);
+
       } catch (error) {
         console.log(error);
       }
@@ -88,6 +105,12 @@ const ObjectDetails = () => {
     },
   ];
 
+
+  const rowFunction = (params) => {
+    return params.row.conflict ? 'conflict': '' ;
+  }
+
+
   return (
     <Box m="20px">
       <Header
@@ -95,7 +118,7 @@ const ObjectDetails = () => {
         subtitle={"on: " + state.objectdetails}
       ></Header>
       <Box height="75vh">
-        <Table data={data} columns={columns} initialState={initialState} />
+        <Table data={data} columns={columns} initialState={initialState} rowFunction={rowFunction}/>
       </Box>
     </Box>
   );

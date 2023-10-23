@@ -5,5 +5,5 @@ import java.util.Map;
 public interface GetCollectionStatistics {
     Map<String, Object> getSizeStatistics();
 
-    Double getConflictRate();
+    double getConflictRate();
 }

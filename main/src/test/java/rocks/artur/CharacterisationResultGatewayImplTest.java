@@ -96,6 +96,7 @@ class CharacterisationResultGatewayImplTest {
     void getCollectionStatisticsTest() {
         Map<String, Object> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics();
         Assert.assertEquals(10047L, Long.valueOf(sizeStatistics.get("totalSize").toString()).longValue());
+        System.out.println(sizeStatistics);
     }
 
 

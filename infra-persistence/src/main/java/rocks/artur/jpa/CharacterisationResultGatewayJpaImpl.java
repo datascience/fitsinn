@@ -143,6 +143,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         Long totalCount = characterisationResultViewRepository.getTotalCount();
         result.put("totalCount", totalCount);
 
+        Long conflictRate = characterisationResultViewRepository.getConflictCount();
+        result.put("conflictRate", conflictRate);
+
         List<Object[]> sizeDistribution = characterisationResultViewRepository.getSizeDistribution();
 
         List<PropertyValueStatistic> collect = sizeDistribution.stream()

@@ -19,6 +19,7 @@ const Dashboard = () => {
     ],
     minSize: 4,
     maxSize: 10000,
+    conflictRate: 0.17,
   });
 
   useEffect(() => {
@@ -98,6 +99,15 @@ const Dashboard = () => {
               ? 0
               : (sizeStatistics.maxSize / 1024 / 1024).toFixed(2)
           }
+        />
+
+        <Stat
+            title="Conflct Rate (%)"
+            value={
+              sizeStatistics.conflictRate == null
+                  ? 0
+                  : (sizeStatistics.conflictRate * 100).toFixed(2)
+            }
         />
       </Grid2>
       <Grid2 container spacing={1}>

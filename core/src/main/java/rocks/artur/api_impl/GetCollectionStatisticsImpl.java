@@ -20,7 +20,7 @@ public class GetCollectionStatisticsImpl implements GetCollectionStatistics {
     }
 
     @Override
-    public Double getConflictRate() {
-        return 17.0;
+    public double getConflictRate() {
+        return characterisationResultGateway.getConflictRate();
     }
 }

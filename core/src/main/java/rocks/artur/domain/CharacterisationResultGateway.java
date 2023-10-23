@@ -75,4 +75,6 @@ public interface CharacterisationResultGateway {
     List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties);
 
     void addCharacterisationResults(List<CharacterisationResult> characterisationResults);
+
+    double getConflictRate();
 }

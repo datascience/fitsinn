@@ -209,4 +209,11 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         LOG.debug("saving " + collect);
         characterisationResultRepository.saveAll(collect);
     }
+
+    @Override
+    public double getConflictRate() {
+        Long totalCount = characterisationResultViewRepository.getTotalCount();
+        Long conflictCount = characterisationResultViewRepository.getConflictCount();
+        return conflictCount/(double)totalCount;
+    }
 }

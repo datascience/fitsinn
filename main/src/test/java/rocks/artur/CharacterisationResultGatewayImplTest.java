@@ -114,4 +114,11 @@ class CharacterisationResultGatewayImplTest {
         List<String[]> samples = characterisationResultGatewaySqlImpl.getSamples(null, SamplingAlgorithms.SELECTIVE_FEATURE_DISTRIBUTION, properties);
         Assert.assertEquals(2, samples.size());
     }
+
+    @Test
+    void getConflictRateTest() {
+
+        double conflictRate = characterisationResultGatewaySqlImpl.getConflictRate();
+        Assert.assertEquals(0.333333333333,conflictRate, 0.01);
+    }
 }

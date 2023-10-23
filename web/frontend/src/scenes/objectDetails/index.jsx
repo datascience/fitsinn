@@ -52,7 +52,7 @@ const ObjectDetails = () => {
 
         const response2 = await fetch(
             BACKEND_URL +
-            "/objectConflicts?" +
+            "/objectconflicts?" +
             new URLSearchParams({
               filepath: state.objectdetails,
             }),
@@ -71,6 +71,7 @@ const ObjectDetails = () => {
           }
           return res;
         });
+        console.log(tmp)
         setData(tmp);
 
       } catch (error) {

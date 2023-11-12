@@ -79,13 +79,17 @@ def crh_weather(dataset, iti):
     con_count = np.zeros(nos)  # Count of continuous data for each source
 
     # CRH iteration
-    for i in range(1, iti + 1):
+    for i in range(iti):
         score1 = np.zeros(nos)
         score2 = np.zeros(nos)
 
         # Update weight
-        for j in range(nof):
-            if pd.api.types.is_string_dtype(dataset.at[j, 1]):  # Categorical data
+        
+        for j in range(len(dataset)):
+            print(dataset.loc[j])
+            val = dataset.loc[j].values[1]
+            if not val.isdigit():
+           # if pd.api.types.is_string_dtype(dataset.at[j, 1]):  # Categorical data
                 score1[dataset.at[j, 2]] += int(truth_matrix[j] != dataset.at[j, 1])
 
                 if i == 2:

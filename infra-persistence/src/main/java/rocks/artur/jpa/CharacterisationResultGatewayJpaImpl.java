@@ -118,6 +118,21 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
+    @Override
+    public List<CharacterisationResult> getCharacterisationResultsByFilepathProperty(String filepath, Property property) {
+        List<CharacterisationResultJPA> allJPAByFilePath = characterisationResultRepository.findAllByFilePath(filepath);
+        List<CharacterisationResult> result = allJPAByFilePath.stream().filter(item -> item.getProperty().equals(property.toString())).map(item -> new CharacterisationResult(Property.valueOf(item.getProperty()), item.getValue(),
+                ValueType.valueOf(item.getValueType()), item.getSource(), item.getFilePath())).collect(Collectors.toList());
+        return result;
+    }
+
+    @Override
+    public List<String[]> getFilepathProperty() {
+        List<Object[]> filepathProperty = characterisationResultRepository.getFilepathProperty();
+        List<String[]> result = filepathProperty.stream().map(item -> new String[]{item[0].toString(), item[1].toString()}).collect(Collectors.toList());
+        return result;
+    }
+
 
     public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
         List<CharacterisationResultViewJPA> allJPAByFilePath = characterisationResultViewRepository.findAllByFilePath(filepath);

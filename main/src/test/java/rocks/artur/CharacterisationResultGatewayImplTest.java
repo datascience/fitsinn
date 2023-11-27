@@ -122,4 +122,26 @@ class CharacterisationResultGatewayImplTest {
         double conflictRate = characterisationResultGatewaySqlImpl.getConflictRate();
         Assert.assertEquals(0.333333333333,conflictRate, 0.01);
     }
+
+
+    @Test
+    void getConflictsByFilepathTest() {
+        List<String[]> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
+        Assert.assertEquals(8,filepathProperty.size());
+    }
+
+
+    @Test
+    void getCharacterisationResultsByFilepathPropertyTest() {
+        List<String[]> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
+
+        List<CharacterisationResult> results = new ArrayList<>();
+
+        for (String[] strings : filepathProperty) {
+            List<CharacterisationResult> characterisationResultsByFilepathProperty = characterisationResultGatewaySqlImpl.getCharacterisationResultsByFilepathProperty(strings[0], Property.valueOf(strings[1]));
+            results.addAll(characterisationResultsByFilepathProperty);
+        }
+
+        Assert.assertEquals(8,results.size());
+    }
 }

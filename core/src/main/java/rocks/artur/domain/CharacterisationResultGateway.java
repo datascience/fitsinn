@@ -42,6 +42,10 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath);
 
+    List<CharacterisationResult> getCharacterisationResultsByFilepathProperty(String filepath, Property property);
+
+    List<String[]> getFilepathProperty();
+
     /**
      * gets a list of characterisation results with conflicts for a given digital object.
      *

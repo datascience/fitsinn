@@ -87,4 +87,34 @@ public class CharacterisationResult {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CharacterisationResult that = (CharacterisationResult) o;
+
+        if (property != that.property) return false;
+        if ( value != null && !value.equals(that.value) ) return false;
+        if ( that.value != null && !that.value.equals(value) ) return false;
+        if (valueType != that.valueType) return false;
+        if ( source != null && !source.equals(that.source) ) return false;
+        if ( that.source != null && !that.source.equals(source) ) return false;
+
+        if ( filePath != null && !filePath.equals(that.filePath) ) return false;
+        if ( that.filePath != null && !that.filePath.equals(filePath) ) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = property.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (valueType != null ? valueType.hashCode() : 0);
+        result = 31 * result + (source != null ? source.hashCode() : 0);
+        result = 31 * result + filePath.hashCode();
+        return result;
+    }
 }

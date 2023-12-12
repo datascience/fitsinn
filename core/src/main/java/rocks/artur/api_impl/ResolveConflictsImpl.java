@@ -5,8 +5,10 @@ import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.CharacterisationResultGateway;
 import rocks.artur.domain.Property;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,8 @@ public class ResolveConflictsImpl implements ResolveConflicts {
     }
 
     List<String> sources;
-    Double[] sourceWeights;
+    Map<String, Double> sourceWeights;
+    Map<CharacterisationResult, String> truth;
 
     void getData() {
 
@@ -40,35 +43,36 @@ public class ResolveConflictsImpl implements ResolveConflicts {
 
         sources = characterisationResultGateway.getSources();
 
-        Map<String, Double> sourceWeights = sources.stream().collect(Collectors.toMap(
+        sourceWeights = sources.stream().collect(Collectors.toMap(
                 Function.identity(),
                 s -> 1.0 / sources.size()));
 
 
-        List<CharacterisationResult> characterisationResultsAll = characterisationResultGateway.getCharacterisationResults(null);
-        Map<CharacterisationResult, Double> weightMatrix = characterisationResultsAll.stream().collect(Collectors.toMap(Function.identity(), s -> 0.0));
-
+        truth = new HashMap<>();
         for (String[] entry : entries) {
             List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByFilepathProperty(entry[0], Property.valueOf(entry[1]));
 
             if (characterisationResults.size() > 0) {
                 CharacterisationResult firstResult = characterisationResults.get(0);
-                switch (firstResult.getValueType()) {
-
-                    case STRING -> {
-
-                    }
-                    case BOOL -> {
-                    }
-                    case INTEGER -> {
-                    }
-                    case FLOAT -> {
-                    }
-                    case TIMESTAMP -> {
-                    }
-                    case UID -> {
+                Map<String, Double> votingScores = new HashMap<>();
+                for (CharacterisationResult characterisationResult : characterisationResults) {
+                    String source = characterisationResult.getSource();
+                    Double sourceWeight = sourceWeights.get(source);
+                    String value = characterisationResult.getValue();
+                    if (votingScores.containsKey(value)) {
+                        Double score = votingScores.get(value);
+                        votingScores.put(value, score + sourceWeight);
+                    } else {
+                        votingScores.put(value, sourceWeight);
                     }
                 }
+                Optional<Map.Entry<String, Double>> first = votingScores.entrySet().stream().max(Map.Entry.comparingByValue());
+                if (first.isPresent()) {
+                    String trueValue = first.get().getKey();
+                    truth.put(firstResult, trueValue);
+                }
+
+
             }
 
         }

@@ -1,9 +1,9 @@
 package rocks.artur.api_impl;
 
 import rocks.artur.api.ResolveConflicts;
+import rocks.artur.api_impl.filter.Entry;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.CharacterisationResultGateway;
-import rocks.artur.domain.Property;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,18 +13,25 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ResolveConflictsImpl implements ResolveConflicts {
+
+
     private CharacterisationResultGateway characterisationResultGateway;
+
+    public ResolveConflictsImpl(CharacterisationResultGateway characterisationResultGateway) {
+        this.characterisationResultGateway = characterisationResultGateway;
+    }
 
     @Override
     public void run() {
-
-
-        getData();
-        generateTruth();
+        init();
         updateWeights();
+        for (int i = 0; i < 3; i++) {
+            scoring();
+            updateWeights();
+        }
     }
 
-    private void updateWeights() {
+    private void scoring() {
         Map<String, Double> score = sources.stream().collect(Collectors.toMap(
                 Function.identity(),
                 s -> 0.0));
@@ -34,10 +41,10 @@ public class ResolveConflictsImpl implements ResolveConflicts {
                 s -> 0.0));
 
 
-        List<String[]> entries = characterisationResultGateway.getFilepathProperty();
+        List<Entry> entries = characterisationResultGateway.getFilepathProperty();
 
-        for (String[] entry : entries) {
-            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByFilepathProperty(entry[0], Property.valueOf(entry[1]));
+        for (Entry entry : entries) {
+            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByFilepathProperty(entry.getFilepath(), entry.getProperty());
 
             for (CharacterisationResult characterisationResult : characterisationResults) {
 
@@ -71,30 +78,10 @@ public class ResolveConflictsImpl implements ResolveConflicts {
         }
     }
 
-    private void generateTruth() {
-
-    }
-
-    List<String> sources;
-    Map<String, Double> sourceWeights;
-    Map<String[], String> truth;
-
-    void getData() {
-
-
-        List<String[]> entries = characterisationResultGateway.getFilepathProperty();
-
-
-        sources = characterisationResultGateway.getSources();
-
-        sourceWeights = sources.stream().collect(Collectors.toMap(
-                Function.identity(),
-                s -> 1.0 / sources.size()));
-
-
-        truth = new HashMap<>();
-        for (String[] entry : entries) {
-            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByFilepathProperty(entry[0], Property.valueOf(entry[1]));
+    private void updateWeights() {
+        List<Entry> entries = characterisationResultGateway.getFilepathProperty();
+        for (Entry entry : entries) {
+            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByFilepathProperty(entry.getFilepath(), entry.getProperty());
 
             if (characterisationResults.size() > 0) {
                 CharacterisationResult firstResult = characterisationResults.get(0);
@@ -111,11 +98,22 @@ public class ResolveConflictsImpl implements ResolveConflicts {
                     String trueValue = first.get().getKey();
                     truth.put(entry, trueValue);
                 }
-
-
             }
-
         }
+    }
+
+    List<String> sources;
+    Map<String, Double> sourceWeights;
+    Map<Entry, String> truth;
+
+    void init() {
+
+        sources = characterisationResultGateway.getSources();
+        sourceWeights = sources.stream().collect(Collectors.toMap(
+                Function.identity(),
+                s -> 1.0 / sources.size()));
+        truth = new HashMap<>();
+
 
     }
 }

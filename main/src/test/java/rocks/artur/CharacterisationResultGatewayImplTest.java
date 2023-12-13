@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import rocks.artur.api_impl.filter.Entry;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
@@ -126,19 +127,19 @@ class CharacterisationResultGatewayImplTest {
 
     @Test
     void getConflictsByFilepathTest() {
-        List<String[]> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
+        List<Entry> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
         Assert.assertEquals(8,filepathProperty.size());
     }
 
 
     @Test
     void getCharacterisationResultsByFilepathPropertyTest() {
-        List<String[]> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
+        List<Entry> filepathProperty = characterisationResultGatewaySqlImpl.getFilepathProperty();
 
         List<CharacterisationResult> results = new ArrayList<>();
 
-        for (String[] strings : filepathProperty) {
-            List<CharacterisationResult> characterisationResultsByFilepathProperty = characterisationResultGatewaySqlImpl.getCharacterisationResultsByFilepathProperty(strings[0], Property.valueOf(strings[1]));
+        for (Entry strings : filepathProperty) {
+            List<CharacterisationResult> characterisationResultsByFilepathProperty = characterisationResultGatewaySqlImpl.getCharacterisationResultsByFilepathProperty(strings.getFilepath(), strings.getProperty());
             results.addAll(characterisationResultsByFilepathProperty);
         }
 

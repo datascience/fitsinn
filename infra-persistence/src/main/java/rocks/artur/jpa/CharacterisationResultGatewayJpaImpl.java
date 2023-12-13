@@ -4,6 +4,7 @@ package rocks.artur.jpa;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.artur.api_impl.filter.Entry;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
@@ -127,9 +128,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     }
 
     @Override
-    public List<String[]> getFilepathProperty() {
+    public List<Entry> getFilepathProperty() {
         List<Object[]> filepathProperty = characterisationResultRepository.getFilepathProperty();
-        List<String[]> result = filepathProperty.stream().map(item -> new String[]{item[0].toString(), item[1].toString()}).collect(Collectors.toList());
+        List<Entry> result = filepathProperty.stream().map(item -> new Entry(item[0].toString(), item[1].toString())).collect(Collectors.toList());
         return result;
     }
 

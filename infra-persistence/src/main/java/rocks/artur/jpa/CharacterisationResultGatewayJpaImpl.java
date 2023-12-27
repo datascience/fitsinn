@@ -4,7 +4,7 @@ package rocks.artur.jpa;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.artur.api_impl.filter.Entry;
+import rocks.artur.api_impl.Entry;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;

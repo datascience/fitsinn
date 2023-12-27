@@ -1,6 +1,6 @@
 package rocks.artur.domain;
 
-import rocks.artur.api_impl.filter.Entry;
+import rocks.artur.api_impl.Entry;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;

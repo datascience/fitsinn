@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import rocks.artur.api_impl.filter.Entry;
+import rocks.artur.api_impl.Entry;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
@@ -143,6 +143,6 @@ class CharacterisationResultGatewayImplTest {
             results.addAll(characterisationResultsByFilepathProperty);
         }
 
-        Assert.assertEquals(8,results.size());
+        Assert.assertEquals(10,results.size());
     }
 }

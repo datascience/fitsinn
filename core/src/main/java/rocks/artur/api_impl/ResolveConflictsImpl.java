@@ -1,7 +1,6 @@
 package rocks.artur.api_impl;
 
 import rocks.artur.api.ResolveConflicts;
-import rocks.artur.api_impl.filter.Entry;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.CharacterisationResultGateway;
 

@@ -1,4 +1,4 @@
-package rocks.artur.api_impl.filter;
+package rocks.artur.api_impl;
 
 import rocks.artur.domain.Property;
 
@@ -42,14 +42,17 @@ public class Entry {
 
         Entry entry = (Entry) o;
 
-        if (!getFilepath().equals(entry.getFilepath())) return false;
-        return getProperty() == entry.getProperty();
+        if (!filepath.equals(entry.getFilepath())) return false;
+        return property == entry.getProperty();
     }
 
     @Override
     public int hashCode() {
-        int result = getFilepath().hashCode();
-        result = 31 * result + getProperty().hashCode();
+        if (filepath == null || property == null) {
+            return 0;
+        }
+        int result = filepath.hashCode();
+        result = 31 * result + property.hashCode();
         return result;
     }
 }

@@ -7,7 +7,7 @@ VALUES ('/home/artur', 'EXTERNALIDENTIFIER', 'Droid:3', 'fmt/18', 'STRING');
 INSERT INTO characterisationresult(filePath, property, source, property_value, valueType)
 VALUES ('/home/artur', 'MIMETYPE', 'Droid:3', 'application/pdf', 'STRING');
 INSERT INTO characterisationresult(filePath, property, source, property_value, valueType)
-VALUES ('/home/artur', 'MIMETYPE', 'TIKA:2', 'application/pdf', 'STRING');
+VALUES ('/home/artur', 'MIMETYPE', 'TIKA:2', 'application/doc', 'STRING');
 INSERT INTO characterisationresult(filePath, property, source, property_value, valueType)
 VALUES ('/home/artur', 'MIMETYPE', 'file utility:5.03', 'application/doc', 'STRING');
 INSERT INTO characterisationresult(filePath, property, source, property_value, valueType)

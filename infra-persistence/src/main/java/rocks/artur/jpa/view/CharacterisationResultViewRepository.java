@@ -17,6 +17,10 @@ public interface CharacterisationResultViewRepository extends JpaRepository<Char
     @Query("select count(*) as count from CharacterisationResultViewJPA where value='CONFLICT'")
     Long getConflictCount();
 
+
+    @Query("select distinct filePath, property from CharacterisationResultViewJPA where value='CONFLICT'")
+    List<String[]> getConflictEntries();
+
     List<CharacterisationResultViewJPA> findAllByFilePath(String filePath);
 
 

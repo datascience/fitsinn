@@ -1,6 +1,5 @@
 package rocks.artur.domain;
 
-import rocks.artur.api_impl.Entry;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
@@ -43,9 +42,11 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath);
 
-    List<CharacterisationResult> getCharacterisationResultsByFilepathProperty(String filepath, Property property);
+    List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry);
 
-    List<Entry> getFilepathProperty();
+    List<Entry> getConflictEntries();
+
+    List<Entry> getEntries();
 
     /**
      * gets a list of characterisation results with conflicts for a given digital object.
@@ -82,4 +83,6 @@ public interface CharacterisationResultGateway {
     void addCharacterisationResults(List<CharacterisationResult> characterisationResults);
 
     double getConflictRate();
+
+    void delete(CharacterisationResult characterisationResult);
 }

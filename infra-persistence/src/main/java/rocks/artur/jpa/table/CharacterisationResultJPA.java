@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import rocks.artur.domain.CharacterisationResult;
+import rocks.artur.domain.Property;
+import rocks.artur.domain.ValueType;
 
 
 @Entity
@@ -27,6 +30,15 @@ public class CharacterisationResultJPA {
     @Column(name = "valuetype")
     private String valueType;
 
+    public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
+        this.filePath = characterisationResult.getFilePath();
+        this.source = characterisationResult.getSource();
+        this.value = characterisationResult.getValue();
+        this.valueType = characterisationResult.getValueType().toString();
+        this.property = characterisationResult.getProperty().toString();
+    }
+
+    public CharacterisationResultJPA(){}
 
     public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
         CharacterisationResultJPA result = new CharacterisationResultJPA();
@@ -87,6 +99,19 @@ public class CharacterisationResultJPA {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+
+    public CharacterisationResult toCharacterisationResult(){
+        CharacterisationResult result = new CharacterisationResult();
+
+        result.setValue(this.value);
+        result.setSource(this.source);
+        result.setProperty(Property.valueOf(this.property.toUpperCase()));
+        result.setValueType(ValueType.valueOf(this.valueType.toUpperCase()));
+        result.setFilePath(this.filePath);
+
+        return result;
     }
 
 }

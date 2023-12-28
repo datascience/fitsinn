@@ -1,6 +1,4 @@
-package rocks.artur.api_impl;
-
-import rocks.artur.domain.Property;
+package rocks.artur.domain;
 
 public class Entry {
     String filepath;
@@ -54,5 +52,13 @@ public class Entry {
         int result = filepath.hashCode();
         result = 31 * result + property.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Entry{" +
+                "filepath='" + filepath + '\'' +
+                ", property=" + property +
+                '}';
     }
 }

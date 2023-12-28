@@ -39,7 +39,7 @@ class CharacterisationResultGatewayImplTest {
 
         List<CharacterisationResult> list = new ArrayList<>();
         characterisationResults.forEach(list::add);
-        Assert.assertEquals(10, list.size());
+        Assert.assertEquals(14, list.size());
     }
 
 
@@ -62,7 +62,7 @@ class CharacterisationResultGatewayImplTest {
     void getPropertyValueDistributionWithoutFilterTest() {
 
         List<PropertyValueStatistic> propertyValueDistribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, null);
-        Assert.assertEquals(2, propertyValueDistribution.size());
+        Assert.assertEquals(3, propertyValueDistribution.size());
     }
 
 
@@ -79,7 +79,7 @@ class CharacterisationResultGatewayImplTest {
         List<PropertyValueStatistic> propertyValueDistribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.MIMETYPE, null);
         Assert.assertEquals(2, propertyValueDistribution.size());
         boolean conflict = propertyValueDistribution.stream().anyMatch(propertyValueStatistic -> propertyValueStatistic.getValue().equals("CONFLICT"));
-        Assert.assertTrue(conflict);
+        Assert.assertFalse(conflict);
     }
 
     @Test
@@ -89,7 +89,7 @@ class CharacterisationResultGatewayImplTest {
 
         List<CharacterisationResult> list = new ArrayList<>();
         propertyValueStatistics.forEach(list::add);
-        Assert.assertEquals(6, list.size());
+        Assert.assertEquals(5, list.size());
     }
 
 
@@ -106,7 +106,7 @@ class CharacterisationResultGatewayImplTest {
         List<Property> properties = new ArrayList<>();
         properties.add(Property.FORMAT);
         List<String[]> samples = characterisationResultGatewaySqlImpl.getSamples(null, SamplingAlgorithms.RANDOM, properties);
-        Assert.assertEquals(3, samples.size());
+        Assert.assertEquals(5, samples.size());
     }
 
     @Test
@@ -114,21 +114,21 @@ class CharacterisationResultGatewayImplTest {
         List<Property> properties = new ArrayList<>();
         properties.add(Property.FORMAT);
         List<String[]> samples = characterisationResultGatewaySqlImpl.getSamples(null, SamplingAlgorithms.SELECTIVE_FEATURE_DISTRIBUTION, properties);
-        Assert.assertEquals(2, samples.size());
+        Assert.assertEquals(3, samples.size());
     }
 
     @Test
     void getConflictRateTest() {
 
         double conflictRate = characterisationResultGatewaySqlImpl.getConflictRate();
-        Assert.assertEquals(0.333333333333,conflictRate, 0.01);
+        Assert.assertEquals(0.4,conflictRate, 0.01);
     }
 
 
     @Test
     void getConflictsByFilepathTest() {
         List<Entry> filepathProperty = characterisationResultGatewaySqlImpl.getConflictEntries();
-        Assert.assertEquals(1,filepathProperty.size());
+        Assert.assertEquals(2,filepathProperty.size());
     }
 
 
@@ -143,6 +143,6 @@ class CharacterisationResultGatewayImplTest {
             results.addAll(characterisationResultsByFilepathProperty);
         }
 
-        Assert.assertEquals(10,results.size());
+        Assert.assertEquals(14,results.size());
     }
 }

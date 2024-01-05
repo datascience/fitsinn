@@ -25,12 +25,15 @@ public class ResolveConflictsImpl implements ResolveConflicts {
     public void run() {
         init();
         System.out.println(sourceWeights);
-        updateWeights();
+        System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
+        updateTruth();
+        System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
         System.out.println(truth);
         for (int i = 0; i < 3; i++) {
-            scoring();
-            System.out.println(sourceWeights);
             updateWeights();
+            System.out.println(sourceWeights);
+            System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
+            updateTruth();
             System.out.println(truth);
         }
 
@@ -53,7 +56,7 @@ public class ResolveConflictsImpl implements ResolveConflicts {
         });
     }
 
-    private void scoring() {
+    private void updateWeights() {
         Map<String, Double> score = sources.stream().collect(Collectors.toMap(
                 Function.identity(),
                 s -> 0.0));
@@ -85,25 +88,31 @@ public class ResolveConflictsImpl implements ResolveConflicts {
         for (String source : score.keySet()) {
             Double countSource = count.getOrDefault(source, 1.0);
             if (countSource == 0 ) {
-                countSource = 1d;
+                score.put(source, 0d);
+            } else {
+                score.put(source, score.get(source) / countSource);
             }
-            score.put(source, score.get(source) / countSource);
         }
         Double sum = score.values().stream().reduce(0.0, (a, b) -> a + b);
 
         score.replaceAll((s, v) -> score.get(s) / sum);
 
-        Optional<Map.Entry<String, Double>> max = score.entrySet().stream().max(Map.Entry.comparingByValue());
-        if (max.isPresent()) {
-            Double norm_score = max.get().getValue();
+        //Optional<Map.Entry<String, Double>> max = score.entrySet().stream().max(Map.Entry.comparingByValue());
+        //if (max.isPresent()) {
+           // Double norm_score = max.get().getValue();
             for (String source : score.keySet()) {
-                double w = score.get(source) / norm_score;
-                sourceWeights.put(source, -Math.log(w) + 0.00001);
-            }
+               // double w = score.get(source) / norm_score;
+                Double weig = score.get(source);
+                if (weig == 0d) {
+                    sourceWeights.put(source,0.00001);
+                } else {
+                    sourceWeights.put(source, -Math.log(weig));
+                }
+         //   }
         }
     }
 
-    private void updateWeights() {
+    private void updateTruth() {
         List<Entry> entries = characterisationResultGateway.getConflictEntries();
         for (Entry entry : entries) {
             List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry);

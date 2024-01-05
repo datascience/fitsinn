@@ -37,11 +37,13 @@ public class RestService {
     AnalyzePersistFile analyzePersistFile;
     GetCollectionStatistics getCollectionStatistics;
 
+    ResolveConflicts resolveConflicts;
+
     public RestService(GetProperties getProperties,
                        GetPropertyValueDistribution getPropertyValueDistribution,
                        AnalyzePersistFile analyzePersistFile,
                        GetObjects getObjects, GetCollectionStatistics getCollectionStatistics,
-                       GetSources getSources, GetSamples getSamples) {
+                       GetSources getSources, GetSamples getSamples, ResolveConflicts resolveConflicts) {
         this.getProperties = getProperties;
         this.getObjects = getObjects;
         this.getPropertyValueDistribution = getPropertyValueDistribution;
@@ -49,6 +51,7 @@ public class RestService {
         this.getCollectionStatistics = getCollectionStatistics;
         this.getSources = getSources;
         this.getSamples = getSamples;
+        this.resolveConflicts = resolveConflicts;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/health")
@@ -199,5 +202,12 @@ public class RestService {
                 Response.ok(totalCount).build();
 
         return response;
+    }
+
+
+    @RequestMapping(method = RequestMethod.POST, value = "/resolveconflicts")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void  resolveConflicts() throws ParseException {
+        resolveConflicts.run();
     }
 }

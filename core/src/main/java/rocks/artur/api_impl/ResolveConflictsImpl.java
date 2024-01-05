@@ -25,16 +25,16 @@ public class ResolveConflictsImpl implements ResolveConflicts {
     public void run() {
         init();
         System.out.println(sourceWeights);
-        System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
+        //System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
         updateTruth();
         System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
-        System.out.println(truth);
+        //System.out.println(truth);
         for (int i = 0; i < 3; i++) {
             updateWeights();
             System.out.println(sourceWeights);
             System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
             updateTruth();
-            System.out.println(truth);
+            //System.out.println(truth);
         }
 
         resolveConflicts();
@@ -66,7 +66,7 @@ public class ResolveConflictsImpl implements ResolveConflicts {
                 s -> 0.0));
 
 
-        List<Entry> entries = characterisationResultGateway.getConflictEntries();
+        List<Entry> entries = characterisationResultGateway.getEntries();
 
         for (Entry entry : entries) {
             List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry);
@@ -113,7 +113,7 @@ public class ResolveConflictsImpl implements ResolveConflicts {
     }
 
     private void updateTruth() {
-        List<Entry> entries = characterisationResultGateway.getConflictEntries();
+        List<Entry> entries = characterisationResultGateway.getEntries();
         for (Entry entry : entries) {
             List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry);
 

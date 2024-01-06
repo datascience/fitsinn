@@ -45,7 +45,7 @@ const Dashboard = () => {
           BACKEND_URL + "/statistics",
           requestOptions
         );
-        const data = await response.json();
+        const data = response.json();
 
         setSizeStatistics(data);
       } catch (error) {
@@ -60,7 +60,13 @@ const Dashboard = () => {
 
   const handleClick = () => {
     new Promise((resolve, reject) => {
-      setTimeout(() => resolve("resolved"), 2000);
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      fetch(BACKEND_URL + "/resolveconflicts", requestOptions);
+      resolve("ok");
     }).then((result) => {
       setResolveButtonText("resolved");
       setResolveButtonColor(colors.blueAccent[700]);

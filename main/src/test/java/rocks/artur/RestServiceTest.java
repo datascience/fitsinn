@@ -230,4 +230,13 @@ class RestServiceTest {
 
         Assert.assertNotNull(str);
     }
+
+    @Test
+    void resolveConflictsTest() {
+        String str = given().port(port)
+                .when().post("/resolveconflicts")
+                .then()
+                .statusCode(200).extract().asString();
+        System.out.println("Result: " + str);
+    }
 }

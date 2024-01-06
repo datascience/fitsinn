@@ -97,18 +97,18 @@ public class ResolveConflictsImpl implements ResolveConflicts {
 
         score.replaceAll((s, v) -> score.get(s) / sum);
 
-        //Optional<Map.Entry<String, Double>> max = score.entrySet().stream().max(Map.Entry.comparingByValue());
-        //if (max.isPresent()) {
-           // Double norm_score = max.get().getValue();
+        Optional<Map.Entry<String, Double>> max = score.entrySet().stream().max(Map.Entry.comparingByValue());
+        if (max.isPresent()) {
+            Double norm_score = max.get().getValue();
             for (String source : score.keySet()) {
-               // double w = score.get(source) / norm_score;
+                double w = score.get(source) / norm_score;
                 Double weig = score.get(source);
-                if (weig == 0d) {
+                if (w == 0d) {
                     sourceWeights.put(source,0.00001);
                 } else {
-                    sourceWeights.put(source, -Math.log(weig));
+                    sourceWeights.put(source, -Math.log(w));
                 }
-         //   }
+            }
         }
     }
 

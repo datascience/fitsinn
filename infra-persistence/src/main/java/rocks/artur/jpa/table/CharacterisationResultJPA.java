@@ -19,15 +19,17 @@ public class CharacterisationResultJPA {
     @Column(nullable = false, name = "filepath")
     private String filePath;
     @Id
+    @Column(nullable = false)
     private String property;
 
     @Id
+    @Column(nullable = false)
     private String source;
 
-    @Column(name = "property_value")
+    @Column(name = "property_value", nullable = false)
     private String value;
 
-    @Column(name = "valuetype")
+    @Column(name = "valuetype", nullable = false)
     private String valueType;
 
     public CharacterisationResultJPA(CharacterisationResult characterisationResult) {

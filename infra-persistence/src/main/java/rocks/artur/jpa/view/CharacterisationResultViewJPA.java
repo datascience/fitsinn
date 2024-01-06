@@ -17,11 +17,12 @@ public class CharacterisationResultViewJPA {
     @Column(nullable = false, name = "filepath")
     private String filePath;
     @Id
+    @Column(nullable = false)
     private String property;
-    @Column(name = "property_value")
+    @Column(nullable = false, name = "property_value")
     private String value;
 
-    @Column(name = "valuetype")
+    @Column(nullable = false, name = "valuetype")
     private String valueType;
 
 

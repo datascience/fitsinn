@@ -77,7 +77,7 @@ public class ResolveConflictsImpl implements ResolveConflicts {
 
                 String value = characterisationResult.getValue();
                 String source = characterisationResult.getSource();
-                if (trueValue.equals(value)) {
+                if (value.equals(trueValue)) {
                     score.put(source, score.getOrDefault(source, 0.0) + 0);
                 } else {
                     score.put(source, score.getOrDefault(source, 0.0) + 1);

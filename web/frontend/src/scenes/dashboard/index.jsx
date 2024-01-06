@@ -28,10 +28,11 @@ const Dashboard = () => {
   );
   const [resolveButtonText, setResolveButtonText] = useState("resolve");
 
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
   useEffect(() => {
     console.log("loading the dashboard");
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
 
     const fetchPost = async () => {
       try {

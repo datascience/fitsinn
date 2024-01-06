@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Button, useTheme, Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import Histogram from "./histogram";
 import Stat from "./stat";
+import StatBox from "../../components/StatBox";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,6 +22,11 @@ const Dashboard = () => {
     maxSize: 10000,
     conflictRate: 0.17,
   });
+
+  const [resolveButtonColor, setResolveButtonColor] = useState(
+    colors.blueAccent[700]
+  );
+  const [resolveButtonText, setResolveButtonText] = useState("resolve");
 
   useEffect(() => {
     console.log("loading the dashboard");
@@ -48,6 +54,20 @@ const Dashboard = () => {
     };
     fetchPost();
   }, []);
+
+  const delay = (ms) =>
+    new Promise((resolve) => setTimeout(resolve("done"), ms));
+
+  const handleClick = () => {
+    new Promise((resolve, reject) => {
+      setTimeout(() => resolve("resolved"), 2000);
+    }).then((result) => {
+      setResolveButtonText("resolved");
+      setResolveButtonColor(colors.blueAccent[700]);
+    });
+    setResolveButtonColor(colors.blueAccent[300]);
+    setResolveButtonText("resolving");
+  };
 
   return (
     <Box m="20px">
@@ -101,14 +121,41 @@ const Dashboard = () => {
           }
         />
 
-        <Stat
-            title="Conflct Rate (%)"
-            value={
-              sizeStatistics.conflictRate == null
+        <Grid2 item sx="auto">
+          <Box
+            width={200}
+            height={100}
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              subtitle="Conflct Rate (%)"
+              title={
+                sizeStatistics.conflictRate == null
                   ? 0
                   : (sizeStatistics.conflictRate * 100).toFixed(2)
-            }
-        />
+              }
+            />
+            <Box
+              sx={{
+                ".MuiButton-root": {
+                  color: colors.grey[100],
+                  backgroundColor: resolveButtonColor,
+                  margin: "0px 20px 0px -20px",
+                  width: 90,
+                },
+              }}
+            >
+              <Button onClick={handleClick}>
+                <Typography variant="h5" fontWeight="600">
+                  {resolveButtonText}
+                </Typography>
+              </Button>
+            </Box>
+          </Box>
+        </Grid2>
       </Grid2>
       <Grid2 container spacing={1}>
         <Histogram property="MIMETYPE"></Histogram>

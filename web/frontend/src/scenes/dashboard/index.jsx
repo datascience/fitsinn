@@ -7,6 +7,7 @@ import { BACKEND_URL } from "../../AppConfig";
 import Histogram from "./histogram";
 import Stat from "./stat";
 import StatBox from "../../components/StatBox";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -23,10 +24,13 @@ const Dashboard = () => {
     conflictRate: 0.17,
   });
 
-  const [resolveButtonColor, setResolveButtonColor] = useState(
-    colors.blueAccent[700]
+  const [conflictResolution, setConflictResolution] = useSessionStorage(
+    "conflictResolution",
+    {
+      color: colors.blueAccent[700],
+      text: "resolve",
+    }
   );
-  const [resolveButtonText, setResolveButtonText] = useState("resolve");
 
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -59,7 +63,7 @@ const Dashboard = () => {
   const delay = (ms) =>
     new Promise((resolve) => setTimeout(resolve("done"), ms));
 
-  const handleClick = () => {
+  const handleClick = async () => {
     new Promise((resolve, reject) => {
       var requestOptions = {
         method: "POST",
@@ -69,11 +73,15 @@ const Dashboard = () => {
       fetch(BACKEND_URL + "/resolveconflicts", requestOptions);
       resolve("ok");
     }).then((result) => {
-      setResolveButtonText("resolved");
-      setResolveButtonColor(colors.blueAccent[700]);
+      setConflictResolution({
+        color: colors.blueAccent[700],
+        text: "resolved",
+      });
     });
-    setResolveButtonColor(colors.blueAccent[300]);
-    setResolveButtonText("resolving");
+    setConflictResolution({
+      color: colors.blueAccent[300],
+      text: "resolving",
+    });
   };
 
   return (
@@ -84,9 +92,9 @@ const Dashboard = () => {
       </Box>
 
       {/* GRID & CHARTS */}
-      <Grid2 container spacing={1} sx={4}>
+      <Grid2 container spacing={1}>
         <Stat
-          title="Total File Count"
+          title="File Count"
           value={
             sizeStatistics.totalCount == null ? 0 : sizeStatistics.totalCount
           }
@@ -128,9 +136,9 @@ const Dashboard = () => {
           }
         />
 
-        <Grid2 item sx="auto">
+        <Grid2 item>
           <Box
-            width={200}
+            width={210}
             height={100}
             backgroundColor={colors.primary[400]}
             display="flex"
@@ -149,7 +157,7 @@ const Dashboard = () => {
               sx={{
                 ".MuiButton-root": {
                   color: colors.grey[100],
-                  backgroundColor: resolveButtonColor,
+                  backgroundColor: conflictResolution.color,
                   margin: "0px 20px 0px -20px",
                   width: 90,
                 },
@@ -157,7 +165,7 @@ const Dashboard = () => {
             >
               <Button onClick={handleClick}>
                 <Typography variant="h5" fontWeight="600">
-                  {resolveButtonText}
+                  {conflictResolution.text}
                 </Typography>
               </Button>
             </Box>

@@ -39,45 +39,37 @@ const Dashboard = () => {
     console.log("loading the dashboard");
 
     const fetchPost = async () => {
-      try {
-        var requestOptions = {
-          method: "GET",
-          headers: myHeaders,
-          redirect: "follow",
-        };
-
-        const response = await fetch(
-          BACKEND_URL + "/statistics",
-          requestOptions
-        );
-        const data = response.json();
-
-        setSizeStatistics(data);
-      } catch (error) {
-        console.log(error);
-      }
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      const response = await fetch(BACKEND_URL + "/statistics", requestOptions);
+      const data = await response.json();
+      setSizeStatistics(data);
     };
     fetchPost();
   }, []);
 
-  const delay = (ms) =>
-    new Promise((resolve) => setTimeout(resolve("done"), ms));
-
-  const handleClick = async () => {
-    new Promise((resolve, reject) => {
+  const handleClick = () => {
+    console.log("Conflict resolution started");
+    const fetchPost = async () => {
       var requestOptions = {
         method: "POST",
         headers: myHeaders,
         redirect: "follow",
       };
-      fetch(BACKEND_URL + "/resolveconflicts", requestOptions);
-      resolve("ok");
-    }).then((result) => {
+      const response = await fetch(
+        BACKEND_URL + "/resolveconflicts",
+        requestOptions
+      );
       setConflictResolution({
         color: colors.blueAccent[700],
         text: "resolved",
       });
-    });
+      console.log("Conflict resolution finished");
+    };
+    fetchPost();
     setConflictResolution({
       color: colors.blueAccent[300],
       text: "resolving",

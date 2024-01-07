@@ -8,7 +8,7 @@ const Histogram = ({ property }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Grid2 item sx="auto">
+    <Grid2 item>
       <Box backgroundColor={colors.primary[400]}>
         <Typography
           variant="h5"

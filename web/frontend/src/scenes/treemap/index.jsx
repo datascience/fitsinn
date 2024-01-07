@@ -4,11 +4,11 @@ import Header from "../../components/Header";
 import { propertyValues as data } from "../../data/procontentData";
 import { BACKEND_URL } from "../../AppConfig";
 import TreeMap from "../../components/TreeMap";
-import { useTracked } from "react-tracked";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Treemap = () => {
+  const [filter, setFilter] = useSessionStorage("filterString", "");
   const [data, setData] = useState({});
-  const [state, dispatch] = useTracked();
   useEffect(() => {
     console.log("updating bar chart");
     var myHeaders = new Headers();
@@ -31,7 +31,7 @@ const Treemap = () => {
             new URLSearchParams({
               properties: ["FORMAT", "MIMETYPE"],
               algorithm: "SELECTIVE_FEATURE_DISTRIBUTION",
-              filter: state.filter,
+              filter: filter,
             }),
           requestOptions
         );
@@ -56,7 +56,7 @@ const Treemap = () => {
       }
     };
     fetchPost();
-  }, [state.filter]);
+  }, [filter]);
 
   return (
     <Box m="20px">

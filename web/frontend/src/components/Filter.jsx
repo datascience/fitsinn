@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { Button } from "@mui/material";
 import { tokens } from "../theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { QueryBuilderMaterial } from "@react-querybuilder/material";
 import { QueryBuilder, formatQuery, parseCEL } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
@@ -35,7 +35,12 @@ const properties = [
 const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [query, setQuery] = useSessionStorage("filterQuery", "");
+
+  const [filterString, setFilterString] = useSessionStorage("filterString", "");
+
+  const [filter, setFilter] = useState(
+    filterString ? parseCEL(filterString) : ""
+  );
 
   var fields = properties;
 
@@ -53,6 +58,21 @@ const Filter = () => {
     fetchSources();
     console.log("updating filter component state");
   }, []);
+
+  const updateFilter = (q) => {
+    console.log(q);
+    if (q == "") {
+      return;
+    }
+    let stringQuery = formatQuery(q, "cel");
+    console.log(stringQuery);
+    if (stringQuery === "1 == 1") {
+      setFilterString("");
+    } else {
+      setFilterString(stringQuery);
+    }
+    setFilter(q);
+  };
 
   return (
     <Box
@@ -87,32 +107,10 @@ const Filter = () => {
           <QueryBuilder
             fields={fields}
             operators={operators}
-            query={query}
-            onQueryChange={(q) => setQuery(q)}
+            query={filterString ? parseCEL(filterString) : ""}
+            onQueryChange={updateFilter}
           />
         </QueryBuilderMaterial>
-      </Box>
-      <Box
-        sx={{
-          ".MuiButton-root": {
-            color: colors.grey[100],
-            backgroundColor: colors.blueAccent[700],
-          },
-        }}
-      >
-        <Button
-          onClick={() => {
-            if (query == "") {
-              return;
-            }
-            let stringQuery = formatQuery(query, "cel");
-            console.log(stringQuery);
-          }}
-        >
-          <Typography variant="h5" fontWeight="600">
-            Set filter
-          </Typography>
-        </Button>
       </Box>
     </Box>
   );

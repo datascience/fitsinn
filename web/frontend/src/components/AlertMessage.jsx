@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import { Alert, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useSessionStorage } from "@uidotdev/usehooks";
 
 const AlertMessage = ({ message }) => {
-  const [open, setOpen] = useSessionStorage("alertMessage", true);
+  const [open, setOpen] = useState(true);
   function handleClose(event, reason) {
     if (reason === "clickaway") {
       return;

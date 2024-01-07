@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import Table from "../../components/Table";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import { useSessionStorage } from "@uidotdev/usehooks";
 
@@ -12,7 +12,7 @@ const ObjectDetails = () => {
     },
   };
 
-  const [data, setData] = useSessionStorage("initialObjectDetails", [
+  const [data, setData] = useState([
     {
       id: 1,
       property: 1,

@@ -2,6 +2,7 @@ import SimpleBarChart from "../../components/SimpleBarChart";
 import React, { useState, useEffect } from "react";
 import { useTracked } from "react-tracked";
 import { BACKEND_URL } from "../../AppConfig";
+
 const PropertyValueDistribution = (payload) => {
   const [data, setData] = useState([]);
   const [state, dispatch] = useTracked();

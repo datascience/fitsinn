@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   ProSidebar,
   Menu,
@@ -20,6 +19,7 @@ import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import { useContext } from "react";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -43,8 +43,16 @@ const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+
+  const [isCollapsed, setIsCollapsed] = useSessionStorage(
+    "isDashboardCollapsed",
+    false
+  );
+
+  const [selected, setSelected] = useSessionStorage(
+    "selectedPage",
+    "Dashboard"
+  );
 
   return (
     <Box

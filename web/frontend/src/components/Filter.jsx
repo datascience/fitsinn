@@ -2,12 +2,11 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { Button } from "@mui/material";
 import { tokens } from "../theme";
 import React, { useEffect } from "react";
-import { useState } from "react";
-import { useTracked } from "react-tracked";
 import { QueryBuilderMaterial } from "@react-querybuilder/material";
 import { QueryBuilder, formatQuery, parseCEL } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
 import { BACKEND_URL } from "../AppConfig";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const operators = [
   { name: "=", label: "=" },
@@ -36,39 +35,24 @@ const properties = [
 const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const [state, dispatch] = useTracked();
-
-  //var filter = sessionStorage.getItem("filter");
-  const [query, setQuery] = useState(
-    state.filter ? parseCEL(state.filter) : ""
-  );
-  // useState(filter ? parseCEL(filter) : state.filter);
+  const [query, setQuery] = useSessionStorage("filterQuery", "");
 
   var fields = properties;
 
-  useEffect(
-    () => {
-      //if (!state.filterFields) {
+  useEffect(() => {
+    const fetchSources = async () => {
+      try {
+        const response = await fetch(BACKEND_URL + "/sources");
+        let data = await response.json();
+        let sources = data.map((prop) => ({ name: prop, label: prop }));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-      const fetchSources = async () => {
-        try {
-          const response = await fetch(BACKEND_URL + "/sources");
-          let data = await response.json();
-          let sources = data.map((prop) => ({ name: prop, label: prop }));
-          dispatch({ filterSources: sources });
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      fetchSources();
-      console.log("updating filter component state");
-      setQuery(state.filter ? parseCEL(state.filter) : "");
-    },
-    //}
-    [state.filter]
-  );
+    fetchSources();
+    console.log("updating filter component state");
+  }, []);
 
   return (
     <Box
@@ -123,12 +107,6 @@ const Filter = () => {
             }
             let stringQuery = formatQuery(query, "cel");
             console.log(stringQuery);
-            //sessionStorage.setItem("filter", stringQuery);
-            if (stringQuery === "1 == 1") {
-              dispatch({ filter: "" });
-            } else {
-              dispatch({ filter: stringQuery });
-            }
           }}
         >
           <Typography variant="h5" fontWeight="600">

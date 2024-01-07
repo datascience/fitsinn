@@ -1,20 +1,25 @@
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import Table from "../../components/Table";
-import React, { useState, useEffect } from "react";
-import { useTracked } from "react-tracked";
+import React, { useEffect } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import { useNavigate } from "react-router-dom";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Objects = () => {
-  const [data, setData] = useState([
+  const [data, setData] = useSessionStorage("objectList", [
     {
       id: 1,
       count: 1,
       filepath: "/usr/local/tomcat/webapps/fits/upload/1582118786085/README.md",
     },
   ]);
-  const [state, dispatch] = useTracked();
+
+  const [selectedObject, setSelectedObject] = useSessionStorage(
+    "selectedObject",
+    ""
+  );
+  const [filter, setFilter] = useSessionStorage("filterQuery", "");
   const navigate = useNavigate();
   useEffect(() => {
     console.log("loading the object list");
@@ -24,7 +29,7 @@ const Objects = () => {
     const fetchPost = async () => {
       try {
         var raw = JSON.stringify({
-          filter: state.filter,
+          filter: filter,
         });
 
         var requestOptions = {
@@ -38,7 +43,7 @@ const Objects = () => {
           BACKEND_URL +
             "/objects?" +
             new URLSearchParams({
-              filter: state.filter,
+              filter: filter,
             }),
           requestOptions
         );
@@ -56,7 +61,7 @@ const Objects = () => {
       }
     };
     fetchPost();
-  }, [state.filter]);
+  }, [filter]);
 
   const initialState = {
     sorting: {
@@ -79,7 +84,7 @@ const Objects = () => {
 
   const handleRowClick = (params) => {
     console.log(params.row.filepath);
-    dispatch({ objectdetails: params.row.filepath });
+    setSelectedObject(params.row.filepath);
     navigate(`/objectdetails`);
   };
 

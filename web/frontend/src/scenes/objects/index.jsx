@@ -1,13 +1,13 @@
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import Table from "../../components/Table";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import { useNavigate } from "react-router-dom";
 import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Objects = () => {
-  const [data, setData] = useSessionStorage("objectList", [
+  const [data, setData] = useState([
     {
       id: 1,
       count: 1,
@@ -19,7 +19,7 @@ const Objects = () => {
     "selectedObject",
     ""
   );
-  const [filter, setFilter] = useSessionStorage("filterQuery", "");
+  const [filter, setFilter] = useSessionStorage("filterString", "");
   const navigate = useNavigate();
   useEffect(() => {
     console.log("loading the object list");

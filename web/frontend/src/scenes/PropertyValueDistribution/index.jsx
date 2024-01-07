@@ -1,11 +1,12 @@
 import SimpleBarChart from "../../components/SimpleBarChart";
 import React, { useState, useEffect } from "react";
-import { useTracked } from "react-tracked";
 import { BACKEND_URL } from "../../AppConfig";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const PropertyValueDistribution = (payload) => {
+  const [filter, setFilter] = useSessionStorage("filterString", "");
+
   const [data, setData] = useState([]);
-  const [state, dispatch] = useTracked();
   // GET with fetch API
   useEffect(() => {
     console.log("updating bar chart");
@@ -16,7 +17,7 @@ const PropertyValueDistribution = (payload) => {
       try {
         var raw = JSON.stringify({
           property: payload["property"],
-          filter: state.filter,
+          filter: filter,
         });
 
         var requestOptions = {
@@ -31,7 +32,7 @@ const PropertyValueDistribution = (payload) => {
             "/propertyvalues?" +
             new URLSearchParams({
               property: payload["property"],
-              filter: state.filter,
+              filter: filter,
             }),
 
           requestOptions
@@ -55,7 +56,7 @@ const PropertyValueDistribution = (payload) => {
       }
     };
     fetchPost();
-  }, [state.filter]);
+  }, [filter]);
 
   let filterClick = (property, event) => {
     if (event.indexValue == "...others") {
@@ -68,16 +69,12 @@ const PropertyValueDistribution = (payload) => {
       newCondition = `${property} == "${event.indexValue}"`;
     }
     console.log("new condition: [" + newCondition + "]");
-    console.log("Filter: [" + state.filter + "]");
-    if (!state.filter.includes(newCondition)) {
-      if (state.filter) {
-        dispatch({
-          filter: state.filter + " && " + newCondition,
-        });
+    console.log("Filter: [" + filter + "]");
+    if (!filter.includes(newCondition)) {
+      if (filter) {
+        setFilter(filter + " && " + newCondition);
       } else {
-        dispatch({
-          filter: newCondition,
-        });
+        setFilter(newCondition);
       }
     }
   };

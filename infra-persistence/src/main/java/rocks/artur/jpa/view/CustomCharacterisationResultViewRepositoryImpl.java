@@ -8,6 +8,7 @@ import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,33 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;
+    }
+
+    @Override
+    public double[] getSizeStatistics(FilterCriteria filterCriteria){
+        String subquery = "select distinct FILEPATH from CHARACTERISATIONRESULTVIEW ";
+        if (filterCriteria != null) {
+            subquery = filterJPA.convert(filterCriteria);
+        }
+
+        String query = String.format(
+                "select sum(cast (t.property_value as int)) as totalsize,  " +
+                        "min(cast (t.property_value as int)) as minsize, " +
+                        "max(cast (t.property_value as int)) as maxsize, " +
+                        "avg(cast (t.property_value as int)) as avgsize, " +
+                        "count(t.property_value) as count " +
+                        "from CHARACTERISATIONRESULTVIEW t " +
+                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "where t.PROPERTY='SIZE'", subquery);
+
+        Object[] singleResult = (Object[]) entityManager.createNativeQuery(query).getSingleResult();
+        Double sum = Double.valueOf(singleResult[0].toString());
+        Double min = Double.valueOf(singleResult[1].toString());
+        Double max = Double.valueOf(singleResult[2].toString());
+        Double avg = Double.valueOf(singleResult[3].toString());
+        Double count = Double.valueOf(singleResult[4].toString());
+        double[] result = new double[]{sum, min, max, avg, count};
+        return result;
     }
 
     @Override
@@ -145,6 +173,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         List<String[]> resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;
     }
+
 
 
 }

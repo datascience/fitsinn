@@ -15,15 +15,11 @@ const Dashboard = () => {
   const [sizeStatistics, setSizeStatistics] = useState({
     totalSize: 10047,
     avgSize: 3349,
-    sizeDistribution: [
-      { count: 2, value: "0-1KB" },
-      { count: 1, value: "1KB-1MB" },
-    ],
     minSize: 4,
     maxSize: 10000,
     conflictRate: 0.17,
   });
-
+  const [filter, setFilter] = useSessionStorage("filterString", "");
   const [conflictResolution, setConflictResolution] = useSessionStorage(
     "conflictResolution",
     {
@@ -40,16 +36,19 @@ const Dashboard = () => {
 
     const fetchPost = async () => {
       var requestOptions = {
-        method: "GET",
+        method: "POST",
         headers: myHeaders,
         redirect: "follow",
       };
-      const response = await fetch(BACKEND_URL + "/statistics", requestOptions);
+      const response = await fetch(BACKEND_URL + "/statistics?" +
+          new URLSearchParams({
+            filter: filter,
+          }), requestOptions);
       const data = await response.json();
       setSizeStatistics(data);
     };
     fetchPost();
-  }, []);
+  }, [filter]);
 
   const handleClick = () => {
     console.log("Conflict resolution started");

@@ -144,32 +144,25 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     }
 
     @Override
-    public Map<String, Object> getSizeStatistics() {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria) {
+        Map<String, Double> result = new HashMap<>();
 
-        Long totalSize = characterisationResultViewRepository.getTotalSize();
-        result.put("totalSize", totalSize);
+        double[] sizeStatistics = characterisationResultViewRepository.getSizeStatistics(filterCriteria);
+        result.put("totalSize", sizeStatistics[0]);
         Long minSize = characterisationResultViewRepository.getMinSize();
-        result.put("minSize", minSize);
+        result.put("minSize", sizeStatistics[1]);
         Long maxSize = characterisationResultViewRepository.getMaxSize();
-        result.put("maxSize", maxSize);
+        result.put("maxSize", sizeStatistics[2]);
 
         Long avgSize = characterisationResultViewRepository.getAvgSize();
-        result.put("avgSize", avgSize);
+        result.put("avgSize", sizeStatistics[3]);
 
         Long totalCount = characterisationResultViewRepository.getTotalCount();
-        result.put("totalCount", totalCount);
+        result.put("totalCount", sizeStatistics[4]);
 
         double conflictRate = this.getConflictRate();
         result.put("conflictRate", conflictRate);
 
-        List<Object[]> sizeDistribution = characterisationResultViewRepository.getSizeDistribution();
-
-        List<PropertyValueStatistic> collect = sizeDistribution.stream()
-                .map(stat -> new PropertyValueStatistic((Long) stat[1], (String) stat[0]))
-                .collect(Collectors.toList());
-
-        result.put("sizeDistribution", collect);
         return result;
     }
 

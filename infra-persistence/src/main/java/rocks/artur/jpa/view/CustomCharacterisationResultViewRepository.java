@@ -15,4 +15,6 @@ public interface CustomCharacterisationResultViewRepository {
     List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize);
 
     List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties);
+
+    double[] getSizeStatistics(FilterCriteria filterCriteria);
 }

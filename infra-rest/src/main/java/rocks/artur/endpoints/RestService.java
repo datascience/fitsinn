@@ -100,9 +100,11 @@ public class RestService {
 
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/statistics")
-    public Map<String, Object> getCollectionStatistics() {
-        Map<String, Object> sizeStatistics = getCollectionStatistics.getSizeStatistics();
+    @RequestMapping(method = RequestMethod.POST, value = "/statistics")
+    public Map<String, Double> getCollectionStatistics(@RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter) throws ParseException {
+        CriteriaParser parser = new CriteriaParser();
+        FilterCriteria filterCriteria = parser.parse(filter);
+        Map<String, Double> sizeStatistics = getCollectionStatistics.getSizeStatistics(filterCriteria);
         return sizeStatistics;
     }
 

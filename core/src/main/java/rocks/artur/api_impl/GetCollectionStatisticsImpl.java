@@ -2,6 +2,7 @@ package rocks.artur.api_impl;
 
 import rocks.artur.api.GetCollectionStatistics;
 import rocks.artur.domain.CharacterisationResultGateway;
+import rocks.artur.domain.FilterCriteria;
 
 import java.util.Map;
 
@@ -14,8 +15,8 @@ public class GetCollectionStatisticsImpl implements GetCollectionStatistics {
     }
 
     @Override
-    public Map<String, Object> getSizeStatistics() {
-        Map<String, Object> sizeStatistics = characterisationResultGateway.getSizeStatistics();
+    public Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria) {
+        Map<String, Double> sizeStatistics = characterisationResultGateway.getSizeStatistics(filterCriteria);
         return sizeStatistics;
     }
 

@@ -102,7 +102,7 @@ class RestServiceTest {
     @Test
     void getCollectionStatisticsTest() {
         String str = given().port(port)
-                .when().get("/statistics")
+                .when().post("/statistics")
                 .then()
                 .statusCode(200).extract().asString();
         System.out.println("Result: " + str);

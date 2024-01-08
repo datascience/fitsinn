@@ -94,9 +94,22 @@ class CharacterisationResultGatewayImplTest {
 
 
     @Test
-    void getCollectionStatisticsTest() {
-        Map<String, Object> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics();
-        Assert.assertEquals(10047L, Long.valueOf(sizeStatistics.get("totalSize").toString()).longValue());
+    void getCollectionStatisticsWithoutFilterTest() throws ParseException {
+        String typeFilter = "FORMAT=\"Portable Document Format\"";
+        CriteriaParser parser = new CriteriaParser();
+        FilterCriteria parse = parser.parse(typeFilter);
+        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics(null);
+        Assert.assertEquals(10047.0, sizeStatistics.get("totalSize"), 0.1);
+        System.out.println(sizeStatistics);
+    }
+
+    @Test
+    void getCollectionStatisticsWithFilterTest() throws ParseException {
+        String typeFilter = "FORMAT=\"Portable Document Format\"";
+        CriteriaParser parser = new CriteriaParser();
+        FilterCriteria parse = parser.parse(typeFilter);
+        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics(parse);
+        Assert.assertEquals(4.0, sizeStatistics.get("totalSize"), 0.1);
         System.out.println(sizeStatistics);
     }
 

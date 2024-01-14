@@ -17,7 +17,7 @@ const operators = [
   { name: ">=", label: ">=" },
 ];
 
-const properties1 = [
+var properties = [
   { name: "FORMAT", label: "FORMAT" },
   { name: "FORMAT_VERSION", label: "FORMAT_VERSION" },
   { name: "MIMETYPE", label: "MIMETYPE" },
@@ -32,6 +32,8 @@ const properties1 = [
   { name: "CREATINGAPPLICATIONNAME", label: "CREATINGAPPLICATIONNAME" },
 ];
 
+export const dateProperties = ["FSLASTMODIFIED", "CREATED"];
+
 const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -40,51 +42,27 @@ const Filter = () => {
   myHeaders.append("Content-Type", "application/json");
 
   const [filterString, setFilterString] = useSessionStorage("filterString", "");
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
+  );
 
   const [filter, setFilter] = useState(
     filterString ? parseCEL(filterString) : ""
   );
 
-  const [properties, setProperties] = useState([]);
-
-  const fetchSources = async () => {
-    try {
-      const response = await fetch(BACKEND_URL + "/sources");
-      let data = await response.json();
-      let sources = data.map((prop) => ({ name: prop, label: prop }));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchProperties = async () => {
-    var requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
-
-    const response = await fetch(
-      BACKEND_URL + "/properties?" + new URLSearchParams(),
-      requestOptions
-    );
-    let data = await response.json();
-
-    let properties = data.map((prop) => ({
-      name: prop.property,
-      label: prop.property,
-    }));
-    setProperties(properties);
-  };
-
   useEffect(() => {
-    fetchSources();
-    fetchProperties();
+    properties = globalProperties.map((prop) => {
+      if (prop in dateProperties) {
+        return { name: prop, label: prop, inputType: "date" };
+      } else {
+        return { name: prop, label: prop };
+      }
+    });
     console.log("updating filter component state");
   }, []);
 
   const updateFilter = (q) => {
-    console.log(q);
     if (q == "") {
       return;
     }
@@ -129,7 +107,7 @@ const Filter = () => {
       >
         <QueryBuilderMaterial style={{ color: "green", ".rqb-spacing": 0.5 }}>
           <QueryBuilder
-            fields={properties1}
+            fields={properties}
             operators={operators}
             query={filterString ? parseCEL(filterString) : ""}
             onQueryChange={updateFilter}

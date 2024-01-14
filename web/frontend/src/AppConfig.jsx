@@ -11,17 +11,30 @@ export const BACKEND_URL =
 
 const AppConfig = () => {
   const [errorMessage, setErrorMessage] = useSessionStorage("errorMessage", "");
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
+  );
+
+  const fetchGlobalProperties = async () => {
+    const response = await fetch(BACKEND_URL + "/properties");
+    let data = await response.json();
+    let properties = data.map((prop) => prop.property);
+    setGlobalProperties(properties);
+  };
+  const fetchHealth = async () => {
+    try {
+      const response = await fetch(BACKEND_URL + "/health");
+      await response;
+    } catch (error) {
+      console.log(error);
+      setErrorMessage("REST API is not accessible!");
+    }
+  };
+
   useEffect(() => {
-    const fetchGet = async () => {
-      try {
-        const response = await fetch(BACKEND_URL + "/health");
-        await response;
-      } catch (error) {
-        console.log(error);
-        setErrorMessage("REST API is not accessible!");
-      }
-    };
-    fetchGet();
+    fetchHealth();
+    fetchGlobalProperties();
   }, []);
 
   return (

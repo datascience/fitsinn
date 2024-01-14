@@ -35,23 +35,27 @@ const PropertyValueDistribution = (payload) => {
               property: payload["property"],
               filter: filter,
             }),
-
           requestOptions
         );
         const data = await response.json();
-        var sum = data.reduce(function (a, b, idx) {
-          if (idx > 10) {
-            return a + parseInt(b.count);
-          } else {
-            return 0;
+        console.log(data);
+        if (data.length > 0) {
+          var sum = data.reduce(function (a, b, idx) {
+            if (idx > 10) {
+              return a + parseInt(b.count);
+            } else {
+              return 0;
+            }
+          });
+          if (data.length > 10) {
+            data.length = 10;
+            data.push({ count: sum, value: "...others" });
           }
-        });
-        if (data.length > 10) {
-          data.length = 10;
-          data.push({ count: sum, value: "...others" });
+          data.reverse();
+          setData(data);
+        } else {
+          setData(data);
         }
-        data.reverse();
-        setData(data);
       } catch (error) {
         console.log(error);
       }

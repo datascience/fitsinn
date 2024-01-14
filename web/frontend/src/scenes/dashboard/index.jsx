@@ -25,6 +25,11 @@ const Dashboard = () => {
   const [properties, setProperties] = useState([]);
 
   const [filter, setFilter] = useSessionStorage("filterString", "");
+
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
+  );
   const [conflictResolution, setConflictResolution] = useSessionStorage(
     "conflictResolution",
     {
@@ -54,32 +59,10 @@ const Dashboard = () => {
     setSizeStatistics(data);
   };
 
-  const fetchProperties = async () => {
-    var requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
-
-    const response = await fetch(
-      BACKEND_URL +
-        "/properties?" +
-        new URLSearchParams({
-          filter: filter,
-        }),
-      requestOptions
-    );
-    let data = await response.json();
-
-    let properties = data.map((prop) => prop.property);
-    setProperties(properties);
-  };
-
   useEffect(() => {
     console.log("loading the dashboard");
 
     fetchStatistics();
-    fetchProperties();
   }, [filter]);
 
   const handleClick = () => {
@@ -197,7 +180,7 @@ const Dashboard = () => {
         </Grid2>
       </Grid2>
       <Grid2 container spacing={1}>
-        {properties.map((prop) => (
+        {globalProperties.map((prop) => (
           <Histogram property={prop}></Histogram>
         ))}
       </Grid2>

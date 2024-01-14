@@ -15,10 +15,7 @@ import rocks.artur.jpa.table.CharacterisationResultRepository;
 import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 import rocks.artur.jpa.view.CharacterisationResultViewRepository;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -86,10 +83,27 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                 List<Object[]> propertyValueDistribution =
                         characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
 
-                List<Float> floats = propertyValueDistribution.stream()
-                        .map(stat -> Float.parseFloat(stat[0].toString())).sorted(Float::compare).collect(Collectors.toList());
+                List<Float> floats = propertyValueDistribution.stream().filter(stat -> !(stat[0].equals("CONFLICT")))
+                        .map(stat -> {
+                            Float val = Float.parseFloat(stat[0].toString());
+                            Long count =  (Long) stat[1];
+
+                            List<Float> result = new ArrayList<>();
+
+                            for (long l=0; l < count; l++){
+                                result.add(val);
+                            }
+                            return result;
+                        }
+                        ).flatMap(Collection::stream).sorted(Float::compare).collect(Collectors.toList());
 
                 List<PropertyValueStatistic> propertyValueStatistics = BinningAlgorithms.runBinning(floats);
+
+                Optional<Long> conflicts = propertyValueDistribution.stream().filter(stat -> stat[0].equals("CONFLICT"))
+                        .map(stat -> (Long) stat[1]).findAny();
+
+                conflicts.ifPresent(aLong -> propertyValueStatistics.add(new PropertyValueStatistic(aLong, "CONFLICT")));
+
                 return propertyValueStatistics;
             }
             default:

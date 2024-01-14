@@ -17,7 +17,7 @@ const operators = [
   { name: ">=", label: ">=" },
 ];
 
-const properties = [
+const properties1 = [
   { name: "FORMAT", label: "FORMAT" },
   { name: "FORMAT_VERSION", label: "FORMAT_VERSION" },
   { name: "MIMETYPE", label: "MIMETYPE" },
@@ -36,26 +36,50 @@ const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
   const [filterString, setFilterString] = useSessionStorage("filterString", "");
 
   const [filter, setFilter] = useState(
     filterString ? parseCEL(filterString) : ""
   );
 
-  var fields = properties;
+  const [properties, setProperties] = useState([]);
 
-  useEffect(() => {
-    const fetchSources = async () => {
-      try {
-        const response = await fetch(BACKEND_URL + "/sources");
-        let data = await response.json();
-        let sources = data.map((prop) => ({ name: prop, label: prop }));
-      } catch (error) {
-        console.log(error);
-      }
+  const fetchSources = async () => {
+    try {
+      const response = await fetch(BACKEND_URL + "/sources");
+      let data = await response.json();
+      let sources = data.map((prop) => ({ name: prop, label: prop }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchProperties = async () => {
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
     };
 
+    const response = await fetch(
+      BACKEND_URL + "/properties?" + new URLSearchParams(),
+      requestOptions
+    );
+    let data = await response.json();
+
+    let properties = data.map((prop) => ({
+      name: prop.property,
+      label: prop.property,
+    }));
+    setProperties(properties);
+  };
+
+  useEffect(() => {
     fetchSources();
+    fetchProperties();
     console.log("updating filter component state");
   }, []);
 
@@ -105,7 +129,7 @@ const Filter = () => {
       >
         <QueryBuilderMaterial style={{ color: "green", ".rqb-spacing": 0.5 }}>
           <QueryBuilder
-            fields={fields}
+            fields={properties1}
             operators={operators}
             query={filterString ? parseCEL(filterString) : ""}
             onQueryChange={updateFilter}

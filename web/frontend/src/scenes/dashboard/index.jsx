@@ -1,24 +1,29 @@
-import { Box, Button, useTheme, Typography } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
-import React, { useState, useEffect } from "react";
+import { useSessionStorage } from "@uidotdev/usehooks";
+import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../AppConfig";
+import Header from "../../components/Header";
+import StatBox from "../../components/StatBox";
+import { tokens } from "../../theme";
 import Histogram from "./histogram";
 import Stat from "./stat";
-import StatBox from "../../components/StatBox";
-import { useSessionStorage } from "@uidotdev/usehooks";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [sizeStatistics, setSizeStatistics] = useState({
-    totalSize: 10047,
-    avgSize: 3349,
-    minSize: 4,
-    maxSize: 10000,
-    conflictRate: 0.17,
-  });
+  const [sizeStatistics, setSizeStatistics] = useState([
+    {
+      totalSize: 10047,
+      avgSize: 3349,
+      minSize: 4,
+      maxSize: 10000,
+      conflictRate: 0.17,
+    },
+  ]);
+
+  const [properties, setProperties] = useState([]);
+
   const [filter, setFilter] = useSessionStorage("filterString", "");
   const [conflictResolution, setConflictResolution] = useSessionStorage(
     "conflictResolution",
@@ -31,23 +36,50 @@ const Dashboard = () => {
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
+  const fetchStatistics = async () => {
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      BACKEND_URL +
+        "/statistics?" +
+        new URLSearchParams({
+          filter: filter,
+        }),
+      requestOptions
+    );
+    const data = await response.json();
+    setSizeStatistics(data);
+  };
+
+  const fetchProperties = async () => {
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    const response = await fetch(
+      BACKEND_URL +
+        "/properties?" +
+        new URLSearchParams({
+          filter: filter,
+        }),
+      requestOptions
+    );
+    let data = await response.json();
+
+    let properties = data.map((prop) => prop.property);
+    setProperties(properties);
+  };
+
   useEffect(() => {
     console.log("loading the dashboard");
 
-    const fetchPost = async () => {
-      var requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        redirect: "follow",
-      };
-      const response = await fetch(BACKEND_URL + "/statistics?" +
-          new URLSearchParams({
-            filter: filter,
-          }), requestOptions);
-      const data = await response.json();
-      setSizeStatistics(data);
-    };
-    fetchPost();
+    fetchStatistics();
+    fetchProperties();
   }, [filter]);
 
   const handleClick = () => {
@@ -148,7 +180,8 @@ const Dashboard = () => {
               sx={{
                 ".MuiButton-root": {
                   color: colors.grey[100],
-                  backgroundColor: conflictResolution.color,
+                  backgroundColor: colors.blueAccent[700],
+                  fontSize: 12,
                   margin: "0px 20px 0px -20px",
                   width: 90,
                 },
@@ -164,13 +197,9 @@ const Dashboard = () => {
         </Grid2>
       </Grid2>
       <Grid2 container spacing={1}>
-        <Histogram property="MIMETYPE"></Histogram>
-        <Histogram property="FORMAT"></Histogram>
-        <Histogram property="EXTERNALIDENTIFIER"></Histogram>
-
-        <Histogram property="FORMAT_VERSION"></Histogram>
-        <Histogram property="FSLASTMODIFIED"></Histogram>
-        <Histogram property="SIZE"></Histogram>
+        {properties.map((prop) => (
+          <Histogram property={prop}></Histogram>
+        ))}
       </Grid2>
     </Box>
   );

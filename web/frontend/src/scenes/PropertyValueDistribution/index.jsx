@@ -2,6 +2,7 @@ import SimpleBarChart from "../../components/SimpleBarChart";
 import React, { useState, useEffect } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import { useSessionStorage } from "@uidotdev/usehooks";
+import dateProperties from "../../components/Filter";
 
 const PropertyValueDistribution = (payload) => {
   const [filter, setFilter] = useSessionStorage("filterString", "");
@@ -63,7 +64,10 @@ const PropertyValueDistribution = (payload) => {
       return;
     }
     let newCondition = null;
-    if (property == "FSLASTMODIFIED") {
+
+    console.log(dateProperties);
+
+    if (property in dateProperties) {
       newCondition = `${property} >= "${event.indexValue}-01-01" && ${property} <= "${event.indexValue}-12-31"`;
     } else {
       newCondition = `${property} == "${event.indexValue}"`;

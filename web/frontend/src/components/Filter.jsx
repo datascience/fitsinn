@@ -68,7 +68,7 @@ const Filter = () => {
     }
     let stringQuery = formatQuery(q, "cel");
     console.log(stringQuery);
-    if (stringQuery === "1 == 1") {
+    if (stringQuery === "1 == 1" || stringQuery.endsWith('== ""')) {
       setFilterString("");
     } else {
       setFilterString(stringQuery);

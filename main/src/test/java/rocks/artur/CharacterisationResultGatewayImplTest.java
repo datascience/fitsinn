@@ -55,6 +55,7 @@ class CharacterisationResultGatewayImplTest {
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria parse = parser.parse(typeFilter);
         List<PropertyValueStatistic> propertyValueDistribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, parse);
+        System.out.println(propertyValueDistribution);
         Assert.assertEquals(1, propertyValueDistribution.size());
     }
 
@@ -62,6 +63,9 @@ class CharacterisationResultGatewayImplTest {
     void getPropertyValueDistributionWithoutFilterTest() {
 
         List<PropertyValueStatistic> propertyValueDistribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, null);
+        System.out.println(propertyValueDistribution);
+        List<CharacterisationResult> characterisationResults = characterisationResultGatewaySqlImpl.getCharacterisationResults(null);
+        System.out.println(characterisationResults);
         Assert.assertEquals(3, propertyValueDistribution.size());
     }
 

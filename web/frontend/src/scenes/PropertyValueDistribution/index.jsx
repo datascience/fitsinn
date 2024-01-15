@@ -2,7 +2,7 @@ import SimpleBarChart from "../../components/SimpleBarChart";
 import React, { useState, useEffect } from "react";
 import { BACKEND_URL } from "../../AppConfig";
 import { useSessionStorage } from "@uidotdev/usehooks";
-import dateProperties from "../../components/Filter";
+import { dateProperties } from "../../components/Filter";
 
 const PropertyValueDistribution = (payload) => {
   const [filter, setFilter] = useSessionStorage("filterString", "");
@@ -38,7 +38,6 @@ const PropertyValueDistribution = (payload) => {
           requestOptions
         );
         const data = await response.json();
-        console.log(data);
         if (data.length > 0) {
           var sum = data.reduce(function (a, b, idx) {
             if (idx > 10) {
@@ -71,7 +70,7 @@ const PropertyValueDistribution = (payload) => {
 
     console.log(dateProperties);
 
-    if (property in dateProperties) {
+    if (dateProperties.includes(property)) {
       newCondition = `${property} >= "${event.indexValue}-01-01" && ${property} <= "${event.indexValue}-12-31"`;
     } else {
       newCondition = `${property} == "${event.indexValue}"`;

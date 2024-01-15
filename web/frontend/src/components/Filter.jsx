@@ -53,7 +53,7 @@ const Filter = () => {
 
   useEffect(() => {
     properties = globalProperties.map((prop) => {
-      if (prop in dateProperties) {
+      if (dateProperties.includes(prop)) {
         return { name: prop, label: prop, inputType: "date" };
       } else {
         return { name: prop, label: prop };

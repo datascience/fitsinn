@@ -1,17 +1,17 @@
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import Table from "../../components/Table";
-import { useTracked } from "react-tracked";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../AppConfig";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const ObjectDetails = () => {
-  const [state, dispatch] = useTracked();
   const initialState = {
     sorting: {
       sortModel: [{ field: "property", sort: "asc" }],
     },
   };
+
   const [data, setData] = useState([
     {
       id: 1,
@@ -21,16 +21,20 @@ const ObjectDetails = () => {
       filepath: "/usr/local/tomcat/webapps/fits/upload/1582118786085/README.md",
     },
   ]);
+  const [selectedObject, setSelectedObject] = useSessionStorage(
+    "selectedObject",
+    ""
+  );
   useEffect(() => {
     console.log("loading the object details list");
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const fetchPost = async () => {
-      console.log(state.objectdetails);
+      console.log(selectedObject);
       try {
         var raw = JSON.stringify({
-          filePath: state.objectdetails,
+          filePath: selectedObject,
         });
 
         var requestOptions = {
@@ -43,43 +47,39 @@ const ObjectDetails = () => {
           BACKEND_URL +
             "/object?" +
             new URLSearchParams({
-              filepath: state.objectdetails,
+              filepath: selectedObject,
             }),
           requestOptions
         );
         const data = await response.json();
 
-
         const response2 = await fetch(
-            BACKEND_URL +
+          BACKEND_URL +
             "/objectconflicts?" +
             new URLSearchParams({
-              filepath: state.objectdetails,
+              filepath: selectedObject,
             }),
-            requestOptions
+          requestOptions
         );
         const conflictedProps = await response2.json();
-
-
 
         let id = 0;
         var tmp = data.map((stat) => {
           var res = stat;
           res.id = id++;
           if (conflictedProps.includes(res.property)) {
-            res.conflict=true
+            res.conflict = true;
           }
           return res;
         });
-        console.log(tmp)
+        console.log(tmp);
         setData(tmp);
-
       } catch (error) {
         console.log(error);
       }
     };
     fetchPost();
-  }, [state.objectdetails]);
+  }, [selectedObject]);
 
   const columns = [
     {
@@ -105,20 +105,23 @@ const ObjectDetails = () => {
     },
   ];
 
-
   const rowFunction = (params) => {
-    return params.row.conflict ? 'conflict': '' ;
-  }
-
+    return params.row.conflict ? "conflict" : "";
+  };
 
   return (
     <Box m="20px">
       <Header
         title="Object Details"
-        subtitle={"on: " + state.objectdetails}
+        subtitle={"on: " + selectedObject}
       ></Header>
       <Box height="75vh">
-        <Table data={data} columns={columns} initialState={initialState} rowFunction={rowFunction}/>
+        <Table
+          data={data}
+          columns={columns}
+          initialState={initialState}
+          rowFunction={rowFunction}
+        />
       </Box>
     </Box>
   );

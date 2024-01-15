@@ -42,6 +42,12 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath);
 
+    List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry);
+
+    List<Entry> getConflictEntries();
+
+    List<Entry> getEntries();
+
     /**
      * gets a list of characterisation results with conflicts for a given digital object.
      *
@@ -49,7 +55,7 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getConflictsByFilepath(String filepath);
 
-    Map<String, Object> getSizeStatistics();
+    Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria);
 
     List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter);
 
@@ -77,4 +83,6 @@ public interface CharacterisationResultGateway {
     void addCharacterisationResults(List<CharacterisationResult> characterisationResults);
 
     double getConflictRate();
+
+    void delete(CharacterisationResult characterisationResult);
 }

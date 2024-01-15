@@ -1,10 +1,13 @@
 import SimpleBarChart from "../../components/SimpleBarChart";
 import React, { useState, useEffect } from "react";
-import { useTracked } from "react-tracked";
 import { BACKEND_URL } from "../../AppConfig";
+import { useSessionStorage } from "@uidotdev/usehooks";
+import { dateProperties } from "../../components/Filter";
+
 const PropertyValueDistribution = (payload) => {
+  const [filter, setFilter] = useSessionStorage("filterString", "");
+
   const [data, setData] = useState([]);
-  const [state, dispatch] = useTracked();
   // GET with fetch API
   useEffect(() => {
     console.log("updating bar chart");
@@ -15,7 +18,7 @@ const PropertyValueDistribution = (payload) => {
       try {
         var raw = JSON.stringify({
           property: payload["property"],
-          filter: state.filter,
+          filter: filter,
         });
 
         var requestOptions = {
@@ -30,53 +33,55 @@ const PropertyValueDistribution = (payload) => {
             "/propertyvalues?" +
             new URLSearchParams({
               property: payload["property"],
-              filter: state.filter,
+              filter: filter,
             }),
-
           requestOptions
         );
         const data = await response.json();
-        var sum = data.reduce(function (a, b, idx) {
-          if (idx > 10) {
-            return a + parseInt(b.count);
-          } else {
-            return 0;
+        if (data.length > 0) {
+          var sum = data.reduce(function (a, b, idx) {
+            if (idx > 10) {
+              return a + parseInt(b.count);
+            } else {
+              return 0;
+            }
+          });
+          if (data.length > 10) {
+            data.length = 10;
+            data.push({ count: sum, value: "...others" });
           }
-        });
-        if (data.length > 10) {
-          data.length = 10;
-          data.push({ count: sum, value: "...others" });
+          data.reverse();
+          setData(data);
+        } else {
+          setData(data);
         }
-        data.reverse();
-        setData(data);
       } catch (error) {
         console.log(error);
       }
     };
     fetchPost();
-  }, [state.filter]);
+  }, [filter]);
 
   let filterClick = (property, event) => {
     if (event.indexValue == "...others") {
       return;
     }
     let newCondition = null;
-    if (property == "FSLASTMODIFIED") {
+
+    console.log(dateProperties);
+
+    if (event.indexValue != "CONFLICT" && dateProperties.includes(property)) {
       newCondition = `${property} >= "${event.indexValue}-01-01" && ${property} <= "${event.indexValue}-12-31"`;
     } else {
       newCondition = `${property} == "${event.indexValue}"`;
     }
     console.log("new condition: [" + newCondition + "]");
-    console.log("Filter: [" + state.filter + "]");
-    if (!state.filter.includes(newCondition)) {
-      if (state.filter) {
-        dispatch({
-          filter: state.filter + " && " + newCondition,
-        });
+    console.log("Filter: [" + filter + "]");
+    if (!filter.includes(newCondition)) {
+      if (filter) {
+        setFilter(filter + " && " + newCondition);
       } else {
-        dispatch({
-          filter: newCondition,
-        });
+        setFilter(newCondition);
       }
     }
   };

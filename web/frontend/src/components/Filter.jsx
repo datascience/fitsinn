@@ -1,13 +1,12 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { Button } from "@mui/material";
 import { tokens } from "../theme";
-import React, { useEffect } from "react";
-import { useState } from "react";
-import { useTracked } from "react-tracked";
+import React, { useEffect, useState } from "react";
 import { QueryBuilderMaterial } from "@react-querybuilder/material";
 import { QueryBuilder, formatQuery, parseCEL } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
 import { BACKEND_URL } from "../AppConfig";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 const operators = [
   { name: "=", label: "=" },
@@ -18,7 +17,7 @@ const operators = [
   { name: ">=", label: ">=" },
 ];
 
-const properties = [
+var properties = [
   { name: "FORMAT", label: "FORMAT" },
   { name: "FORMAT_VERSION", label: "FORMAT_VERSION" },
   { name: "MIMETYPE", label: "MIMETYPE" },
@@ -33,42 +32,49 @@ const properties = [
   { name: "CREATINGAPPLICATIONNAME", label: "CREATINGAPPLICATIONNAME" },
 ];
 
+export const dateProperties = ["FSLASTMODIFIED", "CREATED", "LASTMODIFIED"];
+
 const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [state, dispatch] = useTracked();
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
 
-  //var filter = sessionStorage.getItem("filter");
-  const [query, setQuery] = useState(
-    state.filter ? parseCEL(state.filter) : ""
+  const [filterString, setFilterString] = useSessionStorage("filterString", "");
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
   );
-  // useState(filter ? parseCEL(filter) : state.filter);
 
-  var fields = properties;
-
-  useEffect(
-    () => {
-      //if (!state.filterFields) {
-
-      const fetchSources = async () => {
-        try {
-          const response = await fetch(BACKEND_URL + "/sources");
-          let data = await response.json();
-          let sources = data.map((prop) => ({ name: prop, label: prop }));
-          dispatch({ filterSources: sources });
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      fetchSources();
-      console.log("updating filter component state");
-      setQuery(state.filter ? parseCEL(state.filter) : "");
-    },
-    //}
-    [state.filter]
+  const [filter, setFilter] = useState(
+    filterString ? parseCEL(filterString) : ""
   );
+
+  useEffect(() => {
+    properties = globalProperties.map((prop) => {
+      if (dateProperties.includes(prop)) {
+        return { name: prop, label: prop, inputType: "date" };
+      } else {
+        return { name: prop, label: prop };
+      }
+    });
+    console.log("updating filter component state");
+  }, []);
+
+  const updateFilter = (q) => {
+    if (q == "") {
+      return;
+    }
+    let stringQuery = formatQuery(q, "cel");
+    console.log(stringQuery);
+    if (stringQuery === "1 == 1" || stringQuery.endsWith('== ""')) {
+      setFilterString("");
+    } else {
+      setFilterString(stringQuery);
+    }
+    setFilter(q);
+  };
 
   return (
     <Box
@@ -101,40 +107,12 @@ const Filter = () => {
       >
         <QueryBuilderMaterial style={{ color: "green", ".rqb-spacing": 0.5 }}>
           <QueryBuilder
-            fields={fields}
+            fields={properties}
             operators={operators}
-            query={query}
-            onQueryChange={(q) => setQuery(q)}
+            query={filterString ? parseCEL(filterString) : ""}
+            onQueryChange={updateFilter}
           />
         </QueryBuilderMaterial>
-      </Box>
-      <Box
-        sx={{
-          ".MuiButton-root": {
-            color: colors.grey[100],
-            backgroundColor: colors.blueAccent[700],
-          },
-        }}
-      >
-        <Button
-          onClick={() => {
-            if (query == "") {
-              return;
-            }
-            let stringQuery = formatQuery(query, "cel");
-            console.log(stringQuery);
-            //sessionStorage.setItem("filter", stringQuery);
-            if (stringQuery === "1 == 1") {
-              dispatch({ filter: "" });
-            } else {
-              dispatch({ filter: stringQuery });
-            }
-          }}
-        >
-          <Typography variant="h5" fontWeight="600">
-            Set filter
-          </Typography>
-        </Button>
       </Box>
     </Box>
   );

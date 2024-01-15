@@ -12,7 +12,11 @@ public interface CharacterisationResultRepository extends JpaRepository<Characte
     @Query("select property, count(*) as count from CharacterisationResultJPA group by property")
     List<Object[]> getPropertyDistribution();
 
+    @Query("select distinct filePath, property from CharacterisationResultJPA")
+    List<Object[]> getFilepathProperty();
+
     List<CharacterisationResultJPA> findAllByFilePath(String filePath);
+
 
 
 }

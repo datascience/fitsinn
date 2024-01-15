@@ -2,11 +2,11 @@ DROP ALL OBJECTS;
 
 CREATE TABLE characterisationresult (
 id INTEGER NOT NULL AUTO_INCREMENT,
-filePath varchar(400),
-property varchar(200),
-source varchar(200),
-property_value varchar(400),
-valueType  varchar(200),
+filePath varchar(400)  NOT NULL,
+property varchar(200)  NOT NULL,
+source varchar(200)  NOT NULL,
+property_value varchar(400)  NOT NULL,
+valueType  varchar(200)  NOT NULL,
 CONSTRAINT PK_Characterisationresult PRIMARY KEY (filePath,property, source)
 );
 

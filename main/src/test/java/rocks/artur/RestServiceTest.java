@@ -102,7 +102,7 @@ class RestServiceTest {
     @Test
     void getCollectionStatisticsTest() {
         String str = given().port(port)
-                .when().get("/statistics")
+                .when().post("/statistics")
                 .then()
                 .statusCode(200).extract().asString();
         System.out.println("Result: " + str);
@@ -229,5 +229,14 @@ class RestServiceTest {
         System.out.println("Result: " + str);
 
         Assert.assertNotNull(str);
+    }
+
+    @Test
+    void resolveConflictsTest() {
+        String str = given().port(port)
+                .when().post("/resolveconflicts")
+                .then()
+                .statusCode(200).extract().asString();
+        System.out.println("Result: " + str);
     }
 }

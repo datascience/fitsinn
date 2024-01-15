@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTracked } from "react-tracked";
 import AlertMessage from "./components/AlertMessage";
+import { useSessionStorage } from "@uidotdev/usehooks";
 
 export const BACKEND_URL =
   "http://" +
@@ -9,26 +10,31 @@ export const BACKEND_URL =
   process.env.REACT_APP_REST_API_PORT;
 
 const AppConfig = () => {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [state, dispatch] = useTracked();
+  const [errorMessage, setErrorMessage] = useSessionStorage("errorMessage", "");
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
+  );
+
+  const fetchGlobalProperties = async () => {
+    const response = await fetch(BACKEND_URL + "/properties");
+    let data = await response.json();
+    let properties = data.map((prop) => prop.property);
+    setGlobalProperties(properties);
+  };
+  const fetchHealth = async () => {
+    try {
+      const response = await fetch(BACKEND_URL + "/health");
+      await response;
+    } catch (error) {
+      console.log(error);
+      setErrorMessage("REST API is not accessible!");
+    }
+  };
+
   useEffect(() => {
-    //console.log("loading data from session storage");
-
-    //var filter = sessionStorage.getItem("filter");
-    //if (filter) {
-    //  dispatch({ filter: filter });
-    //}
-
-    const fetchGet = async () => {
-      try {
-        const response = await fetch(BACKEND_URL + "/health");
-        await response;
-      } catch (error) {
-        console.log(error);
-        setErrorMessage("REST API is not accessible!");
-      }
-    };
-    fetchGet();
+    fetchHealth();
+    fetchGlobalProperties();
   }, []);
 
   return (

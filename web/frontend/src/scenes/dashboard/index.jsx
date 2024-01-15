@@ -1,53 +1,94 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
-import React, { useState, useEffect } from "react";
+import { useSessionStorage } from "@uidotdev/usehooks";
+import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../AppConfig";
+import Header from "../../components/Header";
+import StatBox from "../../components/StatBox";
+import { tokens } from "../../theme";
 import Histogram from "./histogram";
 import Stat from "./stat";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [sizeStatistics, setSizeStatistics] = useState({
-    totalSize: 10047,
-    avgSize: 3349,
-    sizeDistribution: [
-      { count: 2, value: "0-1KB" },
-      { count: 1, value: "1KB-1MB" },
-    ],
-    minSize: 4,
-    maxSize: 10000,
-    conflictRate: 0.17,
-  });
+  const [sizeStatistics, setSizeStatistics] = useState([
+    {
+      totalSize: 10047,
+      avgSize: 3349,
+      minSize: 4,
+      maxSize: 10000,
+      conflictRate: 0.17,
+    },
+  ]);
+
+  const [properties, setProperties] = useState([]);
+
+  const [filter, setFilter] = useSessionStorage("filterString", "");
+
+  const [globalProperties, setGlobalProperties] = useSessionStorage(
+    "globalProperties",
+    []
+  );
+  const [conflictResolution, setConflictResolution] = useSessionStorage(
+    "conflictResolution",
+    {
+      color: colors.blueAccent[700],
+      text: "resolve",
+    }
+  );
+
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const fetchStatistics = async () => {
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+    const response = await fetch(
+      BACKEND_URL +
+        "/statistics?" +
+        new URLSearchParams({
+          filter: filter,
+        }),
+      requestOptions
+    );
+    const data = await response.json();
+    setSizeStatistics(data);
+  };
 
   useEffect(() => {
     console.log("loading the dashboard");
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
 
+    fetchStatistics();
+  }, [filter]);
+
+  const handleClick = () => {
+    console.log("Conflict resolution started");
     const fetchPost = async () => {
-      try {
-        var requestOptions = {
-          method: "GET",
-          headers: myHeaders,
-          redirect: "follow",
-        };
-
-        const response = await fetch(
-          BACKEND_URL + "/statistics",
-          requestOptions
-        );
-        const data = await response.json();
-
-        setSizeStatistics(data);
-      } catch (error) {
-        console.log(error);
-      }
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      const response = await fetch(
+        BACKEND_URL + "/resolveconflicts",
+        requestOptions
+      );
+      setConflictResolution({
+        color: colors.blueAccent[700],
+        text: "resolved",
+      });
+      console.log("Conflict resolution finished");
     };
     fetchPost();
-  }, []);
+    setConflictResolution({
+      color: colors.blueAccent[300],
+      text: "resolving",
+    });
+  };
 
   return (
     <Box m="20px">
@@ -57,9 +98,9 @@ const Dashboard = () => {
       </Box>
 
       {/* GRID & CHARTS */}
-      <Grid2 container spacing={1} sx={4}>
+      <Grid2 container spacing={1}>
         <Stat
-          title="Total File Count"
+          title="File Count"
           value={
             sizeStatistics.totalCount == null ? 0 : sizeStatistics.totalCount
           }
@@ -101,23 +142,47 @@ const Dashboard = () => {
           }
         />
 
-        <Stat
-            title="Conflct Rate (%)"
-            value={
-              sizeStatistics.conflictRate == null
+        <Grid2 item>
+          <Box
+            width={210}
+            height={100}
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StatBox
+              subtitle="Conflct Rate (%)"
+              title={
+                sizeStatistics.conflictRate == null
                   ? 0
                   : (sizeStatistics.conflictRate * 100).toFixed(2)
-            }
-        />
+              }
+            />
+            <Box
+              sx={{
+                ".MuiButton-root": {
+                  color: colors.grey[100],
+                  backgroundColor: colors.blueAccent[700],
+                  fontSize: 12,
+                  margin: "0px 20px 0px -20px",
+                  width: 90,
+                },
+              }}
+            >
+              <Button onClick={handleClick}>
+                <Typography variant="h5" fontWeight="600">
+                  {conflictResolution.text}
+                </Typography>
+              </Button>
+            </Box>
+          </Box>
+        </Grid2>
       </Grid2>
       <Grid2 container spacing={1}>
-        <Histogram property="MIMETYPE"></Histogram>
-        <Histogram property="FORMAT"></Histogram>
-        <Histogram property="EXTERNALIDENTIFIER"></Histogram>
-
-        <Histogram property="FORMAT_VERSION"></Histogram>
-        <Histogram property="FSLASTMODIFIED"></Histogram>
-        <Histogram property="SIZE"></Histogram>
+        {globalProperties.map((prop) => (
+          <Histogram property={prop}></Histogram>
+        ))}
       </Grid2>
     </Box>
   );

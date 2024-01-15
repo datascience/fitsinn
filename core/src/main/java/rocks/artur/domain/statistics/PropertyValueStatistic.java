@@ -3,7 +3,7 @@ package rocks.artur.domain.statistics;
 /**
  * This class describes a distribution of property values.
  */
-public class    PropertyValueStatistic {
+public class PropertyValueStatistic {
     private Long count;
     private String value;
 
@@ -26,5 +26,13 @@ public class    PropertyValueStatistic {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyValueStatistic{" +
+                "count=" + count +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

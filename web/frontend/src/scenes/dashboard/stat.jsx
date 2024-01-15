@@ -10,7 +10,7 @@ const Stat = ({ value, title }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Grid2 item sx="auto">
+    <Grid2 item>
       <Box
         width={150}
         height={100}

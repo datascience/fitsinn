@@ -22,7 +22,11 @@ public class FilterJPA {
             String result;
             switch (property.getValueType()) {
                 case TIMESTAMP:
-                    result = String.format("select distinct FILEPATH from CHARACTERISATIONRESULTVIEW where property = '%s' and PARSEDATETIME(PROPERTY_VALUE,'dd-MM-yyyy HH:mm:ss') %s PARSEDATETIME('%s','yyyy-MM-dd')", property, operator, value);
+                    if (!value.equals("CONFLICT")) {
+                        result = String.format("select distinct FILEPATH from CHARACTERISATIONRESULT where property = '%s' and PARSEDATETIME(PROPERTY_VALUE,'dd-MM-yyyy HH:mm:ss') %s PARSEDATETIME('%s','yyyy-MM-dd')", property, operator, value);
+                    } else {
+                        result = String.format("select distinct FILEPATH from CHARACTERISATIONRESULTVIEW where property = '%s' and property_value %s '%s'", property, operator, value);
+                    }
                     break;
                 default:
                     result = String.format("select distinct FILEPATH from CHARACTERISATIONRESULTVIEW where property = '%s' and property_value %s '%s'", property, operator, value);

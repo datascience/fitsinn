@@ -70,7 +70,7 @@ const PropertyValueDistribution = (payload) => {
 
     console.log(dateProperties);
 
-    if (dateProperties.includes(property)) {
+    if (event.indexValue != "CONFLICT" && dateProperties.includes(property)) {
       newCondition = `${property} >= "${event.indexValue}-01-01" && ${property} <= "${event.indexValue}-12-31"`;
     } else {
       newCondition = `${property} == "${event.indexValue}"`;

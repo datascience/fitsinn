@@ -32,7 +32,7 @@ var properties = [
   { name: "CREATINGAPPLICATIONNAME", label: "CREATINGAPPLICATIONNAME" },
 ];
 
-export const dateProperties = ["FSLASTMODIFIED", "CREATED"];
+export const dateProperties = ["FSLASTMODIFIED", "CREATED", "LASTMODIFIED"];
 
 const Filter = () => {
   const theme = useTheme();

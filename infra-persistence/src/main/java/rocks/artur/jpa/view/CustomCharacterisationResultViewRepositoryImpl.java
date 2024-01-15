@@ -49,10 +49,16 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         }
         //THIS IS H2-SPECIFIC SQL, BECAUSE OF PARSEDATETIME
         String query = String.format(
-                "select SUBSTRING(PROPERTY_VALUE,7,4), count(*) " +
+                "select CASE " +
+                        "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
+                        "ELSE SUBSTRING(PROPERTY_VALUE,7,4) " +
+                        "END, count(*) " +
                         "from CHARACTERISATIONRESULTVIEW t " +
                         "join (%s) c on t.FILEPATH=c.FILEPATH " +
-                        "where PROPERTY= '%s' group by SUBSTRING(PROPERTY_VALUE,7,4)", subquery, property);
+                        "where PROPERTY= '%s' group by CASE " +
+                        "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
+                        "ELSE SUBSTRING(PROPERTY_VALUE,7,4) " +
+                        "END", subquery, property);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;

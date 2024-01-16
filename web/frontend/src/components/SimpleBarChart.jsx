@@ -67,16 +67,43 @@ const SimpleBarChart = ({ data, property, filterClick }) => {
       axisBottom={null}
       axisLeft={null}
       axisRight={{
-        format: (v) => {
-          return v.length > 30 ? "..." + v.substring(v.length - 30) : v;
-        },
+        //format: (v) => {
+        //  return v.length > 30 ? "..." + v.substring(v.length - 30) : v;
+        //},
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
         legend: "",
-
         legendPosition: "middle",
         legendOffset: -40,
+        renderTick: ({
+          textAnchor,
+          textBaseline,
+          textX,
+          textY,
+          value,
+          x,
+          y,
+        }) => {
+          value =
+            value.length > 30
+              ? "..." + value.substring(value.length - 30)
+              : value;
+          return (
+            <g transform={`translate(${x},${y})`}>
+              <text
+                alignmentBaseline={textBaseline}
+                textAnchor={textAnchor}
+                transform={`translate(${textX},${textY})`}
+                fill={
+                  value == "CONFLICT" ? colors.redAccent[500] : colors.grey[100]
+                }
+              >
+                <tspan>{value}</tspan>
+              </text>
+            </g>
+          );
+        },
       }}
       labelSkipWidth={12}
       labelSkipHeight={12}

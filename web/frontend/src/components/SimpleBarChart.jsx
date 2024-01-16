@@ -58,7 +58,7 @@ const SimpleBarChart = ({ data, property, filterClick }) => {
       height={250}
       colors={colors.greenAccent[400]}
       enableGridY={false}
-      margin={{ top: 10, bottom: 10, right: 250, left: 10 }}
+      margin={{ top: 10, bottom: 10, right: 270, left: 10 }}
       padding={0.3}
       borderColor={{
         from: "color",
@@ -67,7 +67,16 @@ const SimpleBarChart = ({ data, property, filterClick }) => {
       axisBottom={null}
       axisLeft={null}
       axisRight={{
-        tickSize: 3,
+        format: (v) => {
+          return v.length > 30 ? "..." + v.substring(v.length - 30) : v;
+        },
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: "",
+
+        legendPosition: "middle",
+        legendOffset: -40,
       }}
       labelSkipWidth={12}
       labelSkipHeight={12}

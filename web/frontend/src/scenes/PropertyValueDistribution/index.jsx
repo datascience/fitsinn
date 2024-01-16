@@ -48,7 +48,7 @@ const PropertyValueDistribution = (payload) => {
           });
           if (data.length > 10) {
             data.length = 10;
-            data.push({ count: sum, value: "...others" });
+            data.push({ count: sum, value: ".etc" });
           }
           data.reverse();
           setData(data);

@@ -102,7 +102,7 @@ class CharacterisationResultGatewayImplTest {
         String typeFilter = "FORMAT=\"Portable Document Format\"";
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria parse = parser.parse(typeFilter);
-        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics(null);
+        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getCollectionStatistics(null);
         Assert.assertEquals(10047.0, sizeStatistics.get("totalSize"), 0.1);
         System.out.println(sizeStatistics);
     }
@@ -112,7 +112,7 @@ class CharacterisationResultGatewayImplTest {
         String typeFilter = "FORMAT=\"Portable Document Format\"";
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria parse = parser.parse(typeFilter);
-        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getSizeStatistics(parse);
+        Map<String, Double> sizeStatistics = characterisationResultGatewaySqlImpl.getCollectionStatistics(parse);
         Assert.assertEquals(4.0, sizeStatistics.get("totalSize"), 0.1);
         System.out.println(sizeStatistics);
     }

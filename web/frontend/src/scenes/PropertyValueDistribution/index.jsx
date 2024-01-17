@@ -63,7 +63,7 @@ const PropertyValueDistribution = (payload) => {
   }, [filter]);
 
   let filterClick = (property, event) => {
-    if (event.indexValue == "...others") {
+    if (event.indexValue == ".etc") {
       return;
     }
     let newCondition = null;

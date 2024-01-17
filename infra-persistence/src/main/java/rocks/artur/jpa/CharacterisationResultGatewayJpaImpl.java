@@ -158,25 +158,19 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     }
 
     @Override
-    public Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria) {
+    public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria) {
         Map<String, Double> result = new HashMap<>();
 
         double[] sizeStatistics = characterisationResultViewRepository.getSizeStatistics(filterCriteria);
         result.put("totalSize", sizeStatistics[0]);
-        Long minSize = characterisationResultViewRepository.getMinSize();
         result.put("minSize", sizeStatistics[1]);
-        Long maxSize = characterisationResultViewRepository.getMaxSize();
         result.put("maxSize", sizeStatistics[2]);
-
-        Long avgSize = characterisationResultViewRepository.getAvgSize();
         result.put("avgSize", sizeStatistics[3]);
-
-        Long totalCount = characterisationResultViewRepository.getTotalCount();
         result.put("totalCount", sizeStatistics[4]);
 
-        double conflictRate = this.getConflictRate();
-        result.put("conflictRate", conflictRate);
-
+        double[] conflictStatistics  = characterisationResultViewRepository.getConflictStatistics(filterCriteria);
+        result.put("conflictRate", conflictStatistics[1]);
+        result.put("conflictCount", conflictStatistics[0]);
         return result;
     }
 

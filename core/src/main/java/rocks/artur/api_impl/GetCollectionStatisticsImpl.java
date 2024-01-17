@@ -15,13 +15,9 @@ public class GetCollectionStatisticsImpl implements GetCollectionStatistics {
     }
 
     @Override
-    public Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria) {
-        Map<String, Double> sizeStatistics = characterisationResultGateway.getSizeStatistics(filterCriteria);
+    public Map<String, Double> getStatistics(FilterCriteria filterCriteria) {
+        Map<String, Double> sizeStatistics = characterisationResultGateway.getCollectionStatistics(filterCriteria);
         return sizeStatistics;
     }
 
-    @Override
-    public double getConflictRate() {
-        return characterisationResultGateway.getConflictRate();
-    }
 }

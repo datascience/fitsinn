@@ -12,6 +12,8 @@ public interface CustomCharacterisationResultViewRepository {
 
     List<Object[]> getObjects(FilterCriteria filterCriteria);
 
+    double[] getConflictStatistics(FilterCriteria filterCriteria);
+
     List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize);
 
     List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties);

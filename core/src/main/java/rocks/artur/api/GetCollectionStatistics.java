@@ -5,7 +5,6 @@ import rocks.artur.domain.FilterCriteria;
 import java.util.Map;
 
 public interface GetCollectionStatistics {
-    Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria);
+    Map<String, Double> getStatistics(FilterCriteria filterCriteria);
 
-    double getConflictRate();
 }

@@ -55,7 +55,7 @@ public interface CharacterisationResultGateway {
      */
     List<CharacterisationResult> getConflictsByFilepath(String filepath);
 
-    Map<String, Double> getSizeStatistics(FilterCriteria filterCriteria);
+    Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria);
 
     List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter);
 

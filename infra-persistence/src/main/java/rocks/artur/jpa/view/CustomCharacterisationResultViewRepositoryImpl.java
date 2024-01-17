@@ -8,7 +8,6 @@ import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,7 +81,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     }
 
     @Override
-    public double[] getSizeStatistics(FilterCriteria filterCriteria){
+    public double[] getSizeStatistics(FilterCriteria filterCriteria) {
         String subquery = "select distinct FILEPATH from CHARACTERISATIONRESULTVIEW ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
@@ -105,6 +104,38 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         Double avg = Double.valueOf(singleResult[3].toString());
         Double count = Double.valueOf(singleResult[4].toString());
         double[] result = new double[]{sum, min, max, avg, count};
+        return result;
+    }
+
+
+    @Override
+    public double[] getConflictStatistics(FilterCriteria filterCriteria) {
+        String subquery = "select distinct FILEPATH from CHARACTERISATIONRESULTVIEW ";
+        if (filterCriteria != null) {
+            subquery = filterJPA.convert(filterCriteria);
+        }
+
+        String query = String.format(
+                "select count(distinct t.FILEPATH) as count " +
+                        "from CHARACTERISATIONRESULTVIEW t " +
+                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "where t.PROPERTY_VALUE='CONFLICT'", subquery);
+
+        Long conflictsCount = (Long) entityManager.createNativeQuery(query).getSingleResult();
+
+
+        String query2 = String.format(
+                "select count(distinct t.FILEPATH) as count " +
+                        "from CHARACTERISATIONRESULTVIEW t " +
+                        "join (%s) c on t.FILEPATH=c.FILEPATH ", subquery);
+
+        Long totalCount = (Long) entityManager.createNativeQuery(query2).getSingleResult();
+
+        double rate = 0d;
+        if (totalCount != 0) {
+            rate = (double) conflictsCount / totalCount;
+        }
+        double[] result = new double[]{conflictsCount, rate};
         return result;
     }
 
@@ -179,7 +210,6 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         List<String[]> resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;
     }
-
 
 
 }

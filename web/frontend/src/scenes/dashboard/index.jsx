@@ -38,6 +38,14 @@ const Dashboard = () => {
     }
   );
 
+  const fetchGlobalProperties = async () => {
+    const response = await fetch(BACKEND_URL + "/properties");
+    let data = await response.json();
+    let properties = data.map((prop) => prop.property);
+    setGlobalProperties(properties);
+  };
+
+
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -63,6 +71,7 @@ const Dashboard = () => {
     console.log("loading the dashboard");
 
     fetchStatistics();
+    fetchGlobalProperties();
   }, [filter]);
 
   const handleClick = () => {

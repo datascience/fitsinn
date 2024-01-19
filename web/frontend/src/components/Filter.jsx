@@ -1,12 +1,10 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { Button } from "@mui/material";
-import { tokens } from "../theme";
-import React, { useEffect, useState } from "react";
-import { QueryBuilderMaterial } from "@react-querybuilder/material";
-import { QueryBuilder, formatQuery, parseCEL } from "react-querybuilder";
+import {Box, useTheme} from "@mui/material";
+import {tokens} from "../theme";
+import React, {useEffect, useState} from "react";
+import {QueryBuilderMaterial} from "@react-querybuilder/material";
+import {formatQuery, parseCEL, QueryBuilder} from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
-import { BACKEND_URL } from "../AppConfig";
-import { useSessionStorage } from "@uidotdev/usehooks";
+import {useSessionStorage} from "@uidotdev/usehooks";
 
 const operators = [
   { name: "=", label: "=" },
@@ -60,7 +58,7 @@ const Filter = () => {
       }
     });
     console.log("updating filter component state");
-  }, []);
+  }, [globalProperties]);
 
   const updateFilter = (q) => {
     if (q == "") {

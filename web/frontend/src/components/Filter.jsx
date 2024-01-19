@@ -31,7 +31,7 @@ var properties = [
 ];
 
 export const dateProperties = ["FSLASTMODIFIED", "CREATED", "LASTMODIFIED"];
-
+export const uniqueProperties = ["FILENAME", "FILEPATH", "MD5CHECKSUM", "TITLE", "MESSAGE"];
 const Filter = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);

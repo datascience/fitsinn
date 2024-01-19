@@ -8,6 +8,7 @@ import StatBox from "../../components/StatBox";
 import { tokens } from "../../theme";
 import Histogram from "./histogram";
 import Stat from "./stat";
+import {uniqueProperties} from "../../components/Filter";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -189,9 +190,11 @@ const Dashboard = () => {
         </Grid2>
       </Grid2>
       <Grid2 container spacing={1}>
-        {globalProperties.map((prop) => (
-          <Histogram property={prop}></Histogram>
-        ))}
+        {globalProperties.map((prop) => {
+          if (!uniqueProperties.includes(prop)) {
+            return <Histogram property={prop}></Histogram>
+          }
+        })}
       </Grid2>
     </Box>
   );

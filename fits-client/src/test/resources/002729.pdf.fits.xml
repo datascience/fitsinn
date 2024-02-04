@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fits xmlns="http://hul.harvard.edu/ois/xml/ns/fits/fits_output" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd" version="0.6.0" timestamp="12/27/11 11:41 AM">
+  <identification status="SINGLE_RESULT">
+    <identity format="PDF/X" mimetype="application/pdf" toolname="FITS" toolversion="0.6.0">
+      <tool toolname="Droid" toolversion="3.0" />
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/144</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/145</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/146</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/147</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/148</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/157</externalIdentifier>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">fmt/158</externalIdentifier>
+    </identity>
+  </identification>
+  <fileinfo>
+    <filepath toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">/home/petrov/taverna/tmp/002/002729.pdf</filepath>
+    <filename toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">/home/petrov/taverna/tmp/002/002729.pdf</filename>
+    <size toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">306944</size>
+    <md5checksum toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">a0d0af49871198eb831d791508c77533</md5checksum>
+    <fslastmodified toolname="OIS File Information" toolversion="0.1" status="SINGLE_RESULT">1324979152000</fslastmodified>
+  </fileinfo>
+  <filestatus />
+  <metadata />
+</fits>
+

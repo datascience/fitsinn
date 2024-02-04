@@ -3,7 +3,7 @@ version: '3'
 services:
 
   fits:
-    image: artourkin/fits-web:dev
+    image: artourkin/fits-web:main
     container_name: fits
     env_file: .env
     networks:
@@ -13,7 +13,7 @@ services:
       - 8081:8080
 
   rest:
-    image: artourkin/fitsinn-rest:dev
+    image: artourkin/fitsinn-rest:main
     container_name: rest
     env_file: .env
     networks:
@@ -26,7 +26,7 @@ services:
       - db-docker
 
   web:
-    image: artourkin/fitsinn-web:dev
+    image: artourkin/fitsinn-web:main
     container_name: web
     env_file: .env
     networks:

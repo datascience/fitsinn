@@ -1,7 +1,7 @@
 FROM maven:3.9.0 as builder
 COPY . /app
 WORKDIR /app
-RUN mvn -pl !web clean install -Pprod
+RUN mvn -pl !web clean install -DskipTests -Pdocker
 
 FROM openjdk:21-jdk-slim
 WORKDIR /app

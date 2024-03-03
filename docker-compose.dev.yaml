@@ -42,17 +42,29 @@ services:
       - 8080:3000
 
   db-docker:
-    image: oscarfonts/h2
+    image: mysql:8.0
     container_name: db-docker
     env_file: .env
     environment:
-      - H2_OPTIONS=-ifNotExists
+      MYSQL_DATABASE: fitsinn
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: pass
     networks:
       - web
     restart: unless-stopped
     ports:
-      - 1521:1521
-      - 81:81
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    env_file: .env
+    restart: always
+    networks:
+      - web
+    ports:
+      - 8090:8080
 
 networks:
   web:

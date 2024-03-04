@@ -60,7 +60,7 @@ services:
     image: adminer
     container_name: adminer
     env_file: .env
-    restart: always
+    restart: unless-stopped
     networks:
       - web
     ports:

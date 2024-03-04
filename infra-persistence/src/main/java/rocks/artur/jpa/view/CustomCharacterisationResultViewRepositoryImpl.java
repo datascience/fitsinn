@@ -50,13 +50,13 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         String query = String.format(
                 "select CASE " +
                         "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
-                        "ELSE SUBSTRING(PROPERTY_VALUE,7,4) " +
+                        "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
                         "END, count(*) " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILEPATH=c.FILEPATH " +
                         "where PROPERTY= '%s' group by CASE " +
                         "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
-                        "ELSE SUBSTRING(PROPERTY_VALUE,7,4) " +
+                        "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
                         "END", subquery, property);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
@@ -88,10 +88,10 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         }
 
         String query = String.format(
-                "select sum(cast (t.property_value as int)) as totalsize,  " +
-                        "min(cast (t.property_value as int)) as minsize, " +
-                        "max(cast (t.property_value as int)) as maxsize, " +
-                        "avg(cast (t.property_value as int)) as avgsize, " +
+                "select sum(cast(t.property_value as SIGNED)) as totalsize,  " +
+                        "min(cast(t.property_value as SIGNED)) as minsize, " +
+                        "max(cast(t.property_value as SIGNED)) as maxsize, " +
+                        "avg(cast(t.property_value as SIGNED)) as avgsize, " +
                         "count(t.property_value) as count " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILEPATH=c.FILEPATH " +

@@ -1,3 +1,7 @@
+DROP VIEW IF EXISTS characterisationresultview;
+DROP TABLE IF EXISTS characterisationresult;
+
+
 
 CREATE TABLE characterisationresult (
 id INT AUTO_INCREMENT primary key NOT NULL,

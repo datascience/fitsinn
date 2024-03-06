@@ -96,7 +96,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILEPATH=c.FILEPATH " +
                         "where t.PROPERTY='SIZE'", subquery);
-        LOG.error(query);
+
         Object[] singleResult = (Object[]) entityManager.createNativeQuery(query).getSingleResult();
         Double sum = Double.valueOf(singleResult[0].toString());
         Double min = Double.valueOf(singleResult[1].toString());

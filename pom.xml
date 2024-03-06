@@ -185,9 +185,9 @@
 
     <profiles>
         <profile>
-            <id>prod</id>
+            <id>docker</id>
             <properties>
-                <active.profile>prod</active.profile>
+                <active.profile>docker</active.profile>
             </properties>
             <build>
                 <plugins>

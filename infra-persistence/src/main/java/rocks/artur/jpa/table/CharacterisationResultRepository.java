@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CharacterisationResultRepository extends JpaRepository<CharacterisationResultJPA, String>, CustomCharacterisationResultRepository{
+public interface CharacterisationResultRepository extends JpaRepository<CharacterisationResultJPA, String>, CustomCharacterisationResultRepository {
 
     @Query("select property, count(*) as count from CharacterisationResultJPA group by property")
     List<Object[]> getPropertyDistribution();
@@ -16,7 +16,6 @@ public interface CharacterisationResultRepository extends JpaRepository<Characte
     List<Object[]> getFilepathProperty();
 
     List<CharacterisationResultJPA> findAllByFilePath(String filePath);
-
 
 
 }

@@ -28,7 +28,7 @@ public class JSONToolkit {
 
     private static final Logger LOG = LoggerFactory.getLogger(JSONToolkit.class);
     public static int PRETTY_PRINT_INDENT_FACTOR = 4;
-    static DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    static DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static String translateXML(String xmlString) throws JSONException {
         JSONObject xmlJSONObj = XML.toJSONObject(xmlString);

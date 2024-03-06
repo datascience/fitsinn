@@ -1,13 +1,15 @@
-DROP ALL OBJECTS;
+DROP VIEW IF EXISTS characterisationresultview;
+DROP TABLE IF EXISTS characterisationresult;
+
+
 
 CREATE TABLE characterisationresult (
-id INTEGER NOT NULL AUTO_INCREMENT,
-filePath varchar(400)  NOT NULL,
-property varchar(200)  NOT NULL,
-source varchar(200)  NOT NULL,
+id INT AUTO_INCREMENT primary key NOT NULL,
+filePath varchar(200)  NOT NULL,
+property varchar(50)  NOT NULL,
+source varchar(30)  NOT NULL,
 property_value varchar(400)  NOT NULL,
-valueType  varchar(200)  NOT NULL,
-CONSTRAINT PK_Characterisationresult PRIMARY KEY (filePath,property, source)
+valueType  varchar(200)  NOT NULL
 );
 
 CREATE INDEX idx_characterisationresult_filepath

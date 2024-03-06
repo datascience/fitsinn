@@ -88,15 +88,15 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         }
 
         String query = String.format(
-                "select sum(cast(t.property_value as SIGNED)) as totalsize,  " +
-                        "min(cast(t.property_value as SIGNED)) as minsize, " +
-                        "max(cast(t.property_value as SIGNED)) as maxsize, " +
-                        "avg(cast(t.property_value as SIGNED)) as avgsize, " +
+                "select  IFNULL(sum(cast(t.property_value as SIGNED)),0) as totalsize,  " +
+                        "IFNULL(min(cast(t.property_value as SIGNED)),0) as minsize, " +
+                        "IFNULL(max(cast(t.property_value as SIGNED)),0) as maxsize, " +
+                        "IFNULL(avg(cast(t.property_value as SIGNED)),0) as avgsize, " +
                         "count(t.property_value) as count " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILEPATH=c.FILEPATH " +
                         "where t.PROPERTY='SIZE'", subquery);
-
+        LOG.error(query);
         Object[] singleResult = (Object[]) entityManager.createNativeQuery(query).getSingleResult();
         Double sum = Double.valueOf(singleResult[0].toString());
         Double min = Double.valueOf(singleResult[1].toString());

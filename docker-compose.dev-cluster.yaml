@@ -1,0 +1,167 @@
+version: '3'
+
+services:
+
+  fits:
+    build:
+      context: .
+      dockerfile: ./fits/Dockerfile
+    container_name: fits
+    env_file: .env
+    networks:
+      - web
+    restart: unless-stopped
+    depends_on:
+      - rest
+    ports:
+      - 8081:8080
+
+  rest:
+    container_name: rest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-docker:6446/fitsinn
+    networks:
+      - web
+    restart: unless-stopped
+    ports:
+      - 8082:8080
+    depends_on:
+      - db-docker
+
+  web:
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile.dev
+    container_name: web
+    env_file: .env
+    networks:
+      - web
+    restart: unless-stopped
+    depends_on:
+      - rest
+    ports:
+      - 8080:3000
+
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      - web
+    ports:
+      - 8090:8080
+
+  mysql-server-1:
+    container_name: mysql-server-1
+    env_file:
+      - mysql/mysql-server.env
+    image: mysql/mysql-server:8.0.12
+    networks:
+      - web
+    command:
+      [
+        "mysqld",
+        "--server_id=1",
+        "--binlog_checksum=NONE",
+        "--gtid_mode=ON",
+        "--enforce_gtid_consistency=ON",
+        "--log_bin",
+        "--log_slave_updates=ON",
+        "--master_info_repository=TABLE",
+        "--relay_log_info_repository=TABLE",
+        "--transaction_write_set_extraction=XXHASH64",
+        "--user=mysql",
+        "--skip-host-cache",
+        "--skip-name-resolve",
+        "--default_authentication_plugin=mysql_native_password",
+      ]
+
+  mysql-server-2:
+    container_name: mysql-server-2
+    env_file:
+      - mysql/mysql-server.env
+    image: mysql/mysql-server:8.0.12
+    networks:
+      - web
+    command:
+      [
+        "mysqld",
+        "--server_id=2",
+        "--binlog_checksum=NONE",
+        "--gtid_mode=ON",
+        "--enforce_gtid_consistency=ON",
+        "--log_bin",
+        "--log_slave_updates=ON",
+        "--master_info_repository=TABLE",
+        "--relay_log_info_repository=TABLE",
+        "--transaction_write_set_extraction=XXHASH64",
+        "--user=mysql",
+        "--skip-host-cache",
+        "--skip-name-resolve",
+        "--default_authentication_plugin=mysql_native_password",
+      ]
+
+
+  mysql-server-3:
+    container_name: mysql-server-3
+    env_file:
+      - mysql/mysql-server.env
+    image: mysql/mysql-server:8.0.12
+    networks:
+      - web
+    command:
+      [
+        "mysqld",
+        "--server_id=3",
+        "--binlog_checksum=NONE",
+        "--gtid_mode=ON",
+        "--enforce_gtid_consistency=ON",
+        "--log_bin",
+        "--log_slave_updates=ON",
+        "--master_info_repository=TABLE",
+        "--relay_log_info_repository=TABLE",
+        "--transaction_write_set_extraction=XXHASH64",
+        "--user=mysql",
+        "--skip-host-cache",
+        "--skip-name-resolve",
+        "--default_authentication_plugin=mysql_native_password",
+      ]
+
+  mysql-shell:
+    container_name: mysql-shell
+    env_file:
+      - mysql/mysql-shell.env
+    image: neumayer/mysql-shell-batch
+    networks:
+      - web
+    volumes:
+      - ./mysql/scripts/:/scripts/
+    depends_on:
+      - mysql-server-1
+      - mysql-server-2
+      - mysql-server-3
+
+  db-docker:
+    container_name: db-docker
+    env_file:
+      - mysql/mysql-router.env
+    image: mysql/mysql-router:8.0
+    networks:
+      - web
+    ports:
+      - 3306:6446
+    depends_on:
+      - mysql-server-1
+      - mysql-server-2
+      - mysql-server-3
+      - mysql-shell
+    restart: on-failure
+
+networks:
+  web:

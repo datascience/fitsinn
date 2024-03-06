@@ -141,7 +141,7 @@ services:
     networks:
       - web
     volumes:
-      - ./mysql/scripts/:/scripts/
+      - ./mysql-cluster/scripts/:/scripts/
     depends_on:
       - mysql-server-1
       - mysql-server-2

@@ -2,7 +2,7 @@ DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
 
 CREATE TABLE characterisationresult (
-id uuid default random_uuid(),
+id UUID default random_uuid(),
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,

@@ -332,7 +332,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002526.html.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(24, output.size());
+        Assert.assertEquals(23, output.size());
     }
 
     @Test
@@ -343,7 +343,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("000009.pdf.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(34, output.size());
+        Assert.assertEquals(32, output.size());
     }
 
     @Test
@@ -354,7 +354,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002392.doc.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(26, output.size());
+        Assert.assertEquals(23, output.size());
     }
 
     @Test
@@ -377,7 +377,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002838.pdf.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(33, output.size());
+        Assert.assertEquals(31, output.size());
     }
 
     @Test

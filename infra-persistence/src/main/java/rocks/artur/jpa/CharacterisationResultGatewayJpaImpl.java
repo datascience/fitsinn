@@ -212,8 +212,16 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
-        List<CharacterisationResultJPA> list = characterisationResults.parallelStream().map(CharacterisationResultJPA::new).collect(Collectors.toList());
-        characterisationResultRepository.saveFast(list);
+        List<CharacterisationResultJPA> tmp = new ArrayList<>();
+        for (CharacterisationResult characterisationResult : characterisationResults) {
+            if (null == characterisationResult.getValue()){
+                LOG.error("Bad characterisation result: " + characterisationResult);
+            } else {
+                tmp.add(new CharacterisationResultJPA(characterisationResult));
+            }
+        }
+
+        characterisationResultRepository.saveFast(tmp);
     }
 
     @Override

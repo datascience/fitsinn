@@ -15,12 +15,10 @@ import rocks.artur.FITSObjects.*;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +26,16 @@ public class JSONToolkit {
 
     private static final Logger LOG = LoggerFactory.getLogger(JSONToolkit.class);
     public static int PRETTY_PRINT_INDENT_FACTOR = 4;
-    static DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    static DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mm:ssXXX]"))
+            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mm:ss]"))
+            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mmXXX]"))
+            .append(DateTimeFormatter.ISO_INSTANT)
+            .append(DateTimeFormatter.RFC_1123_DATE_TIME)
+            .append(DateTimeFormatter.RFC_1123_DATE_TIME).toFormatter();
+
 
     public static String translateXML(String xmlString) throws JSONException {
         JSONObject xmlJSONObj = XML.toJSONObject(xmlString);
@@ -141,56 +148,26 @@ public class JSONToolkit {
     }
 
     private static CharacterisationResult convertDataTypes(CharacterisationResult tmpResult) {
-
         switch (tmpResult.getProperty()) {
             case CREATED:
             case FSLASTMODIFIED:
             case LASTMODIFIED:
                 LOG.debug(String.format("Parsing Object: %s", tmpResult));
-                if (tmpResult.getSource().startsWith("Exiftool")) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ssXXX");
-                        LocalDateTime parse = sdf.parse(tmpResult.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                        tmpResult.setValue(parse.format(outputFormat));
-                    } catch (ParseException e) {
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-                            LocalDateTime parse = sdf.parse(tmpResult.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                            tmpResult.setValue(parse.format(outputFormat));
-                        } catch (ParseException ex) {
-                            try {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mmXXX");
-                                LocalDateTime parse = sdf.parse(tmpResult.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                                tmpResult.setValue(parse.format(outputFormat));
-                            } catch (ParseException ex2) {
-                                throw new RuntimeException(ex2);
-                            }
-                        }
-                    }
-                } else if (tmpResult.getSource().startsWith("NLNZ Metadata Extractor")) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        LocalDateTime parse = sdf.parse(tmpResult.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                        tmpResult.setValue(parse.format(outputFormat));
-                    } catch (ParseException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                } else if (tmpResult.getSource().startsWith("OIS File Information")) {
-                    LocalDateTime triggerTime =
+
+                if (tmpResult.getSource().startsWith("OIS File Information")) {
+                    LocalDateTime parsed =
                             LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(tmpResult.getValue())),
                                     TimeZone.getDefault().toZoneId());
-                    tmpResult.setValue(triggerTime.format(outputFormat));
-                } else if (tmpResult.getSource().startsWith("Tika")) {
-                    DateTimeFormatter tikaFormatter = DateTimeFormatter.ISO_INSTANT;
-                    Instant dateInstant = Instant.from(tikaFormatter.parse(tmpResult.getValue()));
-                    LocalDateTime date = LocalDateTime.ofInstant(dateInstant, ZoneId.systemDefault());
-                    tmpResult.setValue(date.format(outputFormat));
+                    tmpResult.setValue(parsed.format(outputFormatter));
+                } else {
 
+                    LocalDateTime parsed = LocalDateTime.parse(tmpResult.getValue(), inputFormatter);
+                    tmpResult.setValue(parsed.format(outputFormatter));
                 }
+
                 LOG.debug(String.format("Parsed Result: %s", tmpResult));
                 break;
         }
-
         return tmpResult;
     }
 

@@ -2,12 +2,13 @@ DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
 
 CREATE TABLE characterisationresult (
-id UUID primary key NOT NULL,
+id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())),
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,
 property_value varchar(400)  NOT NULL,
-valueType  varchar(200)  NOT NULL
+valueType  varchar(200)  NOT NULL,
+PRIMARY KEY ( id )
 );
 
 CREATE INDEX idx_characterisationresult_filepath

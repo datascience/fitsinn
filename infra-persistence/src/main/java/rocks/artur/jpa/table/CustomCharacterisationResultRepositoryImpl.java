@@ -23,7 +23,6 @@ public class CustomCharacterisationResultRepositoryImpl implements CustomCharact
 
     @Override
     @Transactional
-    @Async
     public void saveFast(List<CharacterisationResultJPA> results) {
 
         for (CharacterisationResultJPA result : results) {

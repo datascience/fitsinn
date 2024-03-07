@@ -13,7 +13,7 @@ valueType  varchar(200)  NOT NULL
 );
 
 CREATE INDEX idx_characterisationresult_filepath
-    ON characterisationresult (filePath);
+    ON characterisationresult (filePath, property);
 
 CREATE VIEW characterisationresultview AS
 SELECT t.filePath, t.property, t.valueType,

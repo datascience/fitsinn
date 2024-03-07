@@ -2,27 +2,31 @@ package rocks.artur.jpa.table;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
 
+import java.util.UUID;
+
 
 @Entity
-@IdClass(CharacterisationResultID.class)
 @Table(name = "characterisationresult")
 public class CharacterisationResultJPA {
 
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     @Column(nullable = false, name = "filepath")
     private String filePath;
-    @Id
     @Column(nullable = false)
     private String property;
 
-    @Id
     @Column(nullable = false)
     private String source;
 
@@ -87,6 +91,7 @@ public class CharacterisationResultJPA {
     @Override
     public String toString() {
         return "CharacterisationResultJPA{" +
+                ", id=" + id +
                 ", property=" + property +
                 ", value='" + value + '\'' +
                 ", valueType=" + valueType +

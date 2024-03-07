@@ -1,10 +1,8 @@
 DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
 
-
-
 CREATE TABLE characterisationresult (
-id INT AUTO_INCREMENT primary key NOT NULL,
+id UUID primary key NOT NULL,
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,

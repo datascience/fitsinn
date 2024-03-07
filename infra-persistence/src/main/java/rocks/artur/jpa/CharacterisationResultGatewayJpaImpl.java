@@ -28,6 +28,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                                          CharacterisationResultViewRepository characterisationResultViewRepository) {
         this.characterisationResultRepository = characterisationResultRepository;
         this.characterisationResultViewRepository = characterisationResultViewRepository;
+
     }
 
     @Override
@@ -211,14 +212,8 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
-
-        List<CharacterisationResultJPA> collect = characterisationResults.parallelStream().map(res -> {
-            CharacterisationResultJPA toSave = new CharacterisationResultJPA(res);
-            return toSave;
-        }).collect(Collectors.toList());
-
-        LOG.debug("saving " + collect);
-        characterisationResultRepository.saveAll(collect);
+        List<CharacterisationResultJPA> list = characterisationResults.parallelStream().map(CharacterisationResultJPA::new).collect(Collectors.toList());
+        characterisationResultRepository.saveFast(list);
     }
 
     @Override
@@ -232,4 +227,5 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     public void delete(CharacterisationResult characterisationResult) {
         characterisationResultRepository.delete(new CharacterisationResultJPA(characterisationResult));
     }
+
 }

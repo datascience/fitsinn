@@ -29,12 +29,8 @@ public class JSONToolkit {
     static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     static DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
-            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mm:ssXXX]"))
-            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mm:ss]"))
-            .append(DateTimeFormatter.ofPattern("[yyyy:MM:dd HH:mmXXX]"))
-            .append(DateTimeFormatter.ISO_INSTANT)
-            .append(DateTimeFormatter.RFC_1123_DATE_TIME)
-            .append(DateTimeFormatter.RFC_1123_DATE_TIME).toFormatter();
+            .appendPattern("[yyyy:MM:dd HH:mm:ssXXX][yyyy:MM:dd HH:mm:ss][yyyy:MM:dd HH:mmXXX][yyyy-MM-dd HH:mm:ss]")
+            .toFormatter();
 
 
     public static String translateXML(String xmlString) throws JSONException {

@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class JSONToolkit {
     static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     static DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
-            .appendPattern("[yyyy:MM:dd HH:mm:ssXXX][yyyy:MM:dd HH:mm:ss][yyyy:MM:dd HH:mmXXX][yyyy-MM-dd HH:mm:ss]")
+            .appendPattern("[yyyy:MM:dd HH:mm:ssXXX][yyyy:MM:dd HH:mm:ss][yyyy:MM:dd HH:mmXXX][yyyy-MM-dd HH:mm:ss][yyyy/MM/dd HH:mm:ss]")
             .toFormatter();
 
 
@@ -143,7 +144,7 @@ public class JSONToolkit {
         return result;
     }
 
-    private static CharacterisationResult convertDataTypes(CharacterisationResult tmpResult) {
+    private static CharacterisationResult convertDataTypes(CharacterisationResult tmpResult) throws DateTimeParseException {
         switch (tmpResult.getProperty()) {
             case CREATED:
             case FSLASTMODIFIED:

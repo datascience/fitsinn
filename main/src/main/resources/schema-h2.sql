@@ -1,8 +1,13 @@
 DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
 
+DROP SEQUENCE IF EXISTS seq;
+
+CREATE SEQUENCE seq AS BIGINT START WITH 1 INCREMENT BY 50;
+
+
 CREATE TABLE characterisationresult (
-id UUID default random_uuid(),
+id BIGINT NOT NULL,
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,

@@ -1,8 +1,15 @@
 DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
+DROP TABLE IF EXISTS seq;
+
+CREATE TABLE seq (
+next_val bigint(20) DEFAULT NULL
+);
+
+INSERT INTO seq (next_val) VALUES(100);
 
 CREATE TABLE characterisationresult (
-id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())),
+id BIGINT NOT NULL,
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,

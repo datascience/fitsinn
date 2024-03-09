@@ -1,20 +1,21 @@
 DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
-DROP TABLE IF EXISTS seq;
 
+DROP TABLE IF EXISTS seq;
 CREATE TABLE seq (
-next_val bigint(20) DEFAULT NULL
+next_val BIGINT DEFAULT NULL
 );
 
-INSERT INTO seq (next_val) VALUES(100);
+INSERT INTO seq VALUES (1);
+
 
 CREATE TABLE characterisationresult (
 id BIGINT NOT NULL,
-filePath varchar(200)  NOT NULL,
-property varchar(50)  NOT NULL,
-source varchar(30)  NOT NULL,
-property_value varchar(400)  NOT NULL,
-valueType  varchar(200)  NOT NULL,
+filePath varchar(255)  NOT NULL,
+property varchar(255)  NOT NULL,
+source varchar(255)  NOT NULL,
+property_value varchar(255)  NOT NULL,
+valueType  varchar(255)  NOT NULL,
 PRIMARY KEY ( id )
 );
 

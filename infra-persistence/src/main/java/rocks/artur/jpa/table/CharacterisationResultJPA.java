@@ -1,10 +1,11 @@
 package rocks.artur.jpa.table;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
-
 
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
@@ -16,7 +17,12 @@ public class CharacterisationResultJPA {
 
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "seqGen")
-    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 100)
+    @GenericGenerator(name = "seqGen", strategy = "sequence",
+            parameters = {
+                    @Parameter(name = "sequence", value = "seq"),
+                    @Parameter(name = "initial_value", value = "1"),
+                    @Parameter(name = "increment_size", value = "100")}
+    )
     private Long id;
 
     @Column(nullable = false, name = "filepath")
@@ -41,7 +47,8 @@ public class CharacterisationResultJPA {
         this.property = characterisationResult.getProperty().toString();
     }
 
-    public CharacterisationResultJPA(){}
+    public CharacterisationResultJPA() {
+    }
 
     public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
         CharacterisationResultJPA result = new CharacterisationResultJPA();
@@ -106,7 +113,7 @@ public class CharacterisationResultJPA {
     }
 
 
-    public CharacterisationResult toCharacterisationResult(){
+    public CharacterisationResult toCharacterisationResult() {
         CharacterisationResult result = new CharacterisationResult();
 
         result.setValue(this.value);

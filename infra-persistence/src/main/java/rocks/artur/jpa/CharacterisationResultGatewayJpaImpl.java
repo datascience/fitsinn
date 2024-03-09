@@ -221,7 +221,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             }
         }
 
-        characterisationResultRepository.saveFast(tmp);
+        characterisationResultRepository.saveAll(tmp);
     }
 
     @Override

@@ -1,13 +1,8 @@
 DROP VIEW IF EXISTS characterisationresultview;
 DROP TABLE IF EXISTS characterisationresult;
 
-DROP SEQUENCE IF EXISTS seq;
-
-CREATE SEQUENCE seq AS BIGINT START WITH 1 INCREMENT BY 50;
-
-
 CREATE TABLE characterisationresult (
-id BIGINT NOT NULL,
+id varchar(255) NOT NULL,
 filePath varchar(200)  NOT NULL,
 property varchar(50)  NOT NULL,
 source varchar(30)  NOT NULL,

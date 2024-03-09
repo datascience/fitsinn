@@ -2,12 +2,9 @@ package rocks.artur.jpa.table;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
-
-import static jakarta.persistence.GenerationType.SEQUENCE;
 
 
 @Entity
@@ -16,15 +13,10 @@ public class CharacterisationResultJPA {
 
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "seqGen")
-    @GenericGenerator(name = "seqGen", strategy = "sequence",
-            parameters = {
-                    @Parameter(name = "sequence", value = "seq"),
-                    @Parameter(name = "initial_value", value = "1"),
-                    @Parameter(name = "increment_size", value = "100")}
-    )
-    private Long id;
-
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", unique = true)
+    private String id;
     @Column(nullable = false, name = "filepath")
     private String filePath;
     @Column(nullable = false)

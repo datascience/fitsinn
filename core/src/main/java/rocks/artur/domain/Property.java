@@ -26,8 +26,6 @@ public enum Property {
 
     WELLFORMED(ValueType.STRING),
 
-    MESSAGE(ValueType.STRING),
-
     LINEBREAK(ValueType.STRING),
     CHARSET(ValueType.STRING),
     PAGECOUNT(ValueType.INTEGER),

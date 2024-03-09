@@ -53,14 +53,14 @@ public class STAXToolkit {
     private void handleStartElement(QName elementName, XMLStreamReader reader) throws XMLStreamException {
         // Add your logic to handle specific elements
         String elementNameLocalPart = elementName.getLocalPart();
-        System.out.println("Start Element: " + elementNameLocalPart);
+        LOG.debug("Start Element: " + elementNameLocalPart);
 
         switch (elementNameLocalPart) {
             case "identity":
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     String attributeName = reader.getAttributeName(i).getLocalPart();
                     String attributeValue = reader.getAttributeValue(i);
-                    System.out.println(" - Attribute: " + attributeName + "=" + attributeValue);
+                    LOG.debug(" - Attribute: " + attributeName + "=" + attributeValue);
                     if (attributeName.equals("format") || attributeName.equals("mimetype")) {
                         identities.put(attributeName, attributeValue);
                     }
@@ -70,7 +70,7 @@ public class STAXToolkit {
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     String attributeName = reader.getAttributeName(i).getLocalPart();
                     String attributeValue = reader.getAttributeValue(i);
-                    System.out.println(" - Attribute: " + attributeName + "=" + attributeValue);
+                    LOG.debug(" - Attribute: " + attributeName + "=" + attributeValue);
 
                     if ("toolname".equals(attributeName)) {
                         sources.add(attributeValue);
@@ -87,7 +87,7 @@ public class STAXToolkit {
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     String attributeName = reader.getAttributeName(i).getLocalPart();
                     String attributeValue = reader.getAttributeValue(i);
-                    System.out.println(" - Attribute: " + attributeName + "=" + attributeValue);
+                    LOG.debug(" - Attribute: " + attributeName + "=" + attributeValue);
                     if ("toolname".equals(attributeName)) {
                         version_source = attributeValue;
                     }
@@ -107,7 +107,7 @@ public class STAXToolkit {
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     String attributeName = reader.getAttributeName(i).getLocalPart();
                     String attributeValue = reader.getAttributeValue(i);
-                    System.out.println(" - Attribute: " + attributeName + "=" + attributeValue);
+                    LOG.debug(" - Attribute: " + attributeName + "=" + attributeValue);
                     if ("toolname".equals(attributeName)) {
                         sourceWellformed = attributeValue;
                     }
@@ -129,7 +129,7 @@ public class STAXToolkit {
                     for (int i = 0; i < reader.getAttributeCount(); i++) {
                         String attributeName = reader.getAttributeName(i).getLocalPart();
                         String attributeValue = reader.getAttributeValue(i);
-                        System.out.println(" - Attribute: " + attributeName + "=" + attributeValue);
+                        LOG.debug(" - Attribute: " + attributeName + "=" + attributeValue);
                         if ("toolname".equals(attributeName)) {
                             source = attributeValue;
                         }
@@ -153,7 +153,7 @@ public class STAXToolkit {
     private void handleEndElement(QName endElementName, XMLStreamReader reader) {
         // Add your logic to handle specific end elements
         String elementNameLocalPart = endElementName.getLocalPart();
-        System.out.println("End Element: " + elementNameLocalPart);
+        LOG.debug("End Element: " + elementNameLocalPart);
 
 
         switch (elementNameLocalPart) {
@@ -203,7 +203,7 @@ public class STAXToolkit {
     }
 
     private void handleText(String text) {
-        System.out.println("Text: " + text);
+        LOG.debug("Text: " + text);
         propertyValue = text;
     }
 }

@@ -1,4 +1,5 @@
-package rocks.artur;
+package rocks.artur.FITSClient;
+
 
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
@@ -6,10 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
 import org.springframework.test.context.ActiveProfiles;
 import rocks.artur.FITSClient.FITSClient;
 import rocks.artur.domain.CharacterisationResult;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -194,12 +198,12 @@ public class FITSClientTest {
     @Test
     void getVersionTest() throws IOException {
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("GET")
                         .withPath("/version")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody("1.5.0")
                 );
@@ -215,12 +219,12 @@ public class FITSClientTest {
     @Test
     void processFileAsByteArrayTest() throws IOException {
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/fits/examine")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -241,12 +245,12 @@ public class FITSClientTest {
     void processFileTest() throws IOException {
 
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/fits/examine")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -264,12 +268,12 @@ public class FITSClientTest {
     void processFITSFileTest() throws IOException {
 
         mockServer.when(
-                        request()
+                        HttpRequest.request()
                                 .withMethod("POST")
                                 .withPath("/fits/examine")
                                 .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -401,6 +405,21 @@ public class FITSClientTest {
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
         Assert.assertEquals(14, output.size());
+    }
+
+    @Test
+    void extractCharResultsStax() throws XMLStreamException {
+        FITSClient fitsClient = new FITSClient();
+        List<CharacterisationResult> characterisationResults = fitsClient.extractCharacterisationResultsStax(VALID_FITS_RESULT2);
+        System.out.println(characterisationResults);
+    }
+
+    @Test
+    void compareExtractionStaxVsJson() throws XMLStreamException {
+        FITSClient fitsClient = new FITSClient();
+        List<CharacterisationResult> characterisationResultsStax = fitsClient.extractCharacterisationResultsStax(VALID_FITS_RESULT3);
+        List<CharacterisationResult> characterisationResultsJSON = fitsClient.extractCharacterisationResults(VALID_FITS_RESULT3);
+        Assert.assertEquals(characterisationResultsJSON.size(), characterisationResultsStax.size());
     }
 
 }

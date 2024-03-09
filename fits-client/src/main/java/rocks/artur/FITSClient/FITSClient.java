@@ -19,8 +19,14 @@ import rocks.artur.api.CharacterisationResultProducer;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.utils.JSONToolkit;
+import rocks.artur.utils.STAXToolkit;
 
 import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -29,6 +35,7 @@ import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -42,7 +49,7 @@ public class FITSClient implements CharacterisationResultProducer {
     private static final Logger LOG = LoggerFactory.getLogger(FITSClient.class);
     List<String> knownProperties = Arrays.stream(FITSPropertyJsonPath.values()).map(Enum::name).collect(Collectors.toList());
     private String FITS_URL = "http://localhost:8888";
-
+    STAXToolkit staxToolkit = new STAXToolkit();
     @Override
     public String getVersion() throws IOException {
 
@@ -79,8 +86,8 @@ public class FITSClient implements CharacterisationResultProducer {
         if (isValid(file)) {
             try {
                 String fitsSTRING = new String(file, StandardCharsets.UTF_8);
-                return extractCharacterisationResults(fitsSTRING);
-            } catch (JSONException e) {
+                return extractCharacterisationResultsStax(fitsSTRING);
+            } catch (XMLStreamException e) {
                 throw new RuntimeException(e);
             }
         } else {
@@ -99,8 +106,8 @@ public class FITSClient implements CharacterisationResultProducer {
             String fitsResultXML = getString(response);
             LOG.debug(fitsResultXML);
             try {
-                return extractCharacterisationResults(fitsResultXML);
-            } catch (JSONException e) {
+                return extractCharacterisationResultsStax(fitsResultXML);
+            } catch (XMLStreamException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -113,7 +120,7 @@ public class FITSClient implements CharacterisationResultProducer {
         return processFile(fileContent, fileName);
     }
 
-    private List<CharacterisationResult> extractCharacterisationResults(String fitsResultXML) throws JSONException {
+    List<CharacterisationResult> extractCharacterisationResults(String fitsResultXML) throws JSONException {
         List<CharacterisationResult> results = new ArrayList<>();
         String fitsResultJSON = JSONToolkit.translateXML(fitsResultXML);
         Set<String> availableFitsProperties = JSONToolkit.getAvailableFitsProperties(fitsResultJSON);
@@ -140,6 +147,13 @@ public class FITSClient implements CharacterisationResultProducer {
 
         return results;
     }
+
+     List<CharacterisationResult> extractCharacterisationResultsStax(String fitsResultXML) throws XMLStreamException {
+        return staxToolkit.getCharacterisationResults(fitsResultXML);
+
+    }
+
+
 
 
     private void addFilepathLabel(List<CharacterisationResult> characterisationResults, String filepath) {

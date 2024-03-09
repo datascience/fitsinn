@@ -1,4 +1,4 @@
-package rocks.artur;
+package rocks.artur.FITSClient;
 
 import org.json.JSONException;
 import org.junit.Assert;

@@ -49,7 +49,6 @@ public class FITSClient implements CharacterisationResultProducer {
     private static final Logger LOG = LoggerFactory.getLogger(FITSClient.class);
     List<String> knownProperties = Arrays.stream(FITSPropertyJsonPath.values()).map(Enum::name).collect(Collectors.toList());
     private String FITS_URL = "http://localhost:8888";
-    STAXToolkit staxToolkit = new STAXToolkit();
     @Override
     public String getVersion() throws IOException {
 
@@ -71,14 +70,12 @@ public class FITSClient implements CharacterisationResultProducer {
     }
 
     public boolean isValid(byte[] file) {
-
-        try {
-            Validator FITSValidator = initValidator("fits_output.xsd");
-            FITSValidator.validate(new StreamSource(new ByteArrayInputStream(file)));
+        String content = new String(file);
+        if (content.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" ")) {
             return true;
-        } catch (SAXException | IOException e) {
-            return false;
         }
+        return false;
     }
 
     public List<CharacterisationResult> processFile(byte[] file, String filename) throws IOException {
@@ -149,6 +146,7 @@ public class FITSClient implements CharacterisationResultProducer {
     }
 
      List<CharacterisationResult> extractCharacterisationResultsStax(String fitsResultXML) throws XMLStreamException {
+        STAXToolkit staxToolkit = new STAXToolkit();
         return staxToolkit.getCharacterisationResults(fitsResultXML);
 
     }

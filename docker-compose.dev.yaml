@@ -20,9 +20,6 @@ services:
       context: .
       dockerfile: ./Dockerfile
     env_file: .env
-    environment:
-      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
-      - SPRING_JPA_SHOW_SQL=true
     networks:
       - web
     restart: unless-stopped

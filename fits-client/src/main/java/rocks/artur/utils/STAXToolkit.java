@@ -17,11 +17,8 @@ import java.util.*;
 public class STAXToolkit {
 
     private final Logger LOG = LoggerFactory.getLogger(STAXToolkit.class);
-
     Map<String, String> identities = new HashMap<>(); // [<format,Portable Network Graphics>, <mimetype,image/png>]
     List<String> sources = new ArrayList<>(); // [<Droid,6.4>, <Exiftool,11.54>]
-    Map<Property, String> properties = new HashMap<>(); //  [<format_version, Portable Network Graphics 1.0>, <format_version, Portable Network Graphics 1.5>]
-
     String filepath;
     String propertyValue;
     List<CharacterisationResult> results = new ArrayList<>();

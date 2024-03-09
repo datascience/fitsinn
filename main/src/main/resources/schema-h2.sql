@@ -3,11 +3,11 @@ DROP TABLE IF EXISTS characterisationresult;
 
 CREATE TABLE characterisationresult (
 id varchar(255) NOT NULL,
-filePath varchar(200)  NOT NULL,
-property varchar(50)  NOT NULL,
-source varchar(30)  NOT NULL,
-property_value varchar(400)  NOT NULL,
-valueType  varchar(200)  NOT NULL,
+filePath varchar(255)  NOT NULL,
+property varchar(255)  NOT NULL,
+source varchar(255)  NOT NULL,
+property_value varchar(255)  NOT NULL,
+valueType  varchar(255)  NOT NULL,
 PRIMARY KEY ( id )
 );
 

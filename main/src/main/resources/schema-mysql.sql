@@ -13,7 +13,7 @@ PRIMARY KEY ( id )
 );
 
 CREATE INDEX idx_characterisationresult_filepath
-    ON characterisationresult (filePath, property);
+    ON characterisationresult (filePath, property, source);
 
 CREATE VIEW characterisationresultview AS
 SELECT t.filePath, t.property, t.valueType,

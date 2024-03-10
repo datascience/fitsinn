@@ -70,20 +70,25 @@ public class FITSClient implements CharacterisationResultProducer {
     }
 
     public boolean isValid(byte[] file) {
-        String content = new String(file);
-        if (content.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" ")) {
+
+        try {
+            Validator FITSValidator = initValidator("fits_output.xsd");
+            FITSValidator.validate(new StreamSource(new ByteArrayInputStream(file)));
             return true;
+        } catch (SAXException | IOException e) {
+            return false;
         }
-        return false;
+    }
+
+    public boolean isValid(String content) {
+        return content.contains("xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\"");
     }
 
     public List<CharacterisationResult> processFile(byte[] file, String filename) throws IOException {
-
-        if (isValid(file)) {
+        String content = new String(file);
+        if (isValid(content)) {
             try {
-                String fitsSTRING = new String(file, StandardCharsets.UTF_8);
-                return extractCharacterisationResultsStax(fitsSTRING);
+                return extractCharacterisationResultsStax(content);
             } catch (XMLStreamException e) {
                 throw new RuntimeException(e);
             }

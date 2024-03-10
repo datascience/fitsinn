@@ -29,7 +29,7 @@ public class FITSClientTest {
 
     private int MOCK_SERVER_PORT = 8888;
 
-    public static String VALID_FITS_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"1.5.0\" timestamp=\"2/19/20 1:26 PM\">\n" +
             "  <identification status=\"CONFLICT\">\n" +
             "    <identity format=\"Markdown\" mimetype=\"text/markdown\" toolname=\"FITS\" toolversion=\"1.5.0\">\n" +
@@ -70,7 +70,7 @@ public class FITSClientTest {
             "\n";
 
 
-    public static String VALID_FITS_RESULT2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"1.5.0\" timestamp=\"7/29/20 7:50 PM\">\n" +
             "  <identification>\n" +
             "    <identity format=\"Portable Network Graphics\" mimetype=\"image/png\" toolname=\"FITS\" toolversion=\"1.5.0\">\n" +
@@ -141,7 +141,7 @@ public class FITSClientTest {
             "</fits>\n";
 
 
-    public static String VALID_FITS_RESULT3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"0.6.0\" timestamp=\"12/27/11 10:49 AM\">\n" +
             "  <identification>\n" +
             "    <identity format=\"Portable Document Format\" mimetype=\"application/pdf\" toolname=\"FITS\" toolversion=\"0.6.0\">\n" +

@@ -213,15 +213,17 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
         List<CharacterisationResultJPA> tmp = new ArrayList<>();
         for (CharacterisationResult characterisationResult : characterisationResults) {
-            if (null == characterisationResult.getValue()) {
+            if (null == characterisationResult) {
                 LOG.error("Bad characterisation result: " + characterisationResult);
             } else {
                 CharacterisationResultJPA characterisationResultJPA = new CharacterisationResultJPA(characterisationResult);
                 String value = characterisationResultJPA.getValue();
-                if (value.length() > 255) {
-                    characterisationResultJPA.setValue(value.substring(0, 255));
+                if (value != null) {
+                    if (value.length() > 255) {
+                        characterisationResultJPA.setValue(value.substring(0, 255));
+                    }
+                    tmp.add(characterisationResultJPA);
                 }
-                tmp.add(characterisationResultJPA);
             }
         }
 

@@ -23,7 +23,7 @@ services:
       - web
     restart: unless-stopped
     deploy:
-      replicas: 5
+      replicas: 2
     depends_on:
       - fits
       - db-docker

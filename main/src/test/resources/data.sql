@@ -1,5 +1,5 @@
 
-INSERT INTO characterisationresult (id, filePath, property, source, property_value, valueType)
+INSERT INTO characterisationresult (id, file_path, property, source, property_value, value_type)
 VALUES
 (10,'/home/conftest1', 'FORMAT', 'file utility:5.03', 'Portable Document Format', 'STRING'),
 (11,'/home/conftest1', 'FORMAT', 'Droid:3', 'MS Word', 'STRING'),

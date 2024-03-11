@@ -8,7 +8,7 @@ import rocks.artur.domain.ValueType;
 
 
 @Entity
-@Table(name = "characterisationresult")
+@Table(name = "characterisationresult", uniqueConstraints = @UniqueConstraint(name = "unique_comb", columnNames={"file_path", "property", "source"}) )
 public class CharacterisationResultJPA {
 
 
@@ -17,7 +17,7 @@ public class CharacterisationResultJPA {
     @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", unique = true)
     private String id;
-    @Column(nullable = false, name = "filepath")
+    @Column(nullable = false, name = "file_path")
     private String filePath;
     @Column(nullable = false)
     private String property;
@@ -28,7 +28,7 @@ public class CharacterisationResultJPA {
     @Column(name = "property_value", nullable = false)
     private String value;
 
-    @Column(name = "valuetype", nullable = false)
+    @Column(name = "value_type", nullable = false)
     private String valueType;
 
     public CharacterisationResultJPA(CharacterisationResult characterisationResult) {

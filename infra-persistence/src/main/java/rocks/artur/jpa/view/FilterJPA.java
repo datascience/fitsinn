@@ -23,13 +23,13 @@ public class FilterJPA {
             switch (property.getValueType()) {
                 case TIMESTAMP:
                     if (!value.equals("CONFLICT")) {
-                        result = String.format("select distinct FILEPATH from characterisationresult where property = '%s' and cast(PROPERTY_VALUE as DATETIME) %s cast('%s' as DATE)", property, operator, value);
+                        result = String.format("select distinct FILE_PATH from characterisationresult where property = '%s' and cast(PROPERTY_VALUE as DATETIME) %s cast('%s' as DATE)", property, operator, value);
                     } else {
-                        result = String.format("select distinct FILEPATH from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
+                        result = String.format("select distinct FILE_PATH from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
                     }
                     break;
                 default:
-                    result = String.format("select distinct FILEPATH from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
+                    result = String.format("select distinct FILE_PATH from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
             }
             return result;
         } else if (filter instanceof AndFilterCriteria) {

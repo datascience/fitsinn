@@ -24,7 +24,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     @Override
     public List getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filter != null) {
             subquery = filterJPA.convert(filter);
         }
@@ -32,7 +32,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         String query = String.format(
                 "select PROPERTY_VALUE, count(*) " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
                         "where PROPERTY= '%s' group by PROPERTY_VALUE", subquery, property);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
@@ -42,7 +42,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     @Override
     public List getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filter != null) {
             subquery = filterJPA.convert(filter);
         }
@@ -53,7 +53,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
                         "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
                         "END, count(*) " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
                         "where PROPERTY= '%s' group by CASE " +
                         "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
                         "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
@@ -65,16 +65,16 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     public List<Object[]> getObjects(FilterCriteria filterCriteria) {
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
         }
 
         String query = String.format(
-                "select t.FILEPATH, count(*) " +
+                "select t.FILE_PATH, count(*) " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
-                        "group by t.FILEPATH", subquery);
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
+                        "group by t.FILE_PATH", subquery);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;
@@ -82,7 +82,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     public double[] getSizeStatistics(FilterCriteria filterCriteria) {
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
         }
@@ -94,7 +94,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
                         "IFNULL(avg(cast(t.property_value as SIGNED)),0) as avgsize, " +
                         "count(t.property_value) as count " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
                         "where t.PROPERTY='SIZE'", subquery);
 
         Object[] singleResult = (Object[]) entityManager.createNativeQuery(query).getSingleResult();
@@ -110,24 +110,24 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     public double[] getConflictStatistics(FilterCriteria filterCriteria) {
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
         }
 
         String query = String.format(
-                "select count(distinct t.FILEPATH) as count " +
+                "select count(distinct t.FILE_PATH) as count " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH " +
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
                         "where t.PROPERTY_VALUE='CONFLICT'", subquery);
 
         Long conflictsCount = (Long) entityManager.createNativeQuery(query).getSingleResult();
 
 
         String query2 = String.format(
-                "select count(distinct t.FILEPATH) as count " +
+                "select count(distinct t.FILE_PATH) as count " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH ", subquery);
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH ", subquery);
 
         Long totalCount = (Long) entityManager.createNativeQuery(query2).getSingleResult();
 
@@ -141,15 +141,15 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize) {
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
         }
 
         String query = String.format(
-                "select t.FILEPATH " +
+                "select t.FILE_PATH " +
                         "from characterisationresultview t " +
-                        "join (%s) c on t.FILEPATH=c.FILEPATH group by t.FILEPATH " +
+                        "join (%s) c on t.FILE_PATH=c.FILE_PATH group by t.FILE_PATH " +
                         "ORDER BY RAND() LIMIT %d  ", subquery, sampleSize);
 
         List<String> resultList = entityManager.createNativeQuery(query).getResultList();
@@ -159,7 +159,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
 
     public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties) {
-        String subquery = "select distinct FILEPATH from characterisationresultview ";
+        String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {
             subquery = filterJPA.convert(filterCriteria);
         }
@@ -170,7 +170,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         for (int i = 0; i < properties.size(); i++) {
             String currProperty = properties.get(i).name();
             if (i == 0) {
-                select.append(String.format("count(%s.filepath) as size, min(%s.filepath) as example, %s.property_value ", currProperty, currProperty, currProperty));
+                select.append(String.format("count(%s.file_path) as size, min(%s.file_path) as example, %s.property_value ", currProperty, currProperty, currProperty));
             } else {
                 select.append(String.format(", %s.property_value ", currProperty));
             }
@@ -182,11 +182,11 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
             String currProperty = properties.get(i).name();
             if (i == 0) {
 
-                from.append(String.format(" (SELECT v.property_value, v.filepath FROM characterisationresultview v\n" +
-                        "join (%s) c on v.FILEPATH=c.FILEPATH where v.property='%s' ) %s ", subquery, currProperty, currProperty));
+                from.append(String.format(" (SELECT v.property_value, v.file_path FROM characterisationresultview v\n" +
+                        "join (%s) c on v.FILE_PATH=c.FILE_PATH where v.property='%s' ) %s ", subquery, currProperty, currProperty));
             } else {
-                from.append(String.format(" join (SELECT v.property_value, v.filepath FROM characterisationresultview v\n" +
-                        "join (%s) c on v.FILEPATH=c.FILEPATH where v.property='%s') %s on %s.filepath=%s.filepath ", subquery, currProperty, currProperty, properties.get(0), currProperty));
+                from.append(String.format(" join (SELECT v.property_value, v.file_path FROM characterisationresultview v\n" +
+                        "join (%s) c on v.FILE_PATH=c.FILE_PATH where v.property='%s') %s on %s.file_path=%s.file_path ", subquery, currProperty, currProperty, properties.get(0), currProperty));
             }   //TODO: Probably, the join is not required. Check if it is true.
         }
 

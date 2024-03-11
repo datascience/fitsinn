@@ -2,7 +2,7 @@
 
 COUNTER=0
 
-PARALLEL_TASKS=50
+PARALLEL_TASKS=30
 
 for i in $(find $2 -type f -print)
 do

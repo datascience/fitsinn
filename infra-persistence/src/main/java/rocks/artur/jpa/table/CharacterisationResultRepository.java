@@ -19,4 +19,5 @@ public interface CharacterisationResultRepository extends JpaRepository<Characte
     List<CharacterisationResultJPA> findAllByFilePath(String filePath);
 
 
+
 }

@@ -8,7 +8,8 @@ property varchar(255)  NOT NULL,
 source varchar(255)  NOT NULL,
 property_value varchar(255)  NOT NULL,
 value_type  varchar(255)  NOT NULL,
-PRIMARY KEY ( id )
+PRIMARY KEY ( id ),
+UNIQUE (file_path, property, source)
 );
 
 CREATE INDEX idx_characterisationresult_filepath

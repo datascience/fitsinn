@@ -6,16 +6,18 @@ import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
 
+import java.util.UUID;
+
 
 @Entity
-@Table(name = "characterisationresult", uniqueConstraints = @UniqueConstraint(name = "unique_comb", columnNames={"file_path", "property", "source"}) )
+@Table(name = "characterisationresult", uniqueConstraints = @UniqueConstraint(name = "unique_comb", columnNames = {"file_path", "property", "source"}))
 public class CharacterisationResultJPA {
 
 
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "id", unique = true)
+    @Column(name = "id")
     private String id;
     @Column(nullable = false, name = "file_path")
     private String filePath;
@@ -32,6 +34,7 @@ public class CharacterisationResultJPA {
     private String valueType;
 
     public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
+        this.id = UUID.randomUUID().toString();
         this.filePath = characterisationResult.getFilePath();
         this.source = characterisationResult.getSource();
         this.value = characterisationResult.getValue();
@@ -40,6 +43,7 @@ public class CharacterisationResultJPA {
     }
 
     public CharacterisationResultJPA() {
+        this.id = UUID.randomUUID().toString();
     }
 
     public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
@@ -117,4 +121,26 @@ public class CharacterisationResultJPA {
         return result;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CharacterisationResultJPA that = (CharacterisationResultJPA) o;
+
+        if (!getFilePath().equals(that.getFilePath())) return false;
+        if (!getProperty().equals(that.getProperty())) return false;
+        return getSource().equals(that.getSource());
+    }
+
+    @Override
+    public int hashCode() {
+        if (getFilePath() == null || getSource() == null || getProperty() == null) {
+            return 0;
+        }
+        int result = getFilePath().hashCode();
+        result = 31 * result + getProperty().hashCode();
+        result = 31 * result + getSource().hashCode();
+        return result;
+    }
 }

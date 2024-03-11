@@ -2,6 +2,7 @@ package rocks.artur.jpa;
 
 
 import jakarta.transaction.Transactional;
+import org.h2.jdbc.JdbcBatchUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.artur.domain.*;
@@ -211,12 +212,12 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
-        List<CharacterisationResultJPA> tmp = new ArrayList<>();
-        for (CharacterisationResult characterisationResult : characterisationResults) {
-            if (null == characterisationResult) {
-                LOG.error("Bad characterisation result: " + characterisationResult);
+        Set<CharacterisationResultJPA> tmp = new HashSet<>();
+        characterisationResults.stream().parallel().forEach(item -> {
+            if (null == item) {
+                LOG.error("Bad characterisation result: " + item);
             } else {
-                CharacterisationResultJPA characterisationResultJPA = new CharacterisationResultJPA(characterisationResult);
+                CharacterisationResultJPA characterisationResultJPA = new CharacterisationResultJPA(item);
                 String value = characterisationResultJPA.getValue();
                 if (value != null) {
                     if (value.length() > 255) {
@@ -225,9 +226,13 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                     tmp.add(characterisationResultJPA);
                 }
             }
+        });
+        try {
+            characterisationResultRepository.saveAll(tmp);
+        } catch (RuntimeException e) {
+            LOG.error("Some characterisation results have already been persisted. Batch insert is not possible." );
+            throw new IllegalArgumentException("Some characterisation results have already been persisted. Batch insert is not possible.");
         }
-
-        characterisationResultRepository.saveAll(tmp);
     }
 
     @Override

@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.springframework.test.context.ActiveProfiles;
-import rocks.artur.FITSClient.FITSClient;
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 
 import javax.xml.stream.XMLStreamException;
@@ -235,7 +234,8 @@ public class FITSClientTest {
 
         FITSClient fitsClient = new FITSClient();
         fitsClient.setFITS_URL(String.format("http://localhost:%d", MOCK_SERVER_PORT));
-        List<CharacterisationResult> output = fitsClient.processFile(array, "testFileName");
+        ByteFile byteFile = new ByteFile(array, "testFileName" );
+        List<CharacterisationResult> output = fitsClient.processFile(byteFile);
 
         Assert.assertEquals(12, output.size());
     }
@@ -311,7 +311,7 @@ public class FITSClientTest {
 
         URL resource = getClass().getClassLoader().getResource("README.md");
         File file = new File(resource.getPath());
-        List<CharacterisationResult> output = fitsClient.processFile(Files.readAllBytes(file.toPath()), "testFileName");
+        List<CharacterisationResult> output = fitsClient.processFile(file);
 
         Assert.assertEquals(9, output.size());
     }

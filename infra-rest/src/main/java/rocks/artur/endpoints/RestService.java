@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rocks.artur.api.*;
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -96,8 +98,6 @@ public class RestService {
         List<Property> collect = objects.stream().map(item -> item.getProperty()).collect(Collectors.toList());
         return collect;
     }
-
-
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/statistics")
@@ -180,7 +180,8 @@ public class RestService {
         String filename = file.getOriginalFilename();
         byte[] bytes = file.getBytes();
         LOG.debug(String.format("Processing file { %s }", file.getOriginalFilename()));
-        Long totalCount = analyzePersistFile.uploadCharacterisationResults(bytes, filename);
+        ByteFile byteFile = new ByteFile(bytes, filename);
+        Long totalCount = analyzePersistFile.uploadCharacterisationResults(byteFile);
 
         Response response =
                 Response.ok(totalCount).build();
@@ -191,25 +192,23 @@ public class RestService {
 
     @RequestMapping(method = RequestMethod.POST, value = "/multipleupload", consumes = {
             "multipart/form-data"})
-    public Response ProcessFiles(@RequestPart(name = "files", required = true)  @Parameter(name = "files", description = "A list of digital objects to upload") MultipartFile[] files) throws IOException {
+    public Response ProcessFiles(@RequestPart(name = "files", required = true) @Parameter(name = "files", description = "A list of digital objects to upload") MultipartFile[] files) throws IOException {
         Long totalCount = 0L;
-        for (MultipartFile uploadfile : files) {
-            LOG.debug(String.format("Processing file { %s }", uploadfile.getOriginalFilename()));
-            byte[] bytes = uploadfile.getBytes();
-            String filename = uploadfile.getOriginalFilename();
-            totalCount += analyzePersistFile.uploadCharacterisationResults(bytes, filename);
+        List<ByteFile> byteFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            LOG.debug(String.format("Processing file { %s }", file.getOriginalFilename()));
+            ByteFile byteFile = new ByteFile(file.getBytes(), file.getOriginalFilename());
+            byteFiles.add(byteFile);
         }
-
-        Response response =
-                Response.ok(totalCount).build();
-
+        analyzePersistFile.uploadCharacterisationResults(byteFiles);
+        Response response = Response.ok(totalCount).build();
         return response;
     }
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/resolveconflicts")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void  resolveConflicts() throws ParseException {
+    public void resolveConflicts() throws ParseException {
         resolveConflicts.run();
     }
 }

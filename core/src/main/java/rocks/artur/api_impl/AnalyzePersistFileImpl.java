@@ -2,11 +2,12 @@ package rocks.artur.api_impl;
 
 import rocks.artur.api.AnalyzePersistFile;
 import rocks.artur.api.CharacterisationResultProducer;
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.CharacterisationResultGateway;
 
-import java.io.File;
-import java.io.IOException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class AnalyzePersistFileImpl implements AnalyzePersistFile {
@@ -20,24 +21,20 @@ public class AnalyzePersistFileImpl implements AnalyzePersistFile {
     }
 
     @Override
-    public Long uploadCharacterisationResults(File file) {
-        try {
-            List<CharacterisationResult> characterisationResults = characterisationResultProducer.processFile(file);
-            characterisationResults.forEach(item -> characterisationResultGateway.addCharacterisationResult(item));
-            return Long.valueOf(characterisationResults.size());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Long uploadCharacterisationResults(ByteFile file) {
+        List<CharacterisationResult> characterisationResults = characterisationResultProducer.processFile(file);
+        characterisationResultGateway.addCharacterisationResults(characterisationResults);
+        return Long.valueOf(characterisationResults.size());
     }
 
     @Override
-    public Long uploadCharacterisationResults(byte[] file, String filename) {
-        try {
-            List<CharacterisationResult> characterisationResults = characterisationResultProducer.processFile(file, filename);
-            characterisationResultGateway.addCharacterisationResults(characterisationResults);
-            return Long.valueOf(characterisationResults.size());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Long uploadCharacterisationResults(List<ByteFile> files) {
+        List<CharacterisationResult> characterisationResults = new ArrayList<>();
+        files.stream().parallel().forEach(file -> {
+            List<CharacterisationResult> tmp = characterisationResultProducer.processFile(file);
+            characterisationResults.addAll(tmp);
+        });
+        characterisationResultGateway.addCharacterisationResults(characterisationResults);
+        return Long.valueOf(characterisationResults.size());
     }
 }

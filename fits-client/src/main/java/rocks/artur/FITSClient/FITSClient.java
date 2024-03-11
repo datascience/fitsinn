@@ -16,17 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import rocks.artur.FITSObjects.FITSPropertyJsonPath;
 import rocks.artur.api.CharacterisationResultProducer;
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.utils.JSONToolkit;
 import rocks.artur.utils.STAXToolkit;
 
 import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -35,8 +32,6 @@ import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,12 +44,19 @@ public class FITSClient implements CharacterisationResultProducer {
     private static final Logger LOG = LoggerFactory.getLogger(FITSClient.class);
     List<String> knownProperties = Arrays.stream(FITSPropertyJsonPath.values()).map(Enum::name).collect(Collectors.toList());
     private String FITS_URL = "http://localhost:8888";
+
     @Override
-    public String getVersion() throws IOException {
+    public String getVersion(){
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(getFITS_URL() + "/version");
-        return getString(httpclient.execute(httpGet));
+        try {
+            return getString(httpclient.execute(httpGet));
+        } catch (IOException e) {
+            LOG.error("Exception occurred when querying the FITS version");
+            e.printStackTrace();
+        }
+        return "";
     }
 
 
@@ -84,42 +86,47 @@ public class FITSClient implements CharacterisationResultProducer {
         return content.contains("xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\"");
     }
 
-    public List<CharacterisationResult> processFile(byte[] file, String filename) throws IOException {
-        String content = new String(file);
-        if (isValid(content)) {
-            try {
-                return extractCharacterisationResultsStax(content);
-            } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost(getFITS_URL() + "/fits/examine");
-
-            ByteArrayBody body = new ByteArrayBody(file, filename);
-
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addPart("datafile", body);
-            HttpEntity reqEntity = builder.build();
-            httppost.setEntity(reqEntity);
-
-            CloseableHttpResponse response = httpclient.execute(httppost);
-            String fitsResultXML = getString(response);
-            LOG.debug(fitsResultXML);
-            try {
-                return extractCharacterisationResultsStax(fitsResultXML);
-            } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
-            }
+    @Override
+    public List<CharacterisationResult> processFile(File file) {
+        String fileName = file.getName();
+        byte[] fileContent = new byte[0];
+        try {
+            fileContent = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            LOG.error("Exception occurred during file processing");
+            e.printStackTrace();
         }
+        ByteFile byteFile = new ByteFile(fileContent, fileName);
+        return processFile(byteFile);
     }
 
     @Override
-    public List<CharacterisationResult> processFile(File file) throws IOException {
-        String fileName = file.getName();
-        byte[] fileContent = Files.readAllBytes(file.toPath());
-        return processFile(fileContent, fileName);
+    public List<CharacterisationResult> processFile(ByteFile file)  {
+        ArrayList<CharacterisationResult> result = new ArrayList<>();
+        if (file.getFile().length == 0) {
+            return result;
+        }
+        try {
+            String content = new String(file.getFile());
+            if (!isValid(content)) {
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                HttpPost httppost = new HttpPost(getFITS_URL() + "/fits/examine");
+                ByteArrayBody body = new ByteArrayBody(file.getFile(), file.getFilename());
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                builder.addPart("datafile", body);
+                HttpEntity reqEntity = builder.build();
+                httppost.setEntity(reqEntity);
+                CloseableHttpResponse response = httpclient.execute(httppost);
+
+                content = getString(response);
+                LOG.debug(content);
+            }
+            result.addAll(extractCharacterisationResultsStax(content));
+        } catch (Exception e) {
+            LOG.error("Exception occurred during file processing");
+            e.printStackTrace();
+        }
+        return result;
     }
 
     List<CharacterisationResult> extractCharacterisationResults(String fitsResultXML) throws JSONException {
@@ -150,13 +157,11 @@ public class FITSClient implements CharacterisationResultProducer {
         return results;
     }
 
-     List<CharacterisationResult> extractCharacterisationResultsStax(String fitsResultXML) throws XMLStreamException {
+    List<CharacterisationResult> extractCharacterisationResultsStax(String fitsResultXML) throws XMLStreamException {
         STAXToolkit staxToolkit = new STAXToolkit();
         return staxToolkit.getCharacterisationResults(fitsResultXML);
 
     }
-
-
 
 
     private void addFilepathLabel(List<CharacterisationResult> characterisationResults, String filepath) {

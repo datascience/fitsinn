@@ -38,7 +38,10 @@ public class App {
                     .startsWith("rocks.artur.domain") &&
                     !mr.getClassMetadata()
                     .getClassName()
-                    .startsWith("rocks.artur.api_impl.filter")
+                    .startsWith("rocks.artur.api_impl.filter") &&
+                    !mr.getClassMetadata()
+                    .getClassName()
+                    .startsWith("rocks.artur.api_impl.utils")
                     ;
         };
     }

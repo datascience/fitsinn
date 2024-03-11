@@ -15,7 +15,7 @@ def upload_chunk(url, chunk_files, chunk_count):
     end_time = time.time()
 
     # Print the response status code and content
-    print(f"Uploaded {chunk_count} - Status Code: {response.status_code}")
+    print(f"Uploaded {chunk_count} files. Time taken: {(end_time - start_time):.2f} seconds. Status Code: {response.status_code}")
     #print(response.text)
 
     return end_time - start_time

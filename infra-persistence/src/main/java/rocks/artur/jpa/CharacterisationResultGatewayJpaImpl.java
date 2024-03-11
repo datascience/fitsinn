@@ -4,7 +4,6 @@ package rocks.artur.jpa;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.artur.domain.Entry;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
@@ -86,16 +85,16 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
                 List<Float> floats = propertyValueDistribution.stream().filter(stat -> !(stat[0].equals("CONFLICT")))
                         .map(stat -> {
-                            Float val = Float.parseFloat(stat[0].toString());
-                            Long count =  (Long) stat[1];
+                                    Float val = Float.parseFloat(stat[0].toString());
+                                    Long count = (Long) stat[1];
 
-                            List<Float> result = new ArrayList<>();
+                                    List<Float> result = new ArrayList<>();
 
-                            for (long l=0; l < count; l++){
-                                result.add(val);
-                            }
-                            return result;
-                        }
+                                    for (long l = 0; l < count; l++) {
+                                        result.add(val);
+                                    }
+                                    return result;
+                                }
                         ).flatMap(Collection::stream).sorted(Float::compare).collect(Collectors.toList());
 
                 List<PropertyValueStatistic> propertyValueStatistics = BinningAlgorithms.runBinning(floats);
@@ -169,7 +168,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         result.put("avgSize", sizeStatistics[3]);
         result.put("totalCount", sizeStatistics[4]);
 
-        double[] conflictStatistics  = characterisationResultViewRepository.getConflictStatistics(filterCriteria);
+        double[] conflictStatistics = characterisationResultViewRepository.getConflictStatistics(filterCriteria);
         result.put("conflictRate", conflictStatistics[1]);
         result.put("conflictCount", conflictStatistics[0]);
         return result;
@@ -214,10 +213,15 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
         List<CharacterisationResultJPA> tmp = new ArrayList<>();
         for (CharacterisationResult characterisationResult : characterisationResults) {
-            if (null == characterisationResult.getValue()){
+            if (null == characterisationResult.getValue()) {
                 LOG.error("Bad characterisation result: " + characterisationResult);
             } else {
-                tmp.add(new CharacterisationResultJPA(characterisationResult));
+                CharacterisationResultJPA characterisationResultJPA = new CharacterisationResultJPA(characterisationResult);
+                String value = characterisationResultJPA.getValue();
+                if (value.length() > 255) {
+                    characterisationResultJPA.setValue(value.substring(0, 255));
+                }
+                tmp.add(characterisationResultJPA);
             }
         }
 
@@ -228,7 +232,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     public double getConflictRate() {
         Long totalCount = characterisationResultViewRepository.getTotalCount();
         Long conflictCount = characterisationResultViewRepository.getConflictCount();
-        return conflictCount/(double)totalCount;
+        return conflictCount / (double) totalCount;
     }
 
     @Override

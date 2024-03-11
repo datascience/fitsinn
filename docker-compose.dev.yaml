@@ -31,7 +31,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./web/Dockerfile
+      dockerfile: ./web/Dockerfile.dev
     container_name: web
     env_file: .env
     networks:

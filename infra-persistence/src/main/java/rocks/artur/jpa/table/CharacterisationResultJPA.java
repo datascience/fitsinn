@@ -10,7 +10,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "characterisationresult", uniqueConstraints = @UniqueConstraint(name = "unique_comb", columnNames = {"file_path", "property", "source"}))
+@Table(name = "characterisationresult")
 public class CharacterisationResultJPA {
 
 
@@ -34,7 +34,7 @@ public class CharacterisationResultJPA {
     private String valueType;
 
     public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
-        this.id = UUID.randomUUID().toString();
+        //this.id = UUID.randomUUID().toString();
         this.filePath = characterisationResult.getFilePath();
         this.source = characterisationResult.getSource();
         this.value = characterisationResult.getValue();
@@ -43,7 +43,7 @@ public class CharacterisationResultJPA {
     }
 
     public CharacterisationResultJPA() {
-        this.id = UUID.randomUUID().toString();
+        //this.id = UUID.randomUUID().toString();
     }
 
     public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
@@ -121,27 +121,4 @@ public class CharacterisationResultJPA {
         return result;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CharacterisationResultJPA that = (CharacterisationResultJPA) o;
-        if (filePath == null || property == null || source == null) return false;
-        if (that.filePath == null || that.property == null || that.source == null) return false;
-        if (!getFilePath().equals(that.getFilePath())) return false;
-        if (!getProperty().equals(that.getProperty())) return false;
-        return getSource().equals(that.getSource());
-    }
-
-    @Override
-    public int hashCode() {
-        if (getFilePath() == null || getSource() == null || getProperty() == null) {
-            return 0;
-        }
-        int result = getFilePath().hashCode();
-        result = 31 * result + getProperty().hashCode();
-        result = 31 * result + getSource().hashCode();
-        return result;
-    }
 }

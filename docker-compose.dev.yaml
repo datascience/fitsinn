@@ -23,7 +23,7 @@ services:
       - web
     restart: unless-stopped
     deploy:
-      replicas: 1
+      replicas: 3
     depends_on:
       - fits
       - db-docker
@@ -31,7 +31,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./web/Dockerfile.dev
+      dockerfile: ./web/Dockerfile
     container_name: web
     env_file: .env
     networks:

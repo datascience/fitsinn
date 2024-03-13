@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collection;
 
 @Repository
 public class CustomCharacterisationResultRepositoryImpl implements CustomCharacterisationResultRepository {
@@ -20,7 +20,7 @@ public class CustomCharacterisationResultRepositoryImpl implements CustomCharact
 
     @Override
     @Transactional
-    public void saveFast(List<CharacterisationResultJPA> results) {
+    public void saveFast(Collection<CharacterisationResultJPA> results) {
 
         for (CharacterisationResultJPA result : results) {
             entityManager.persist(result);

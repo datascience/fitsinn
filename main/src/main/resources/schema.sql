@@ -12,10 +12,10 @@ PRIMARY KEY ( id )
 );
 
 CREATE INDEX idx_characterisationresult_1
-    ON characterisationresult (file_path);
+    ON characterisationresult (file_path,property);
 
 CREATE INDEX idx_characterisationresult_2
-    ON characterisationresult ( property);
+    ON characterisationresult ( property,property_value);
 
 CREATE INDEX idx_characterisationresult_3
     ON characterisationresult ( property_value);

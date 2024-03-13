@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     }
 
     @Override
+    @Cacheable("distributions")
     public List getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
         String subquery = "select distinct FILE_PATH from characterisationresultview ";
@@ -40,6 +42,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     }
 
     @Override
+    @Cacheable("timedistributions")
     public List getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
         String subquery = "select distinct FILE_PATH from characterisationresultview ";
@@ -81,6 +84,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
     }
 
     @Override
+    @Cacheable("sizedistributions")
     public double[] getSizeStatistics(FilterCriteria filterCriteria) {
         String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filterCriteria != null) {

@@ -30,7 +30,7 @@ public class AnalyzePersistFileImpl implements AnalyzePersistFile {
     @Override
     public Long uploadCharacterisationResults(List<ByteFile> files) {
         List<CharacterisationResult> characterisationResults = new ArrayList<>();
-        files.stream().parallel().forEach(file -> {
+        files.stream().forEach(file -> {
             List<CharacterisationResult> tmp = characterisationResultProducer.processFile(file);
             characterisationResults.addAll(tmp);
         });

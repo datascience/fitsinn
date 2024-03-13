@@ -84,10 +84,10 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                 List<Object[]> propertyValueDistribution =
                         characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
 
-                List<Float> floats = propertyValueDistribution.stream().filter(stat -> !(stat[0].equals("CONFLICT")))
+                List<Float> floats = propertyValueDistribution.stream().parallel().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
-                                    Float val = Float.parseFloat(stat[0].toString());
-                                    Long count = (Long) stat[1];
+                                    Float val = Float.parseFloat(stat[1].toString());
+                                    Long count = (Long) stat[2];
 
                                     List<Float> result = new ArrayList<>();
 
@@ -100,8 +100,8 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
                 List<PropertyValueStatistic> propertyValueStatistics = BinningAlgorithms.runBinning(floats);
 
-                Optional<Long> conflicts = propertyValueDistribution.stream().filter(stat -> stat[0].equals("CONFLICT"))
-                        .map(stat -> (Long) stat[1]).findAny();
+                Optional<Long> conflicts = propertyValueDistribution.stream().parallel().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]) && stat[1].equals("CONFLICT"))
+                        .map(stat -> (Long) stat[2]).findAny();
 
                 conflicts.ifPresent(aLong -> propertyValueStatistics.add(new PropertyValueStatistic(aLong, "CONFLICT")));
 
@@ -111,8 +111,8 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
                         characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
-                collect = propertyValueDistribution.stream()
-                        .map(stat -> new PropertyValueStatistic((Long) stat[1], (String) stat[0]))
+                collect = propertyValueDistribution.stream().parallel().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
+                        .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
                 collect.sort(Comparator.comparingLong(PropertyValueStatistic::getCount).reversed());
                 return collect;

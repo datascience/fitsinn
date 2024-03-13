@@ -127,7 +127,8 @@ public class CharacterisationResultJPA {
         if (o == null || getClass() != o.getClass()) return false;
 
         CharacterisationResultJPA that = (CharacterisationResultJPA) o;
-
+        if (filePath == null || property == null || source == null) return false;
+        if (that.filePath == null || that.property == null || that.source == null) return false;
         if (!getFilePath().equals(that.getFilePath())) return false;
         if (!getProperty().equals(that.getProperty())) return false;
         return getSource().equals(that.getSource());

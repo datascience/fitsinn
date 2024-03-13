@@ -8,12 +8,20 @@ property varchar(255)  NOT NULL,
 source varchar(255)  NOT NULL,
 property_value varchar(255)  NOT NULL,
 value_type  varchar(255)  NOT NULL,
-PRIMARY KEY ( id ),
-UNIQUE (file_path, property, source)
+PRIMARY KEY ( id )
 );
 
-CREATE INDEX idx_characterisationresult_filepath
-    ON characterisationresult (file_path, property);
+CREATE INDEX idx_characterisationresult_1
+    ON characterisationresult (file_path);
+
+CREATE INDEX idx_characterisationresult_2
+    ON characterisationresult ( property);
+
+CREATE INDEX idx_characterisationresult_3
+    ON characterisationresult ( property_value);
+
+CREATE INDEX idx_characterisationresult_4
+    ON characterisationresult ( value_type);
 
 CREATE VIEW characterisationresultview AS
 SELECT t.file_path, t.property, t.value_type,

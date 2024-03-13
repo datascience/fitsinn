@@ -30,10 +30,10 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         }
 
         String query = String.format(
-                "select PROPERTY_VALUE, count(*) " +
+                "select PROPERTY, PROPERTY_VALUE, count(*) " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
-                        "where PROPERTY= '%s' group by PROPERTY_VALUE", subquery, property);
+                        "where VALUE_TYPE != 'TIMESTAMP' group by PROPERTY, PROPERTY_VALUE", subquery, property);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;

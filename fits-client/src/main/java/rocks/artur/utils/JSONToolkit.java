@@ -124,19 +124,25 @@ public class JSONToolkit {
                     }
 
                     CharacterisationResult tmpResult = new CharacterisationResult();
-                    setValues(tmpResult, Property.valueOf(jsonPath.name().toUpperCase()), gp.getContent());
-                    tmpResult.setSource(gp.getToolname() + ":" + gp.getToolversion());
-                    tmpResult = convertDataTypes(tmpResult);
-                    result.add(tmpResult);
+                    boolean isPresent = Arrays.stream(Property.values()).anyMatch(item -> jsonPath.name().equalsIgnoreCase(item.name()));
+                    if (isPresent) {
+                        setValues(tmpResult, Property.valueOf(jsonPath.name().toUpperCase()), gp.getContent());
+                        tmpResult.setSource(gp.getToolname() + ":" + gp.getToolversion());
+                        tmpResult = convertDataTypes(tmpResult);
+                        result.add(tmpResult);
+                    }
                 }
 
             } else {
                 GenericProperty read = document.read(jsonPath.getFitsProperty(), GenericProperty.class);
                 CharacterisationResult tmpResult = new CharacterisationResult();
-                setValues(tmpResult, Property.valueOf(jsonPath.name().toUpperCase()), read.getContent());
-                tmpResult.setSource(read.getToolname() + ":" + read.getToolversion());
-                tmpResult = convertDataTypes(tmpResult);
-                result.add(tmpResult);
+                boolean isPresent = Arrays.stream(Property.values()).anyMatch(item -> jsonPath.name().equalsIgnoreCase(item.name()));
+                if (isPresent) {
+                    setValues(tmpResult, Property.valueOf(jsonPath.name().toUpperCase()), read.getContent());
+                    tmpResult.setSource(read.getToolname() + ":" + read.getToolversion());
+                    tmpResult = convertDataTypes(tmpResult);
+                    result.add(tmpResult);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

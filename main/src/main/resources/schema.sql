@@ -11,17 +11,22 @@ value_type  varchar(255)  NOT NULL,
 PRIMARY KEY ( id )
 );
 
+
 CREATE INDEX idx_characterisationresult_1
-    ON characterisationresult (file_path,property);
+    ON characterisationresult ( property);
 
 CREATE INDEX idx_characterisationresult_2
-    ON characterisationresult ( property,property_value);
+    ON characterisationresult ( source);
 
 CREATE INDEX idx_characterisationresult_3
-    ON characterisationresult ( property_value);
+    ON characterisationresult ( value_type);
 
 CREATE INDEX idx_characterisationresult_4
-    ON characterisationresult ( value_type);
+    ON characterisationresult (property_value);
+
+CREATE INDEX idx_characterisationresult_5
+    ON characterisationresult (file_path);
+
 
 CREATE VIEW characterisationresultview AS
 SELECT t.file_path, t.property, t.value_type,

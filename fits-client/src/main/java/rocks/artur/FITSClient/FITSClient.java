@@ -149,9 +149,9 @@ public class FITSClient implements CharacterisationResultProducer {
                 JSONToolkit.getCharacterisationResults(FITSPropertyJsonPath.IDENTIFICATION, fitsResultJSON);
         results.addAll(characterisationResults);
 
-        String filepath = results.stream().filter(result ->
-                result.getProperty().equals(Property.FILEPATH)).findFirst().get().getValue().toString();
-        addFilepathLabel(results, filepath);
+        //String filepath = results.stream().filter(result ->
+       //         result.getProperty().equals(Property.FILEPATH)).findFirst().get().getValue().toString();
+        //addFilepathLabel(results, filepath);
 
 
         return results;

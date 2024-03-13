@@ -22,8 +22,11 @@ services:
     networks:
       - web
     restart: unless-stopped
+    environment:
+      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
+      - SPRING_JPA_SHOW_SQL=true
     deploy:
-      replicas: 3
+      replicas: 1
     depends_on:
       - fits
       - db-docker

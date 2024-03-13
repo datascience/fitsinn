@@ -14,7 +14,7 @@ import org.hibernate.annotations.Immutable;
 public class CharacterisationResultViewJPA {
 
     @Id
-    @Column(nullable = false, name = "filepath")
+    @Column(nullable = false, name = "file_path")
     private String filePath;
     @Id
     @Column(nullable = false)
@@ -22,7 +22,7 @@ public class CharacterisationResultViewJPA {
     @Column(nullable = false, name = "property_value")
     private String value;
 
-    @Column(nullable = false, name = "valuetype")
+    @Column(nullable = false, name = "value_type")
     private String valueType;
 
 

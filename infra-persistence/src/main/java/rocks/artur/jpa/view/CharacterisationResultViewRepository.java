@@ -11,7 +11,7 @@ public interface CharacterisationResultViewRepository extends JpaRepository<Char
         CharacterisationResultViewID>, CustomCharacterisationResultViewRepository {
     List<CharacterisationResultViewJPA> findByFilePath(String filePath);
 
-    @Query("select property, count(*) as count from CharacterisationResultViewJPA group by property")
+    @Query("select property, count(*) as count from CharacterisationResultViewJPA group by property" )
     List<Object[]> getPropertyDistribution();
 
     @Query("select count(*) as count from CharacterisationResultViewJPA where value='CONFLICT'")

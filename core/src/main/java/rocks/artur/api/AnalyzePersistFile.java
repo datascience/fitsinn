@@ -1,6 +1,8 @@
 package rocks.artur.api;
 
-import java.io.File;
+import rocks.artur.api_impl.utils.ByteFile;
+
+import java.util.List;
 
 /**
  * This interface enables the following actions:
@@ -8,6 +10,9 @@ import java.io.File;
  * - to persist a characterisation result in a db.
  */
 public interface AnalyzePersistFile {
-    Long uploadCharacterisationResults(File file);
-    Long uploadCharacterisationResults(byte[] file, String filename);
+
+    Long uploadCharacterisationResults(ByteFile file);
+
+    Long uploadCharacterisationResults(List<ByteFile> files);
+
 }

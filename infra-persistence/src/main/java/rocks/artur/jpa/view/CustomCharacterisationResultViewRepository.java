@@ -7,8 +7,8 @@ import rocks.artur.domain.Property;
 import java.util.List;
 
 public interface CustomCharacterisationResultViewRepository {
-    List getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter);
-    List getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter);
+    List getPropertyValueDistribution(FilterCriteria<CharacterisationResult> filter);
+    List getPropertyValueTimeStampDistribution(FilterCriteria<CharacterisationResult> filter);
 
     List<Object[]> getObjects(FilterCriteria filterCriteria);
 

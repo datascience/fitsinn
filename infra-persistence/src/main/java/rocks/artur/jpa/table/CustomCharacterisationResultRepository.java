@@ -1,10 +1,10 @@
 package rocks.artur.jpa.table;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface CustomCharacterisationResultRepository {
 
-    void saveFast(List<CharacterisationResultJPA> results);
+    void saveFast(Collection<CharacterisationResultJPA> results);
 
 
 }

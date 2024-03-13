@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface CharacterisationResultRepository extends JpaRepository<CharacterisationResultJPA, String>, CustomCharacterisationResultRepository {
@@ -16,6 +17,7 @@ public interface CharacterisationResultRepository extends JpaRepository<Characte
     List<Object[]> getFilepathProperty();
 
     List<CharacterisationResultJPA> findAllByFilePath(String filePath);
+
 
 
 }

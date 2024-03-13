@@ -4,15 +4,18 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 
 @SpringBootApplication
+@EnableCaching
 public class App {
 
     public static void main(String[] args) {
@@ -37,7 +40,10 @@ public class App {
                     .startsWith("rocks.artur.domain") &&
                     !mr.getClassMetadata()
                     .getClassName()
-                    .startsWith("rocks.artur.api_impl.filter")
+                    .startsWith("rocks.artur.api_impl.filter") &&
+                    !mr.getClassMetadata()
+                    .getClassName()
+                    .startsWith("rocks.artur.api_impl.utils")
                     ;
         };
     }

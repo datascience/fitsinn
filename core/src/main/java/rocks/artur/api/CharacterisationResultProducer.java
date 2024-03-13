@@ -1,5 +1,6 @@
 package rocks.artur.api;
 
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public interface CharacterisationResultProducer {
      * @return A version of the tool
      * @throws IOException
      */
-    String getVersion() throws IOException;
+    String getVersion();
 
     /***
      *
@@ -25,7 +26,7 @@ public interface CharacterisationResultProducer {
      * @return A list of @CharacterisationResult
      * @throws IOException
      */
-    List<CharacterisationResult> processFile(File file) throws IOException;
+    List<CharacterisationResult> processFile(File file);
 
 
     /***
@@ -33,9 +34,8 @@ public interface CharacterisationResultProducer {
      * This method extracts metadata properties from a given digital object passed as a byte array.
      *
      * @param file Input File
-     * @param filename
      * @return A list of @CharacterisationResult
      * @throws IOException
      */
-    List<CharacterisationResult> processFile(byte[] file, String filename) throws IOException;
+    List<CharacterisationResult> processFile(ByteFile file);
 }

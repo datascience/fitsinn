@@ -2,9 +2,9 @@ package rocks.artur.jpa;
 
 
 import jakarta.transaction.Transactional;
+import org.h2.jdbc.JdbcBatchUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.artur.domain.Entry;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
@@ -28,6 +28,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
                                          CharacterisationResultViewRepository characterisationResultViewRepository) {
         this.characterisationResultRepository = characterisationResultRepository;
         this.characterisationResultViewRepository = characterisationResultViewRepository;
+
     }
 
     @Override
@@ -71,9 +72,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(property.toString(), filter);
-                collect = propertyValueDistribution.stream()
-                        .map(stat -> new PropertyValueStatistic((Long) stat[1], (String) stat[0]))
+                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(filter);
+                collect = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]))
+                        .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
                 collect.sort(Comparator.comparingLong(PropertyValueStatistic::getCount).reversed());
                 return collect;
@@ -81,26 +82,26 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case INTEGER:
             case FLOAT: {
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
 
-                List<Float> floats = propertyValueDistribution.stream().filter(stat -> !(stat[0].equals("CONFLICT")))
+                List<Float> floats = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
-                            Float val = Float.parseFloat(stat[0].toString());
-                            Long count =  (Long) stat[1];
+                                    Float val = Float.parseFloat(stat[1].toString());
+                                    Long count = (Long) stat[2];
 
-                            List<Float> result = new ArrayList<>();
+                                    List<Float> result = new ArrayList<>();
 
-                            for (long l=0; l < count; l++){
-                                result.add(val);
-                            }
-                            return result;
-                        }
+                                    for (long l = 0; l < count; l++) {
+                                        result.add(val);
+                                    }
+                                    return result;
+                                }
                         ).flatMap(Collection::stream).sorted(Float::compare).collect(Collectors.toList());
 
                 List<PropertyValueStatistic> propertyValueStatistics = BinningAlgorithms.runBinning(floats);
 
-                Optional<Long> conflicts = propertyValueDistribution.stream().filter(stat -> stat[0].equals("CONFLICT"))
-                        .map(stat -> (Long) stat[1]).findAny();
+                Optional<Long> conflicts = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]) && stat[1].equals("CONFLICT"))
+                        .map(stat -> (Long) stat[2]).findAny();
 
                 conflicts.ifPresent(aLong -> propertyValueStatistics.add(new PropertyValueStatistic(aLong, "CONFLICT")));
 
@@ -109,9 +110,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             default:
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
-                collect = propertyValueDistribution.stream()
-                        .map(stat -> new PropertyValueStatistic((Long) stat[1], (String) stat[0]))
+                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
+                collect = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
+                        .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
                 collect.sort(Comparator.comparingLong(PropertyValueStatistic::getCount).reversed());
                 return collect;
@@ -168,7 +169,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         result.put("avgSize", sizeStatistics[3]);
         result.put("totalCount", sizeStatistics[4]);
 
-        double[] conflictStatistics  = characterisationResultViewRepository.getConflictStatistics(filterCriteria);
+        double[] conflictStatistics = characterisationResultViewRepository.getConflictStatistics(filterCriteria);
         result.put("conflictRate", conflictStatistics[1]);
         result.put("conflictCount", conflictStatistics[0]);
         return result;
@@ -211,25 +212,43 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
+        List<CharacterisationResultJPA> tmp = new ArrayList<>();
+        characterisationResults.stream().forEach(item -> {
+            if (null == item) {
+                LOG.error("Bad characterisation result: " + item);
+            } else {
+                CharacterisationResultJPA characterisationResultJPA = new CharacterisationResultJPA(item);
+                String value = characterisationResultJPA.getValue();
+                if (value != null) {
+                    if (value.length() > 255) {
+                        characterisationResultJPA.setValue(value.substring(0, 255));
+                    }
+                    tmp.add(characterisationResultJPA);
+                }
+            }
+        });
+        try {
+            characterisationResultRepository.saveFast(tmp);
+        } catch (RuntimeException e) {
+            LOG.error("Some characterisation results have already been persisted. Batch insert is not possible. Uploaded items with NULL values:" );
+            List<CharacterisationResultJPA> collect = tmp.stream().filter(item -> item.getSource() == null || item.getProperty() == null || item.getFilePath() == null).collect(Collectors.toList());
+            LOG.error(collect.toString());
+            e.printStackTrace();
+            throw new IllegalArgumentException("Some characterisation results have already been persisted. Batch insert is not possible.");
 
-        List<CharacterisationResultJPA> collect = characterisationResults.parallelStream().map(res -> {
-            CharacterisationResultJPA toSave = new CharacterisationResultJPA(res);
-            return toSave;
-        }).collect(Collectors.toList());
-
-        LOG.debug("saving " + collect);
-        characterisationResultRepository.saveAll(collect);
+        }
     }
 
     @Override
     public double getConflictRate() {
         Long totalCount = characterisationResultViewRepository.getTotalCount();
         Long conflictCount = characterisationResultViewRepository.getConflictCount();
-        return conflictCount/(double)totalCount;
+        return conflictCount / (double) totalCount;
     }
 
     @Override
     public void delete(CharacterisationResult characterisationResult) {
         characterisationResultRepository.delete(new CharacterisationResultJPA(characterisationResult));
     }
+
 }

@@ -1,38 +1,40 @@
 package rocks.artur.jpa.table;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
 
+import java.util.UUID;
+
 
 @Entity
-@IdClass(CharacterisationResultID.class)
 @Table(name = "characterisationresult")
 public class CharacterisationResultJPA {
 
+
     @Id
-    @Column(nullable = false, name = "filepath")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id")
+    private String id;
+    @Column(nullable = false, name = "file_path")
     private String filePath;
-    @Id
     @Column(nullable = false)
     private String property;
 
-    @Id
     @Column(nullable = false)
     private String source;
 
     @Column(name = "property_value", nullable = false)
     private String value;
 
-    @Column(name = "valuetype", nullable = false)
+    @Column(name = "value_type", nullable = false)
     private String valueType;
 
     public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
+        //this.id = UUID.randomUUID().toString();
         this.filePath = characterisationResult.getFilePath();
         this.source = characterisationResult.getSource();
         this.value = characterisationResult.getValue();
@@ -40,7 +42,9 @@ public class CharacterisationResultJPA {
         this.property = characterisationResult.getProperty().toString();
     }
 
-    public CharacterisationResultJPA(){}
+    public CharacterisationResultJPA() {
+        //this.id = UUID.randomUUID().toString();
+    }
 
     public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
         CharacterisationResultJPA result = new CharacterisationResultJPA();
@@ -87,6 +91,7 @@ public class CharacterisationResultJPA {
     @Override
     public String toString() {
         return "CharacterisationResultJPA{" +
+                ", id=" + id +
                 ", property=" + property +
                 ", value='" + value + '\'' +
                 ", valueType=" + valueType +
@@ -104,7 +109,7 @@ public class CharacterisationResultJPA {
     }
 
 
-    public CharacterisationResult toCharacterisationResult(){
+    public CharacterisationResult toCharacterisationResult() {
         CharacterisationResult result = new CharacterisationResult();
 
         result.setValue(this.value);

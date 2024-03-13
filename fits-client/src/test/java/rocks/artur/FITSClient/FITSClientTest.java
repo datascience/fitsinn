@@ -1,4 +1,5 @@
-package rocks.artur;
+package rocks.artur.FITSClient;
+
 
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
@@ -6,10 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
-import org.springframework.test.context.ActiveProfiles;
-import rocks.artur.FITSClient.FITSClient;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +28,7 @@ public class FITSClientTest {
 
     private int MOCK_SERVER_PORT = 8888;
 
-    public static String VALID_FITS_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"1.5.0\" timestamp=\"2/19/20 1:26 PM\">\n" +
             "  <identification status=\"CONFLICT\">\n" +
             "    <identity format=\"Markdown\" mimetype=\"text/markdown\" toolname=\"FITS\" toolversion=\"1.5.0\">\n" +
@@ -66,7 +69,7 @@ public class FITSClientTest {
             "\n";
 
 
-    public static String VALID_FITS_RESULT2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT2 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"1.5.0\" timestamp=\"7/29/20 7:50 PM\">\n" +
             "  <identification>\n" +
             "    <identity format=\"Portable Network Graphics\" mimetype=\"image/png\" toolname=\"FITS\" toolversion=\"1.5.0\">\n" +
@@ -137,7 +140,7 @@ public class FITSClientTest {
             "</fits>\n";
 
 
-    public static String VALID_FITS_RESULT3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    public static String VALID_FITS_RESULT3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n" +
             "<fits xmlns=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd\" version=\"0.6.0\" timestamp=\"12/27/11 10:49 AM\">\n" +
             "  <identification>\n" +
             "    <identity format=\"Portable Document Format\" mimetype=\"application/pdf\" toolname=\"FITS\" toolversion=\"0.6.0\">\n" +
@@ -194,12 +197,12 @@ public class FITSClientTest {
     @Test
     void getVersionTest() throws IOException {
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("GET")
                         .withPath("/version")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody("1.5.0")
                 );
@@ -215,12 +218,12 @@ public class FITSClientTest {
     @Test
     void processFileAsByteArrayTest() throws IOException {
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/fits/examine")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -231,9 +234,10 @@ public class FITSClientTest {
 
         FITSClient fitsClient = new FITSClient();
         fitsClient.setFITS_URL(String.format("http://localhost:%d", MOCK_SERVER_PORT));
-        List<CharacterisationResult> output = fitsClient.processFile(array, "testFileName");
+        ByteFile byteFile = new ByteFile(array, "testFileName" );
+        List<CharacterisationResult> output = fitsClient.processFile(byteFile);
 
-        Assert.assertEquals(12, output.size());
+        Assert.assertEquals(9, output.size());
     }
 
 
@@ -241,12 +245,12 @@ public class FITSClientTest {
     void processFileTest() throws IOException {
 
         mockServer.when(
-                request()
+                HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/fits/examine")
                         .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -257,19 +261,19 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("README.md");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(12, output.size());
+        Assert.assertEquals(9, output.size());
     }
 
     @Test
     void processFITSFileTest() throws IOException {
 
         mockServer.when(
-                        request()
+                        HttpRequest.request()
                                 .withMethod("POST")
                                 .withPath("/fits/examine")
                                 .withHeader("\"Content-type\", \"application/json\""))
                 .respond(
-                        response()
+                        HttpResponse.response()
                                 .withStatusCode(200)
                                 .withBody(VALID_FITS_RESULT)
                 );
@@ -280,7 +284,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("998003.csv.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(17, output.size());
+        Assert.assertEquals(14, output.size());
     }
 
 
@@ -307,7 +311,7 @@ public class FITSClientTest {
 
         URL resource = getClass().getClassLoader().getResource("README.md");
         File file = new File(resource.getPath());
-        List<CharacterisationResult> output = fitsClient.processFile(Files.readAllBytes(file.toPath()), "testFileName");
+        List<CharacterisationResult> output = fitsClient.processFile(file);
 
         Assert.assertEquals(9, output.size());
     }
@@ -321,7 +325,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("998003.csv.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(17, output.size());
+        Assert.assertEquals(14, output.size());
     }
 
     @Test
@@ -332,7 +336,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002526.html.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(24, output.size());
+        Assert.assertEquals(21, output.size());
     }
 
     @Test
@@ -343,7 +347,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("000009.pdf.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(34, output.size());
+        Assert.assertEquals(28, output.size());
     }
 
     @Test
@@ -354,7 +358,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002392.doc.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(26, output.size());
+        Assert.assertEquals(22, output.size());
     }
 
     @Test
@@ -365,7 +369,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002451.gz.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(13, output.size());
+        Assert.assertEquals(10, output.size());
     }
 
 
@@ -377,7 +381,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002838.pdf.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(33, output.size());
+        Assert.assertEquals(30, output.size());
     }
 
     @Test
@@ -388,7 +392,7 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002283.tex.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(11, output.size());
+        Assert.assertEquals(8, output.size());
     }
 
 
@@ -400,7 +404,22 @@ public class FITSClientTest {
         URL resource = getClass().getClassLoader().getResource("002729.pdf.fits.xml");
         List<CharacterisationResult> output = fitsClient.processFile(new File(resource.getPath()));
 
-        Assert.assertEquals(14, output.size());
+        Assert.assertEquals(11, output.size());
+    }
+
+    @Test
+    void extractCharResultsStax() throws XMLStreamException {
+        FITSClient fitsClient = new FITSClient();
+        List<CharacterisationResult> characterisationResults = fitsClient.extractCharacterisationResultsStax(VALID_FITS_RESULT2);
+        System.out.println(characterisationResults);
+    }
+
+    @Test
+    void compareExtractionStaxVsJson() throws XMLStreamException {
+        FITSClient fitsClient = new FITSClient();
+        List<CharacterisationResult> characterisationResultsStax = fitsClient.extractCharacterisationResultsStax(VALID_FITS_RESULT3);
+        List<CharacterisationResult> characterisationResultsJSON = fitsClient.extractCharacterisationResults(VALID_FITS_RESULT3);
+        Assert.assertEquals(characterisationResultsJSON.size(), characterisationResultsStax.size());
     }
 
 }

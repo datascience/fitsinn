@@ -24,7 +24,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     @Cacheable("distributions")
-    public List getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
+    public List getPropertyValueDistribution(FilterCriteria<CharacterisationResult> filter) {
 
         String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filter != null) {
@@ -35,7 +35,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
                 "select PROPERTY, PROPERTY_VALUE, count(*) " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
-                        "where VALUE_TYPE != 'TIMESTAMP' group by PROPERTY, PROPERTY_VALUE", subquery, property);
+                        "where VALUE_TYPE != 'TIMESTAMP' group by PROPERTY, PROPERTY_VALUE", subquery);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;
@@ -43,7 +43,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
 
     @Override
     @Cacheable("timedistributions")
-    public List getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
+    public List getPropertyValueTimeStampDistribution(FilterCriteria<CharacterisationResult> filter) {
 
         String subquery = "select distinct FILE_PATH from characterisationresultview ";
         if (filter != null) {
@@ -51,16 +51,16 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
         }
         //THIS IS H2-SPECIFIC SQL, BECAUSE OF PARSEDATETIME
         String query = String.format(
-                "select CASE " +
+                "select PROPERTY, CASE " +
                         "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
                         "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
                         "END, count(*) " +
                         "from characterisationresultview t " +
                         "join (%s) c on t.FILE_PATH=c.FILE_PATH " +
-                        "where PROPERTY= '%s' group by CASE " +
+                        "where VALUE_TYPE = 'TIMESTAMP' group by PROPERTY, CASE " +
                         "WHEN PROPERTY_VALUE = 'CONFLICT' THEN PROPERTY_VALUE " +
                         "ELSE SUBSTRING(PROPERTY_VALUE,1,4) " +
-                        "END", subquery, property);
+                        "END", subquery);
 
         List resultList = entityManager.createNativeQuery(query).getResultList();
         return resultList;

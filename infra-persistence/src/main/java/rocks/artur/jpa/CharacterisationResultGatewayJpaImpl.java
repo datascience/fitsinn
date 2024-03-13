@@ -72,9 +72,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(property.toString(), filter);
-                collect = propertyValueDistribution.stream()
-                        .map(stat -> new PropertyValueStatistic((Long) stat[1], (String) stat[0]))
+                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(filter);
+                collect = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]))
+                        .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
                 collect.sort(Comparator.comparingLong(PropertyValueStatistic::getCount).reversed());
                 return collect;
@@ -82,7 +82,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case INTEGER:
             case FLOAT: {
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
 
                 List<Float> floats = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
@@ -110,7 +110,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             default:
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(property.toString(), filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
                 collect = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());

@@ -13,19 +13,19 @@ PRIMARY KEY ( id )
 
 
 CREATE INDEX idx_characterisationresult_1
-    ON characterisationresult ( property);
+    ON characterisationresult ( property, property_value);
 
 CREATE INDEX idx_characterisationresult_2
     ON characterisationresult ( source);
 
 CREATE INDEX idx_characterisationresult_3
-    ON characterisationresult ( value_type);
+    ON characterisationresult ( value_type, file_path);
 
 CREATE INDEX idx_characterisationresult_4
     ON characterisationresult (property_value);
 
 CREATE INDEX idx_characterisationresult_5
-    ON characterisationresult (file_path);
+    ON characterisationresult (file_path, property, value_type);
 
 
 CREATE VIEW characterisationresultview AS

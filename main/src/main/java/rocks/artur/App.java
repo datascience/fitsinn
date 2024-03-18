@@ -26,7 +26,7 @@ public class App {
     void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
         beanDefinitionScanner.addIncludeFilter(removeModelAndEntitiesFilter());
-        beanDefinitionScanner.scan("rocks.artur.api","rocks.artur.api_impl","rocks.artur.FITSClient","rocks.artur.ch","rocks.artur.endpoints.RestService");
+        beanDefinitionScanner.scan("rocks.artur.api","rocks.artur.api_impl","rocks.artur.FITSClient","rocks.artur.jpa","rocks.artur.endpoints.RestService");
     }
 
     static TypeFilter removeModelAndEntitiesFilter() {
@@ -42,7 +42,7 @@ public class App {
                     .startsWith("rocks.artur.api_impl.utils") &&
                     !mr.getClassMetadata()
                     .getClassName()
-                    .startsWith("rocks.artur.jpa")
+                    .startsWith("rocks.artur.ch")
                     ;
         };
     }

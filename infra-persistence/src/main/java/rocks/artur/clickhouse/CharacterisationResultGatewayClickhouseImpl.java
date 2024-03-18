@@ -1,4 +1,4 @@
-package rocks.artur.ch;
+package rocks.artur.clickhouse;
 
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;

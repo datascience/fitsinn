@@ -11,19 +11,10 @@ import java.util.Collection;
 @Repository
 public class CustomCharacterisationResultRepositoryImpl implements CustomCharacterisationResultRepository {
     private static final Logger LOG = LoggerFactory.getLogger(CustomCharacterisationResultRepositoryImpl.class);
-    private final EntityManager entityManager;
-
-    public CustomCharacterisationResultRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
 
     @Override
-    @Transactional
     public void saveFast(Collection<CharacterisationResultJPA> results) {
 
-        for (CharacterisationResultJPA result : results) {
-            entityManager.persist(result);
-        }
     }
 }

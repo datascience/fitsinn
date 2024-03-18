@@ -1,30 +1,37 @@
-package rocks.artur.ch;
+package rocks.artur.jpa.table;
 
-
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
 
 
-public class CharacterisationResultCH {
+@Entity
+@Table(name = "characterisationresult")
+public class CharacterisationResultJPA {
 
 
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id")
     private String id;
-
+    @Column(nullable = false, name = "file_path")
     private String filePath;
-
+    @Column(nullable = false)
     private String property;
 
-
+    @Column(nullable = false)
     private String source;
 
-
+    @Column(name = "property_value", nullable = false)
     private String value;
 
-
+    @Column(name = "value_type", nullable = false)
     private String valueType;
 
-    public CharacterisationResultCH(CharacterisationResult characterisationResult) {
+    public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
         //this.id = UUID.randomUUID().toString();
         this.filePath = characterisationResult.getFilePath();
         this.source = characterisationResult.getSource();
@@ -33,12 +40,12 @@ public class CharacterisationResultCH {
         this.property = characterisationResult.getProperty().toString();
     }
 
-    public CharacterisationResultCH() {
+    public CharacterisationResultJPA() {
         //this.id = UUID.randomUUID().toString();
     }
 
-    public static CharacterisationResultCH deepCopy(CharacterisationResultCH characterisationResult) {
-        CharacterisationResultCH result = new CharacterisationResultCH();
+    public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
+        CharacterisationResultJPA result = new CharacterisationResultJPA();
         result.setFilePath(characterisationResult.filePath);
         result.setValue(characterisationResult.value);
         result.setProperty(characterisationResult.property);

@@ -228,7 +228,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             }
         });
         try {
-            characterisationResultRepository.saveFast(tmp);
+            characterisationResultRepository.saveAll(tmp);
         } catch (RuntimeException e) {
             LOG.error("Some characterisation results have already been persisted. Batch insert is not possible. Uploaded items with NULL values:" );
             List<CharacterisationResultJPA> collect = tmp.stream().filter(item -> item.getSource() == null || item.getProperty() == null || item.getFilePath() == null).collect(Collectors.toList());

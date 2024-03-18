@@ -1,4 +1,4 @@
-package rocks.artur.ch;
+package rocks.artur.clickhouse;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import rocks.artur.api_impl.filter.AndFilterCriteria;

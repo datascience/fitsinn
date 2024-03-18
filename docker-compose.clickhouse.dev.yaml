@@ -22,9 +22,6 @@ services:
     networks:
       - web
     restart: unless-stopped
-    environment:
-      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
-      - SPRING_JPA_SHOW_SQL=true
     deploy:
       replicas: 1
     ports:
@@ -46,19 +43,34 @@ services:
       - 8080:3000
 
   db-docker:
-    image: mysql:8.0
-    container_name: db-docker
-    env_file: .env
-    environment:
-      MYSQL_DATABASE: fitsinn
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
-      MYSQL_ROOT_PASSWORD: pass
+    image: yandex/clickhouse-server
     networks:
       - web
-    restart: unless-stopped
     ports:
-      - 3306:3306
+      - 8123:8123
+      - 9000:9000
+      - 9004:9004
+
+  db-docker-init:
+    image: yandex/clickhouse-server
+    volumes:
+      - ./ch:/var/clickhouse
+    depends_on:
+      - db-docker
+    networks:
+      - web
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      while ! clickhouse-client --host db-docker -q \"SHOW databases;\"; do
+          echo waiting for clickhouse up
+          sleep 1
+      done
+
+      clickhouse-client --host db-docker --queries-file /var/clickhouse/initdb.sql
+
+      tail -f /dev/null
+      "
 
 
   adminer:

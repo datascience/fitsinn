@@ -17,11 +17,13 @@ services:
   rest:
     build:
       context: .
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     env_file: .env
     networks:
       - web
     restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=clickhouse
     deploy:
       replicas: 1
     ports:

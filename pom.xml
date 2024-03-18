@@ -195,6 +195,11 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${spring-boot.version}</version>
+                        <configuration>
+                            <profiles>
+                                <profile>mysql</profile>
+                            </profiles>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -214,6 +219,11 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${spring-boot.version}</version>
+                        <configuration>
+                            <profiles>
+                                <profile>dev</profile>
+                            </profiles>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -230,9 +240,16 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${spring-boot.version}</version>
+                        <configuration>
+                            <profiles>
+                                <profile>clickhouse</profile>
+                            </profiles>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
+
+
     </profiles>
 </project>

@@ -1,39 +1,30 @@
-package rocks.artur.jpa.table;
+package rocks.artur.ch;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
 
-import java.util.UUID;
+
+public class CharacterisationResultCH {
 
 
-@Entity
-@Table(name = "characterisationresult")
-public class CharacterisationResultJPA {
-
-
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "id")
     private String id;
-    @Column(nullable = false, name = "file_path")
+
     private String filePath;
-    @Column(nullable = false)
+
     private String property;
 
-    @Column(nullable = false)
+
     private String source;
 
-    @Column(name = "property_value", nullable = false)
+
     private String value;
 
-    @Column(name = "value_type", nullable = false)
+
     private String valueType;
 
-    public CharacterisationResultJPA(CharacterisationResult characterisationResult) {
+    public CharacterisationResultCH(CharacterisationResult characterisationResult) {
         //this.id = UUID.randomUUID().toString();
         this.filePath = characterisationResult.getFilePath();
         this.source = characterisationResult.getSource();
@@ -42,12 +33,12 @@ public class CharacterisationResultJPA {
         this.property = characterisationResult.getProperty().toString();
     }
 
-    public CharacterisationResultJPA() {
+    public CharacterisationResultCH() {
         //this.id = UUID.randomUUID().toString();
     }
 
-    public static CharacterisationResultJPA deepCopy(CharacterisationResultJPA characterisationResult) {
-        CharacterisationResultJPA result = new CharacterisationResultJPA();
+    public static CharacterisationResultCH deepCopy(CharacterisationResultCH characterisationResult) {
+        CharacterisationResultCH result = new CharacterisationResultCH();
         result.setFilePath(characterisationResult.filePath);
         result.setValue(characterisationResult.value);
         result.setProperty(characterisationResult.property);

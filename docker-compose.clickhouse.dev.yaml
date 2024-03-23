@@ -17,7 +17,7 @@ services:
   rest:
     build:
       context: .
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     env_file: .env
     networks:
       - web
@@ -46,6 +46,7 @@ services:
 
   db-docker:
     image: yandex/clickhouse-server
+    container_name: db-docker
     networks:
       - web
     ports:
@@ -53,8 +54,10 @@ services:
       - 9000:9000
       - 9004:9004
 
+
   db-docker-init:
     image: yandex/clickhouse-server
+    container_name: db-docker-init
     volumes:
       - ./ch:/var/clickhouse
     depends_on:

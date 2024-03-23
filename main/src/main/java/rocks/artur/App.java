@@ -31,41 +31,30 @@ public class App {
     void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
         beanDefinitionScanner.addIncludeFilter(removeModelAndEntitiesFilter());
-        beanDefinitionScanner.scan("rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.jpa", "rocks.artur.clickhouse", "rocks.artur.endpoints.RestService");
+        String profile = System.getProperty("spring.profiles.active", "unknown");
+        System.out.println(profile);
+        String[] packages = switch (profile) {
+            case "clickhouse" ->
+                    new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.clickhouse"};
+            default ->
+                    new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.jpa"};
+        };
+        beanDefinitionScanner.scan(packages);
     }
 
     TypeFilter removeModelAndEntitiesFilter() {
         String prof = System.getProperty("spring.profiles.active", "unknown");
-        if (prof.equalsIgnoreCase("clickhouse")) {
-            return (MetadataReader mr, MetadataReaderFactory mrf) -> {
-                return !mr.getClassMetadata()
-                        .getClassName()
-                        .startsWith("rocks.artur.domain") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.api_impl.filter") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.api_impl.utils") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.jpa");
+        //System.out.println(prof);
+        return (MetadataReader mr, MetadataReaderFactory mrf) -> {
+            return !mr.getClassMetadata()
+                    .getClassName()
+                    .startsWith("rocks.artur.domain") &&
+                    !mr.getClassMetadata()
+                            .getClassName()
+                            .startsWith("rocks.artur.api_impl.filter") &&
+                    !mr.getClassMetadata()
+                            .getClassName()
+                            .startsWith("rocks.artur.api_impl.utils");
             };
-        } else {
-            return (MetadataReader mr, MetadataReaderFactory mrf) -> {
-                return !mr.getClassMetadata()
-                        .getClassName()
-                        .startsWith("rocks.artur.domain") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.api_impl.filter") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.api_impl.utils") &&
-                        !mr.getClassMetadata()
-                                .getClassName()
-                                .startsWith("rocks.artur.ch");
-            };
-        }
     }
 }

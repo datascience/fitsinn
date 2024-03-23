@@ -1,5 +1,7 @@
 package rocks.artur;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 @SpringBootApplication
 public class App {
 
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
     public static void main(String[] args) {
         SpringApplication.run(App.class);
     }
@@ -41,7 +44,7 @@ public class App {
     }
     private static boolean match(MetadataReader mr, MetadataReaderFactory mrf) {
         String className = mr.getClassMetadata().getClassName();
-        System.out.println(className);
+        LOG.debug(className);
         String[] packagesToIgnore = new String[]{"rocks.artur.domain", "rocks.artur.api_impl.filter", "rocks.artur.api_impl.utils"};
         return Arrays.stream(packagesToIgnore).noneMatch(className::startsWith);
     }

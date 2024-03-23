@@ -30,7 +30,7 @@ public class App {
 
     void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
-        String profile = System.getProperty("spring.profiles.active", "unknown");
+        String profile = System.getenv("DB_SELECTOR") == null ? System.getProperty("spring.profiles.active", "h2") : System.getenv("DB_SELECTOR");
         System.out.println(profile);
         beanDefinitionScanner.addIncludeFilter(removeModelAndEntitiesFilter());
         String[] packages;
@@ -38,10 +38,12 @@ public class App {
             case "clickhouse":
                 packages = new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.clickhouse"};
                 break;
-
-            default:
+            case "h2":
+            case "mysql":
                 packages = new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.jpa"};
                 break;
+            default:
+                throw new UnsupportedOperationException("The selected db is not supported. Choose one from [clickhouse, mysql, h2]");
         }
         beanDefinitionScanner.scan(packages);
     }

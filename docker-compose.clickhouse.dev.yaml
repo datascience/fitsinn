@@ -17,7 +17,7 @@ services:
   rest:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
     env_file: .env
     networks:
       - web

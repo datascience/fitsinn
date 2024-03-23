@@ -30,22 +30,26 @@ public class App {
 
     void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
-        beanDefinitionScanner.addIncludeFilter(removeModelAndEntitiesFilter());
         String profile = System.getProperty("spring.profiles.active", "unknown");
         System.out.println(profile);
-        String[] packages = switch (profile) {
-            case "clickhouse" ->
-                    new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.clickhouse"};
-            default ->
-                    new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.jpa"};
-        };
+        beanDefinitionScanner.addIncludeFilter(removeModelAndEntitiesFilter());
+        String[] packages;
+        switch (profile) {
+            case "clickhouse":
+                packages = new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.clickhouse"};
+                break;
+
+            default:
+                packages = new String[]{"rocks.artur.api", "rocks.artur.api_impl", "rocks.artur.FITSClient", "rocks.artur.endpoints.RestService", "rocks.artur.jpa"};
+                break;
+        }
         beanDefinitionScanner.scan(packages);
     }
 
     TypeFilter removeModelAndEntitiesFilter() {
-        String prof = System.getProperty("spring.profiles.active", "unknown");
-        //System.out.println(prof);
         return (MetadataReader mr, MetadataReaderFactory mrf) -> {
+            System.out.println(mr.getClassMetadata()
+                    .getClassName());
             return !mr.getClassMetadata()
                     .getClassName()
                     .startsWith("rocks.artur.domain") &&

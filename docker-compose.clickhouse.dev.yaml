@@ -23,7 +23,7 @@ services:
       - web
     restart: unless-stopped
     environment:
-      - SPRING_PROFILES_ACTIVE=clickhouse
+      - DB_SELECTOR=clickhouse
     deploy:
       replicas: 1
     ports:

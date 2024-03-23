@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("h2")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class CharacterisationResultGatewayImplTest {

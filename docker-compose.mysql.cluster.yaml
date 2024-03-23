@@ -21,7 +21,7 @@ services:
     env_file: .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-router:6446/fitsinn
-      - SPRING_PROFILES_ACTIVE=mysql
+      - DB_SELECTOR=mysql
     networks:
       - web
     restart: unless-stopped

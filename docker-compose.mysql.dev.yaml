@@ -25,7 +25,7 @@ services:
     environment:
       - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
       - SPRING_JPA_SHOW_SQL=true
-      - SPRING_PROFILES_ACTIVE=mysql
+      - DB_SELECTOR=mysql
     deploy:
       replicas: 1
     ports:

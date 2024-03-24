@@ -1,6 +1,9 @@
 package rocks.artur.clickhouse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
 import rocks.artur.api_impl.filter.AndFilterCriteria;
 import rocks.artur.api_impl.filter.OrFilterCriteria;
 import rocks.artur.api_impl.filter.SingleFilterCriteria;
@@ -11,12 +14,14 @@ import rocks.artur.domain.ValueType;
 import rocks.artur.domain.statistics.PropertyStatistic;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class CharacterisationResultClickhouseRepository {
 
-
+    private static final Logger LOG = LoggerFactory.getLogger(CharacterisationResultClickhouseRepository.class);
     private final JdbcTemplate template;
 
     /**
@@ -44,11 +49,11 @@ public class CharacterisationResultClickhouseRepository {
     public List<PropertyStatistic> getPropertyDistribution() {
         String sql = String.format(
                 "select property, count(property_value) as number " +
-                "from characterisationresultview " +
-                "group by property");
+                        "from characterisationresultview " +
+                        "group by property");
 
         List<PropertyStatistic> result = template.query(sql, (rs, rowNum) -> {
-            PropertyStatistic propstat = new PropertyStatistic( rs.getLong("number"), Property.valueOf(rs.getString("property")));
+            PropertyStatistic propstat = new PropertyStatistic(rs.getLong("number"), Property.valueOf(rs.getString("property")));
             return propstat;
         });
         return result;
@@ -84,7 +89,7 @@ public class CharacterisationResultClickhouseRepository {
         if (filter != null) {
             subquery = convert(filter);
         }
-        //THIS IS H2-SPECIFIC SQL, BECAUSE OF PARSEDATETIME
+
         String sql = String.format(
                 "select property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
@@ -148,17 +153,25 @@ public class CharacterisationResultClickhouseRepository {
         }
     }
 
-    public void addAll(List<CharacterisationResult> characterisationResults) {
+    public void saveAll(List<CharacterisationResult> characterisationResults) {
+
+        List<CharacterisationResult> filtered = characterisationResults.stream()
+                .filter(item -> item.getFilePath() != null)
+                .filter(item -> item.getValue() != null && item.getValue().length() < 300).collect(Collectors.toList());
+
         template.batchUpdate("insert into characterisationresult (file_path,property, source, property_value, value_type)" +
-                " values (?,?,?,?,?)",
-                characterisationResults,
+                        " values (?,?,?,?,?)",
+                filtered,
                 100,
-                (PreparedStatement ps, CharacterisationResult cResult) -> {
-                    ps.setString(1, cResult.getFilePath());
-                    ps.setString(2, cResult.getProperty().name());
-                    ps.setString(3, cResult.getSource());
-                    ps.setString(4, cResult.getValue());
-                    ps.setString(5, cResult.getValueType().name());
+                new ParameterizedPreparedStatementSetter<CharacterisationResult>() {
+                    @Override
+                    public void setValues(PreparedStatement ps, CharacterisationResult cResult) throws SQLException {
+                        ps.setString(1, cResult.getFilePath());
+                        ps.setString(2, cResult.getProperty().name());
+                        ps.setString(3, cResult.getSource());
+                        ps.setString(4, cResult.getValue());
+                        ps.setString(5, cResult.getValueType().name());
+                    }
                 });
 
 
@@ -210,6 +223,83 @@ public class CharacterisationResultClickhouseRepository {
         List<String> result = template.query(sql, (rs, rowNum) -> {
             return rs.getString(1);
         });
+        return result;
+    }
+
+    public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath) {
+        String sql = String.format(
+                "select file_path,property, source, property_value, value_type " +
+                        "from characterisationresult t " +
+                        "where t.file_path=%s ", filePath);
+
+        List<CharacterisationResult> result = template.query(sql, (rs, rowNum) -> {
+            CharacterisationResult item = new CharacterisationResult();
+            item.setFilePath(rs.getString(1));
+            item.setProperty(Property.valueOf(rs.getString(2)));
+            item.setSource(rs.getString(3));
+            item.setValue(rs.getString(4));
+            item.setValueType(ValueType.valueOf(rs.getString(5)));
+            return item;
+        });
+        return result;
+    }
+
+    public double[] getSizeStatistics(FilterCriteria filter) {
+
+        String subquery = "select distinct file_path from characterisationresultview ";
+        if (filter != null) {
+            subquery = convert(filter);
+        }
+
+        String sql = String.format(
+                "select  sum(toInt32(t.property_value)) as totalsize,  " +
+                        "min(toInt32(t.property_value)) as minsize, " +
+                        "max(toInt32(t.property_value)) as maxsize, " +
+                        "avg(toInt32(t.property_value)) as avgsize, " +
+                        "count(t.property_value) as count " +
+                        "from characterisationresultview t " +
+                        "join (%s) c on t.file_path=c.file_path " +
+                        "where t.property='SIZE'", subquery);
+
+        List<double[]> result = template.query(sql, (rs, rowNum) -> {
+            double sum = rs.getDouble(1);
+            double min = rs.getDouble(2);
+            double max = rs.getDouble(3);
+            double avg = rs.getDouble(4);
+            double count = rs.getDouble(5);
+
+            return new double[]{sum, min, max, avg, count};
+        });
+        return result.get(0);
+
+    }
+
+    public double[] getConflictStatistics(FilterCriteria filter) {
+        String subquery = "select distinct file_path from characterisationresultview ";
+        if (filter != null) {
+            subquery = convert(filter);
+        }
+
+        String sql = String.format(
+                "select count(distinct t.file_path) as count " +
+                        "from characterisationresultview t " +
+                        "join (%s) c on t.file_path=c.file_path " +
+                        "where t.property_value='CONFLICT'", subquery);
+
+        Long conflictsCount = template.queryForObject(sql, Long.class);
+
+        String sql2 = String.format(
+                "select count(distinct t.file_path) as count " +
+                        "from characterisationresultview t " +
+                        "join (%s) c on t.file_path=c.file_path ", subquery);
+
+        Long totalCount = template.queryForObject(sql2, Long.class);
+
+        double rate = 0d;
+        if (totalCount != 0) {
+            rate = (double) conflictsCount / totalCount;
+        }
+        double[] result = new double[]{conflictsCount, rate};
         return result;
     }
 }

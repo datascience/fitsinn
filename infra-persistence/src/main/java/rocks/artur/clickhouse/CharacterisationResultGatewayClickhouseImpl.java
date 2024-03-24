@@ -1,5 +1,6 @@
 package rocks.artur.clickhouse;
 
+import rocks.artur.api_impl.filter.SingleFilterCriteria;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
@@ -35,7 +36,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath) {
-        return null;
+        return repository.getCharacterisationResultsByFilepath(filePath);
     }
 
     @Override
@@ -60,7 +61,19 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria) {
-        return null;
+        Map<String, Double> result = new HashMap<>();
+
+        double[] sizeStatistics = repository.getSizeStatistics(filterCriteria);
+        result.put("totalSize", sizeStatistics[0]);
+        result.put("minSize", sizeStatistics[1]);
+        result.put("maxSize", sizeStatistics[2]);
+        result.put("avgSize", sizeStatistics[3]);
+        result.put("totalCount", sizeStatistics[4]);
+
+        double[] conflictStatistics = repository.getConflictStatistics(filterCriteria);
+        result.put("conflictRate", conflictStatistics[1]);
+        result.put("conflictCount", conflictStatistics[0]);
+        return result;
     }
 
     @Override
@@ -133,7 +146,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
-        repository.addAll(characterisationResults);
+        repository.saveAll(characterisationResults);
     }
 
     @Override

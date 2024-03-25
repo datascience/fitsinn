@@ -61,16 +61,16 @@ public class CharacterisationResultClickhouseRepository {
 
     public List<Object[]> getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
-        String subquery = "select file_path from characterisationresultview ";
+        String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
+            subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
                 "select property, property_value, count(property_value) as number " +
                         "from characterisationresultview " +
-                        "where file_path in (%s) " +
-                        "and property = '%s' group by property, property_value ORDER BY number desc LIMIT 200", subquery, property);
+                        "where %s property = '%s' group by property, property_value ORDER BY number desc LIMIT 200", subquery, property);
         LOG.info(sql);
         List<Object[]> result = template.query(sql, (rs, rowNum) -> {
             Object[] item = new Object[3];
@@ -85,9 +85,10 @@ public class CharacterisationResultClickhouseRepository {
 
     public List<Object[]> getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
 
-        String subquery = "select file_path from characterisationresultview ";
+        String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
+            subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
@@ -96,8 +97,7 @@ public class CharacterisationResultClickhouseRepository {
                         "ELSE SUBSTRING(property_value,1,4) " +
                         "END as value, count(property) as number " +
                         "from characterisationresultview " +
-                        "where file_path in (%s) " +
-                        "and property = '%s' group by property, CASE " +
+                        "where %s property = '%s' group by property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
                         "END  ORDER BY number desc LIMIT 200", subquery, property);
@@ -178,15 +178,17 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter) {
-        String subquery = "select file_path from characterisationresultview ";
+        String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
+            subquery = String.format("where file_path in (%s) ", subquery);
         }
+
 
         String sql = String.format(
                 "select file_path,property, source, property_value, value_type " +
                         "from characterisationresult " +
-                        "where file_path in (%s) ", subquery);
+                        "%s", subquery);
 
         List<CharacterisationResult> result = template.query(sql, (rs, rowNum) -> {
             CharacterisationResult item = new CharacterisationResult();
@@ -246,9 +248,10 @@ public class CharacterisationResultClickhouseRepository {
 
     public double[] getSizeStatistics(FilterCriteria filter) {
 
-        String subquery = "select file_path from characterisationresultview ";
+        String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
+            subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
@@ -258,8 +261,7 @@ public class CharacterisationResultClickhouseRepository {
                         "avg(toInt32(property_value)) as avgsize, " +
                         "count(property_value) as count " +
                         "from characterisationresultview " +
-                        "where file_path in (%s) " +
-                        "and property='SIZE'", subquery);
+                        "where %s property='SIZE'", subquery);
 
         List<double[]> result = template.query(sql, (rs, rowNum) -> {
             double sum = rs.getDouble(1);
@@ -275,23 +277,30 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public double[] getConflictStatistics(FilterCriteria filter) {
-        String subquery = "select file_path from characterisationresultview ";
+        String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
+            subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
                 "select count(distinct file_path) as count " +
                         "from characterisationresultview " +
-                        "where file_path in (%s)  " +
-                        "and property_value='CONFLICT'", subquery);
+                        "where %s property_value='CONFLICT'", subquery);
 
         Long conflictsCount = template.queryForObject(sql, Long.class);
+
+
+        String subquery2 = "";
+        if (filter != null) {
+            subquery2 = convert(filter);
+            subquery2 = String.format("where file_path in (%s) ", subquery2);
+        }
 
         String sql2 = String.format(
                 "select count(distinct file_path) as count " +
                         "from characterisationresultview " +
-                        "where file_path in (%s)  ", subquery);
+                        "%s", subquery2);
 
         Long totalCount = template.queryForObject(sql2, Long.class);
 

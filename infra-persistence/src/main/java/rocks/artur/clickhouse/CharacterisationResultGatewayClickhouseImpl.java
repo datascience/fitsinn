@@ -6,6 +6,7 @@ import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
+import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,7 +57,10 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
-        return null;
+        List<CharacterisationResult> allJPAByFilePath = repository.getCharacterisationResultsByFilepath(filepath);
+        List<CharacterisationResult> result = allJPAByFilePath.stream().filter(item -> item.getValue().equals("CONFLICT")).collect(Collectors.toList());
+        return result;
+
     }
 
     @Override
@@ -136,7 +140,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria) {
-        return null;
+        return repository.getObjects(filterCriteria);
     }
 
     @Override

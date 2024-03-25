@@ -11,6 +11,7 @@ import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
+import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 
 import java.sql.PreparedStatement;
@@ -230,9 +231,9 @@ public class CharacterisationResultClickhouseRepository {
 
     public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath) {
         String sql = String.format(
-                "select file_path,property, source, property_value, value_type " +
+                "select file_path, property, source, property_value, value_type " +
                         "from characterisationresult " +
-                        "where file_path=%s ", filePath);
+                        "where file_path='%s' ", filePath);
 
         List<CharacterisationResult> result = template.query(sql, (rs, rowNum) -> {
             CharacterisationResult item = new CharacterisationResult();
@@ -311,4 +312,28 @@ public class CharacterisationResultClickhouseRepository {
         double[] result = new double[]{conflictsCount, rate};
         return result;
     }
+
+    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filter) {
+
+        String subquery = "";
+        if (filter != null) {
+            subquery = convert(filter);
+            subquery = String.format(" where file_path in (%s) ", subquery);
+        }
+
+        String sql = String.format(
+                "select file_path, count(*) " +
+                        "from characterisationresultview " +
+                        " %s" +
+                        "group by file_path", subquery);
+
+        List<PropertiesPerObjectStatistic> result = template.query(sql, (rs, rowNum) -> {
+            PropertiesPerObjectStatistic statistic = new PropertiesPerObjectStatistic(rs.getLong(2), rs.getString(1));
+            return statistic;
+
+        });
+
+        return result;
+    }
+
 }

@@ -5,15 +5,20 @@ CREATE TABLE characterisationresult
     source String,
     property_value String,
     value_type String
-) ENGINE = MergeTree PRIMARY KEY (file_path, property, source);
+) ENGINE = MergeTree ORDER BY (source, property, file_path);
 
+CREATE TABLE cresultsagg
+(
+    file_path String,
+    property String,
+    property_value String
+) ENGINE = SummingMergeTree ORDER BY (property, file_path);
 
-
-CREATE VIEW characterisationresultview AS
-SELECT t.file_path, t.property, t.value_type,
+CREATE MATERIALIZED VIEW characterisationresultview to cresultsagg AS
+SELECT file_path, property,
        CASE
-           WHEN COUNT(distinct t.property_value) = 1 THEN MIN(t.property_value)
+           WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)
            ELSE 'CONFLICT'
            END AS property_value
-FROM characterisationresult t
-GROUP BY t.file_path, t.property,t.value_type;
+FROM characterisationresult
+GROUP BY property, file_path;

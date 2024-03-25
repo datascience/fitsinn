@@ -71,7 +71,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(property.name(), filter);
                 collect = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
@@ -81,7 +81,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case INTEGER:
             case FLOAT: {
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(property.name(), filter);
 
                 List<Float> floats = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
@@ -109,7 +109,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             default:
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(property.name(), filter);
                 collect = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());

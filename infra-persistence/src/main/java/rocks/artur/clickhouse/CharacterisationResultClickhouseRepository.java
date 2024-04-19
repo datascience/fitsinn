@@ -50,7 +50,7 @@ public class CharacterisationResultClickhouseRepository {
     public List<PropertyStatistic> getPropertyDistribution() {
         String sql = String.format(
                 "select property, count(property_value) as number " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "group by property ORDER BY number desc LIMIT 200");
 
         List<PropertyStatistic> result = template.query(sql, (rs, rowNum) -> {
@@ -70,7 +70,7 @@ public class CharacterisationResultClickhouseRepository {
 
         String sql = String.format(
                 "select property, property_value, count(property_value) as number " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "where %s property = '%s' group by property, property_value ORDER BY number desc LIMIT 200", subquery, property);
         LOG.info(sql);
         List<Object[]> result = template.query(sql, (rs, rowNum) -> {
@@ -97,7 +97,7 @@ public class CharacterisationResultClickhouseRepository {
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
                         "END as value, count(property) as number " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "where %s property = '%s' group by property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
@@ -125,11 +125,11 @@ public class CharacterisationResultClickhouseRepository {
                     if (!value.equals("CONFLICT")) {
                         result = String.format("select file_path from characterisationresult where property = '%s' and cast(property_value as DATETIME) %s cast('%s' as DATE)", property, operator, value);
                     } else {
-                        result = String.format("select file_path from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
+                        result = String.format("select file_path from characterisationresultaggregated where property = '%s' and property_value %s '%s'", property, operator, value);
                     }
                     break;
                 default:
-                    result = String.format("select file_path from characterisationresultview where property = '%s' and property_value %s '%s'", property, operator, value);
+                    result = String.format("select file_path from characterisationresultaggregated where property = '%s' and property_value %s '%s'", property, operator, value);
             }
             return result;
         } else if (filter instanceof AndFilterCriteria) {
@@ -205,7 +205,7 @@ public class CharacterisationResultClickhouseRepository {
 
     public Long getDigitalObjectCount() {
         String query = String.format(
-                "select count(distinct file_path) from characterisationresultview  ");
+                "select count(distinct file_path) from characterisationresultaggregated  ");
 
         Long result = template.queryForObject(query, Long.class);
         return result;
@@ -213,7 +213,7 @@ public class CharacterisationResultClickhouseRepository {
 
     public Long getConflictCount() {
         String query = String.format(
-                "select count(distinct file_path) from characterisationresultview where property_value = 'CONFLICT' ");
+                "select count(distinct file_path) from characterisationresultaggregated where property_value = 'CONFLICT' ");
 
         Long result = template.queryForObject(query, Long.class);
         return result;
@@ -261,7 +261,7 @@ public class CharacterisationResultClickhouseRepository {
                         "max(toInt32(property_value)) as maxsize, " +
                         "avg(toInt32(property_value)) as avgsize, " +
                         "count(property_value) as count " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "where %s property='SIZE'", subquery);
 
         List<double[]> result = template.query(sql, (rs, rowNum) -> {
@@ -286,7 +286,7 @@ public class CharacterisationResultClickhouseRepository {
 
         String sql = String.format(
                 "select count(distinct file_path) as count " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "where %s property_value='CONFLICT'", subquery);
 
         Long conflictsCount = template.queryForObject(sql, Long.class);
@@ -300,7 +300,7 @@ public class CharacterisationResultClickhouseRepository {
 
         String sql2 = String.format(
                 "select count(distinct file_path) as count " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         "%s", subquery2);
 
         Long totalCount = template.queryForObject(sql2, Long.class);
@@ -323,7 +323,7 @@ public class CharacterisationResultClickhouseRepository {
 
         String sql = String.format(
                 "select file_path, count(*) " +
-                        "from characterisationresultview " +
+                        "from characterisationresultaggregated " +
                         " %s" +
                         "group by file_path", subquery);
 

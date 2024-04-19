@@ -1,5 +1,6 @@
 package rocks.artur.clickhouse;
 
+import org.springdoc.core.customizers.ActuatorOperationCustomizer;
 import rocks.artur.api_impl.filter.SingleFilterCriteria;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
@@ -10,6 +11,7 @@ import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CharacterisationResultGatewayClickhouseImpl implements CharacterisationResultGateway {
 
@@ -57,9 +59,17 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
-        List<CharacterisationResult> allJPAByFilePath = repository.getCharacterisationResultsByFilepath(filepath);
-        List<CharacterisationResult> result = allJPAByFilePath.stream().filter(item -> item.getValue().equals("CONFLICT")).collect(Collectors.toList());
-        return result;
+        List<CharacterisationResult> results = new ArrayList<>();
+        List<CharacterisationResult> allJPAByFilePath = getCharacterisationResultsByFilepath(filepath);
+        List<Property> properties = allJPAByFilePath.stream().map(item -> item.getProperty()).collect(Collectors.toList());
+
+        for (Property property : properties) {
+            List<CharacterisationResult> collect = allJPAByFilePath.stream().filter(item -> item.getProperty().equals(property)).toList();
+            if (collect.stream().map(CharacterisationResult::getValue).distinct().count() > 1) {
+                results.addAll(collect);
+            }
+        }
+        return results;
 
     }
 

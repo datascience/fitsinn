@@ -155,6 +155,17 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties) {
+        switch (algorithm) {
+            case RANDOM -> {
+                List<String[]> samples = repository.getRandomSamples(filterCriteria, 10);
+                return samples;
+            }
+            case SELECTIVE_FEATURE_DISTRIBUTION -> {
+                List<String[]> selectiveFeatureDistributionSamples = repository.getSelectiveFeatureDistributionSamples(filterCriteria, properties);
+                //List<String> examples = selectiveFeatureDistributionSamples.stream().map(arr -> arr[1]).collect(Collectors.toList());
+                return selectiveFeatureDistributionSamples;
+            }
+        }
         return null;
     }
 

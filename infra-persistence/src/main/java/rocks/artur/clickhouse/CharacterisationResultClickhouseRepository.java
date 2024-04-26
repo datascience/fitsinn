@@ -336,4 +336,84 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
+    public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize) {
+
+        String subquery = "";
+        if (filterCriteria != null) {
+            subquery = convert(filterCriteria);
+            subquery = String.format(" where file_path in (%s) ", subquery);
+        }
+
+        String sql = String.format(
+                "select file_path " +
+                        "from characterisationresultaggregated " +
+                        " %s" +
+                        "group by file_path ORDER BY RAND() LIMIT %d  ", subquery, sampleSize);
+
+        List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
+        List<String[]> collect = resultList.stream().map(item -> new String[]{"1", item}).collect(Collectors.toList());
+
+        return collect;
+
+    }
+
+    public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties) {
+        String subquery = "";
+        if (filterCriteria != null) {
+            subquery = convert(filterCriteria);
+            subquery = String.format(" where file_path in (%s) ", subquery);
+        }
+
+
+
+        StringBuilder select = new StringBuilder("SELECT ");
+
+        for (int i = 0; i < properties.size(); i++) {
+            String currProperty = properties.get(i).name();
+            if (i == 0) {
+                select.append(String.format("count(%s.file_path) as size, min(%s.file_path) as example, %s.property_value ", currProperty, currProperty, currProperty));
+            } else {
+                select.append(String.format(", %s.property_value ", currProperty));
+            }
+        }
+
+        StringBuilder from = new StringBuilder("FROM ");
+
+        for (int i = 0; i < properties.size(); i++) {
+            String currProperty = properties.get(i).name();
+            if (i == 0) {
+
+                from.append(String.format(" (SELECT v.property_value, v.file_path FROM characterisationresultaggregated v\n" +
+                        "where %s v.property='%s' ) as %s ", subquery, currProperty, currProperty));
+            } else {
+                from.append(String.format(" join (SELECT v.property_value, v.file_path FROM characterisationresultaggregated v\n" +
+                        "where %s v.property='%s') as %s on %s.file_path=%s.file_path ", subquery, currProperty, currProperty, properties.get(0).name(), currProperty));
+            }   //TODO: Probably, the join is not required. Check if it is true.
+        }
+
+        StringBuilder groupBy = new StringBuilder("GROUP BY ");
+
+        for (int i = 0; i < properties.size(); i++) {
+            String currProperty = properties.get(i).name();
+            if (i == 0) {
+                groupBy.append(String.format(" %s.property_value ", currProperty));
+            } else {
+                groupBy.append(String.format(", %s.property_value ", currProperty));
+            }
+        }
+
+
+        StringBuilder orderBy = new StringBuilder("ORDER BY size DESC");
+
+        String sql = String.format(
+                "%s %s %s %s", select, from, groupBy, orderBy);
+        System.out.println(sql);
+
+
+        List<String[]> result = template.query(sql, (rs, rowNum) -> {
+            return new String[]{rs.getString(1), rs.getString(2)};
+        });
+
+        return result;
+    }
 }

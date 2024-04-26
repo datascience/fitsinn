@@ -40,15 +40,14 @@ const Samples = () => {
           redirect: "follow",
         };
 
+        const params = new URLSearchParams();
+        params.append('filter', filter)
+        params.append('algorithm',"SELECTIVE_FEATURE_DISTRIBUTION")
+        params.append('properties', ["FORMAT", "MIMETYPE", "FORMAT_VERSION"])
+
         const response = await fetch(
           BACKEND_URL +
-            "/samples?" +
-            new URLSearchParams({
-              filter: filter,
-              properties: "FORMAT",
-              properties: "MIMETYPE",
-              algorithm: "SELECTIVE_FEATURE_DISTRIBUTION",
-            }),
+            `/samples?${params.toString()}`,
           requestOptions
         );
         const data = await response.json();

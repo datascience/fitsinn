@@ -183,6 +183,31 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public void delete(CharacterisationResult characterisationResult) {
+/*
+todo: implement this query to remove conflicts
 
+
+
+with weights as (
+        SELECT source,
+        property,
+        COUNT(property_value) as count,
+        COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated
+        WHERE property_value != 'CONFLICT' ) as weight
+        FROM characterisationresult
+        WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )
+        GROUP BY source, property
+    ),
+    tmp_table as (
+        SELECT file_path, property, source, property_value, weight FROM characterisationresult
+        JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source
+        WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')
+    )
+
+SELECT * FROM tmp_table
+WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property)
+
+
+ */
     }
 }

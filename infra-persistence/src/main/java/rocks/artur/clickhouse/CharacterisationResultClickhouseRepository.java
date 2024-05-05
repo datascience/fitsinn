@@ -48,6 +48,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<PropertyStatistic> getPropertyDistribution() {
+        this.before();
         String sql = String.format(
                 "select property, count(property_value) as number " +
                         "from characterisationresultaggregated " +
@@ -61,7 +62,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<Object[]> getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
-
+        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -85,7 +86,7 @@ public class CharacterisationResultClickhouseRepository {
 
 
     public List<Object[]> getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
-
+        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -204,6 +205,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Long getDigitalObjectCount() {
+        this.before();
         String query = String.format(
                 "select count(distinct file_path) from characterisationresultaggregated  ");
 
@@ -212,6 +214,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Long getConflictCount() {
+        this.before();
         String query = String.format(
                 "select count(distinct file_path) from characterisationresultaggregated where property_value = 'CONFLICT' ");
 
@@ -248,7 +251,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public double[] getSizeStatistics(FilterCriteria filter) {
-
+        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -278,6 +281,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public double[] getConflictStatistics(FilterCriteria filter) {
+        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -314,7 +318,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filter) {
-
+        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -337,7 +341,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize) {
-
+        this.before();
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria);
@@ -358,6 +362,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties) {
+        this.before();
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria);
@@ -415,5 +420,121 @@ public class CharacterisationResultClickhouseRepository {
         });
 
         return result;
+    }
+
+
+    public void resolveConflictsSimple(){
+        /*
+        DROP TABLE IF EXISTS to_delete;
+
+        CREATE TABLE to_delete
+        (
+            file_path      String,
+            property       String,
+            source         String
+        ) ENGINE = Memory;
+
+        insert into to_delete
+        with weights as (
+            SELECT source,
+                   property,
+                   COUNT(property_value) as count,
+                   COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated
+                                                 WHERE property_value != 'CONFLICT' ) as weight
+            FROM characterisationresult
+            WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )
+            GROUP BY source, property
+        ),
+             tmp_table as (
+                 SELECT file_path, property, source, property_value, weight FROM characterisationresult
+                                                                                     JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source
+                 WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')
+             )
+        SELECT file_path,property,source FROM tmp_table
+        WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);
+
+        delete from characterisationresult
+        where (file_path, property, source) in (select file_path,property,source from to_delete);
+
+        drop table IF EXISTS characterisationresultaggregated;
+         */
+
+
+
+
+
+
+        String sql  = String.format("" +
+                "DROP TABLE IF EXISTS to_delete;\n" +
+                "\n" +
+                "CREATE TEMPORARY TABLE to_delete\n" +
+                "(\n" +
+                "    file_path      String,\n" +
+                "    property       String,\n" +
+                "    source         String\n" +
+                ") ENGINE = Memory;\n" +
+                "\n" +
+                "\n" +
+                "insert into to_delete\n" +
+                "with weights as (\n" +
+                "    SELECT source,\n" +
+                "           property,\n" +
+                "           COUNT(property_value) as count,\n" +
+                "           COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated\n" +
+                "                                         WHERE property_value != 'CONFLICT' ) as weight\n" +
+                "    FROM characterisationresult\n" +
+                "    WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )\n" +
+                "    GROUP BY source, property\n" +
+                "),\n" +
+                "     tmp_table as (\n" +
+                "         SELECT file_path, property, source, property_value, weight FROM characterisationresult\n" +
+                "                                                                             JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source\n" +
+                "         WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')\n" +
+                "     )\n" +
+                "\n" +
+                "SELECT file_path,property,source FROM tmp_table\n" +
+                "WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);\n" +
+                "\n" +
+                "\n" +
+                "delete from characterisationresult\n" +
+                "where (file_path, property, source) in (select file_path,property,source from to_delete);\n" +
+                "\n" +
+                "DROP TABLE IF EXISTS characterisationresultaggregated;");
+
+        template.update(sql);
+    }
+
+
+
+     void aggregateResults(){
+        /*
+            CREATE TABLE IF NOT EXISTS characterisationresultaggregated
+            ENGINE = AggregatingMergeTree
+                  ORDER BY (property, file_path) AS
+            SELECT file_path, property,
+                   CASE
+                       WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)
+                       ELSE 'CONFLICT'
+                       END AS property_value
+            FROM characterisationresult
+            GROUP BY property, file_path;
+         */
+        String sql  = String.format("" +
+                "CREATE TABLE IF NOT EXISTS characterisationresultaggregated\n" +
+                "ENGINE = AggregatingMergeTree\n" +
+                "      ORDER BY (property, file_path) AS\n" +
+                "SELECT file_path, property,\n" +
+                "       CASE\n" +
+                "           WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)\n" +
+                "           ELSE 'CONFLICT'\n" +
+                "           END AS property_value\n" +
+                "FROM characterisationresult\n" +
+                "GROUP BY property, file_path;"
+        );
+        template.update(sql);
+    }
+
+    void before(){
+        this.aggregateResults();
     }
 }

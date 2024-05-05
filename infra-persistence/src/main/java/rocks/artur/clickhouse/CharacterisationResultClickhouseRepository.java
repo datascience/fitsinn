@@ -460,72 +460,47 @@ public class CharacterisationResultClickhouseRepository {
          */
 
 
-        String sql = "DROP TABLE IF EXISTS to_delete;";
+        String sql =  String.format("DROP TABLE IF EXISTS to_delete;");
         int update = template.update(sql);
 
 
-        sql = "CREATE TABLE to_delete\n" +
-                "        (\n" +
-                "            file_path      String,\n" +
-                "            property       String,\n" +
-                "            source         String\n" +
-                "        ) ENGINE = Memory;";
+        sql =  String.format("" +
+                    "       CREATE TABLE to_delete\n" +
+                    "        (\n" +
+                    "            file_path      String,\n" +
+                    "            property       String,\n" +
+                    "            source         String\n" +
+                    "        ) ENGINE = Memory;");
         update = template.update(sql);
 
-        sql = "CREATE TABLE to_delete\n" +
-                "        (\n" +
-                "            file_path      String,\n" +
-                "            property       String,\n" +
-                "            source         String\n" +
-                "        ) ENGINE = Memory;";
+        sql =  String.format("" +
+                "        insert into to_delete\n" +
+                "        with weights as (\n" +
+                "            SELECT source,\n" +
+                "                   property,\n" +
+                "                   COUNT(property_value) as count,\n" +
+                "                   COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated\n" +
+                "                                                 WHERE property_value != 'CONFLICT' ) as weight\n" +
+                "            FROM characterisationresult\n" +
+                "            WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )\n" +
+                "            GROUP BY source, property\n" +
+                "        ),\n" +
+                "             tmp_table as (\n" +
+                "                 SELECT file_path, property, source, property_value, weight FROM characterisationresult\n" +
+                "                                                                                     JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source\n" +
+                "                 WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')\n" +
+                "             )\n" +
+                "        SELECT file_path,property,source FROM tmp_table\n" +
+                "        WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);");
         update = template.update(sql);
 
-        sql = "CREATE TABLE to_delete\n" +
-                "        (\n" +
-                "            file_path      String,\n" +
-                "            property       String,\n" +
-                "            source         String\n" +
-                "        ) ENGINE = Memory;";
+        sql =  String.format("" +
+                "       delete from characterisationresult\n" +
+                "        where (file_path, property, source) in (select file_path,property,source from to_delete);");
         update = template.update(sql);
 
-        String sql  = String.format("" +
-                "DROP TABLE IF EXISTS to_delete;\n" +
-                "\n" +
-                "CREATE TABLE to_delete\n" +
-                "(\n" +
-                "    file_path      String,\n" +
-                "    property       String,\n" +
-                "    source         String\n" +
-                ") ENGINE = Memory;\n" +
-                "\n" +
-                "\n" +
-                "insert into to_delete\n" +
-                "with weights as (\n" +
-                "    SELECT source,\n" +
-                "           property,\n" +
-                "           COUNT(property_value) as count,\n" +
-                "           COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated\n" +
-                "                                         WHERE property_value != 'CONFLICT' ) as weight\n" +
-                "    FROM characterisationresult\n" +
-                "    WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )\n" +
-                "    GROUP BY source, property\n" +
-                "),\n" +
-                "     tmp_table as (\n" +
-                "         SELECT file_path, property, source, property_value, weight FROM characterisationresult\n" +
-                "                                                                             JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source\n" +
-                "         WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')\n" +
-                "     )\n" +
-                "\n" +
-                "SELECT file_path,property,source FROM tmp_table\n" +
-                "WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);\n" +
-                "\n" +
-                "\n" +
-                "delete from characterisationresult\n" +
-                "where (file_path, property, source) in (select file_path,property,source from to_delete);\n" +
-                "\n" +
-                "DROP TABLE IF EXISTS characterisationresultaggregated;");
-
-        int update = template.update(sql);
+        sql =  String.format("drop table IF EXISTS characterisationresultaggregated");
+        update = template.update(sql);
     }
 
 

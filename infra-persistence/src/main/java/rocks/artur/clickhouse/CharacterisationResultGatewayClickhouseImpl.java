@@ -25,6 +25,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void addCharacterisationResult(CharacterisationResult characterisationResult) {
         repository.save(characterisationResult);
+        repository.cleanAggregation();
     }
 
     @Override
@@ -59,6 +60,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
+        repository.aggregateResults();
         List<CharacterisationResult> results = new ArrayList<>();
         List<CharacterisationResult> allJPAByFilePath = getCharacterisationResultsByFilepath(filepath);
         List<Property> properties = allJPAByFilePath.stream().map(item -> item.getProperty()).collect(Collectors.toList());
@@ -74,6 +76,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria) {
+        repository.aggregateResults();
         Map<String, Double> result = new HashMap<>();
 
         double[] sizeStatistics = repository.getSizeStatistics(filterCriteria);
@@ -91,6 +94,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter) {
+        repository.aggregateResults();
         switch (property.getValueType()) {
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
@@ -154,6 +158,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties) {
+        repository.aggregateResults();
         switch (algorithm) {
             case RANDOM -> {
                 List<String[]> samples = repository.getRandomSamples(filterCriteria, 10);
@@ -171,10 +176,12 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
         repository.saveAll(characterisationResults);
+        repository.cleanAggregation();
     }
 
     @Override
     public double getConflictRate() {
+        repository.aggregateResults();
         Long totalCount = repository.getDigitalObjectCount();
         Long conflictCount = repository.getConflictCount();
         return conflictCount / (double) totalCount;

@@ -48,7 +48,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<PropertyStatistic> getPropertyDistribution() {
-        this.before();
         String sql = String.format(
                 "select property, count(property_value) as number " +
                         "from characterisationresultaggregated " +
@@ -62,7 +61,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<Object[]> getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
-        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -86,7 +84,6 @@ public class CharacterisationResultClickhouseRepository {
 
 
     public List<Object[]> getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
-        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -176,7 +173,6 @@ public class CharacterisationResultClickhouseRepository {
                     }
                 });
 
-
     }
 
     public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter) {
@@ -205,7 +201,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Long getDigitalObjectCount() {
-        this.before();
         String query = String.format(
                 "select count(distinct file_path) from characterisationresultaggregated  ");
 
@@ -214,7 +209,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Long getConflictCount() {
-        this.before();
         String query = String.format(
                 "select count(distinct file_path) from characterisationresultaggregated where property_value = 'CONFLICT' ");
 
@@ -251,7 +245,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public double[] getSizeStatistics(FilterCriteria filter) {
-        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -281,7 +274,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public double[] getConflictStatistics(FilterCriteria filter) {
-        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -318,7 +310,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filter) {
-        this.before();
         String subquery = "";
         if (filter != null) {
             subquery = convert(filter);
@@ -341,7 +332,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize) {
-        this.before();
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria);
@@ -362,7 +352,6 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties) {
-        this.before();
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria);
@@ -499,8 +488,7 @@ public class CharacterisationResultClickhouseRepository {
                 "        where (file_path, property, source) in (select file_path,property,source from to_delete);");
         update = template.update(sql);
 
-        sql =  String.format("drop table IF EXISTS characterisationresultaggregated");
-        update = template.update(sql);
+        this.cleanAggregation();
     }
 
 
@@ -533,7 +521,9 @@ public class CharacterisationResultClickhouseRepository {
         template.update(sql);
     }
 
-    void before(){
-        this.aggregateResults();
+    void cleanAggregation(){
+        String sql =  String.format("drop table IF EXISTS characterisationresultaggregated");
+        int update = template.update(sql);
     }
+
 }

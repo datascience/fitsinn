@@ -13,19 +13,24 @@ import {uniqueProperties} from "../../components/Filter";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [sizeStatistics, setSizeStatistics] = useState([
-    {
-      totalSize: 10047,
-      avgSize: 3349,
-      minSize: 4,
-      maxSize: 10000,
-      conflictRate: 0.17,
-    },
-  ]);
 
   const [properties, setProperties] = useState([]);
 
   const [filter, setFilter] = useSessionStorage("filterString", "");
+
+
+  const [globalStatistics, setGlobalStatistics] = useSessionStorage(
+    "globalStatistics",
+    [
+      {
+        totalSize: 10047,
+        avgSize: 3349,
+        minSize: 4,
+        maxSize: 10000,
+        conflictRate: 0.17,
+      },
+    ]
+  );
 
   const [globalProperties, setGlobalProperties] = useSessionStorage(
     "globalProperties",
@@ -65,14 +70,17 @@ const Dashboard = () => {
       requestOptions
     );
     const data = await response.json();
-    setSizeStatistics(data);
+    setGlobalStatistics(data);
+  };
+
+  const fetchData = async () => {
+    await fetchStatistics();
+    await fetchGlobalProperties();
   };
 
   useEffect(() => {
     console.log("loading the dashboard");
-
-    fetchStatistics();
-    fetchGlobalProperties();
+    fetchData();
   }, [filter]);
 
   const handleClick = () => {
@@ -112,43 +120,43 @@ const Dashboard = () => {
         <Stat
           title="File Count"
           value={
-            sizeStatistics.totalCount == null ? 0 : sizeStatistics.totalCount
+            globalStatistics.totalCount == null ? 0 : globalStatistics.totalCount
           }
         />
 
         <Stat
           title="Total Size (MB)"
           value={
-            sizeStatistics.totalSize == null
+            globalStatistics.totalSize == null
               ? 0
-              : (sizeStatistics.totalSize / 1024 / 1024).toFixed(2)
+              : (globalStatistics.totalSize / 1024 / 1024).toFixed(2)
           }
         />
 
         <Stat
           title="Average File Size (MB)"
           value={
-            sizeStatistics.avgSize == null
+            globalStatistics.avgSize == null
               ? 0
-              : (sizeStatistics.avgSize / 1024 / 1024).toFixed(2)
+              : (globalStatistics.avgSize / 1024 / 1024).toFixed(2)
           }
         />
 
         <Stat
           title="Smallest File Size (MB)"
           value={
-            sizeStatistics.minSize == null
+            globalStatistics.minSize == null
               ? 0
-              : (sizeStatistics.minSize / 1024 / 1024).toFixed(2)
+              : (globalStatistics.minSize / 1024 / 1024).toFixed(2)
           }
         />
 
         <Stat
           title="Biggest File Size (MB)"
           value={
-            sizeStatistics.maxSize == null
+            globalStatistics.maxSize == null
               ? 0
-              : (sizeStatistics.maxSize / 1024 / 1024).toFixed(2)
+              : (globalStatistics.maxSize / 1024 / 1024).toFixed(2)
           }
         />
 
@@ -164,9 +172,9 @@ const Dashboard = () => {
             <StatBox
               subtitle="Conflct Rate (%)"
               title={
-                sizeStatistics.conflictRate == null
+                globalStatistics.conflictRate == null
                   ? 0
-                  : (sizeStatistics.conflictRate * 100).toFixed(2)
+                  : (globalStatistics.conflictRate * 100).toFixed(2)
               }
             />
             <Box

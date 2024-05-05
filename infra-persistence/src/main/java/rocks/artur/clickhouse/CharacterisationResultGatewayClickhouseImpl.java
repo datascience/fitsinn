@@ -70,7 +70,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
             }
         }
         return results;
-
     }
 
     @Override
@@ -184,5 +183,11 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void delete(CharacterisationResult characterisationResult) {
 
+    }
+
+    @Override
+    public void resolveConflictsNative() {
+        repository.resolveConflictsSimple();
+        repository.aggregateResults();
     }
 }

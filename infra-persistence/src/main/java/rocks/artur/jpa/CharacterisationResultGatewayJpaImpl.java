@@ -250,4 +250,9 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         characterisationResultRepository.delete(new CharacterisationResultJPA(characterisationResult));
     }
 
+    @Override
+    public void resolveConflictsNative() {
+
+    }
+
 }

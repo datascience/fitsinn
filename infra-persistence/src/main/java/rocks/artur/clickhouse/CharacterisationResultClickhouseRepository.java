@@ -460,14 +460,38 @@ public class CharacterisationResultClickhouseRepository {
          */
 
 
+        String sql = "DROP TABLE IF EXISTS to_delete;";
+        int update = template.update(sql);
 
 
+        sql = "CREATE TABLE to_delete\n" +
+                "        (\n" +
+                "            file_path      String,\n" +
+                "            property       String,\n" +
+                "            source         String\n" +
+                "        ) ENGINE = Memory;";
+        update = template.update(sql);
 
+        sql = "CREATE TABLE to_delete\n" +
+                "        (\n" +
+                "            file_path      String,\n" +
+                "            property       String,\n" +
+                "            source         String\n" +
+                "        ) ENGINE = Memory;";
+        update = template.update(sql);
+
+        sql = "CREATE TABLE to_delete\n" +
+                "        (\n" +
+                "            file_path      String,\n" +
+                "            property       String,\n" +
+                "            source         String\n" +
+                "        ) ENGINE = Memory;";
+        update = template.update(sql);
 
         String sql  = String.format("" +
                 "DROP TABLE IF EXISTS to_delete;\n" +
                 "\n" +
-                "CREATE TEMPORARY TABLE to_delete\n" +
+                "CREATE TABLE to_delete\n" +
                 "(\n" +
                 "    file_path      String,\n" +
                 "    property       String,\n" +
@@ -501,7 +525,7 @@ public class CharacterisationResultClickhouseRepository {
                 "\n" +
                 "DROP TABLE IF EXISTS characterisationresultaggregated;");
 
-        template.update(sql);
+        int update = template.update(sql);
     }
 
 

@@ -136,7 +136,7 @@ public class CharacterisationResultClickhouseRepository {
             String whereStatement1 = convert(andFilter.getCriteria());
             String whereStatement2 = convert(andFilter.getOtherCriteria());
 
-            String result = String.format("( %s INTERSECT %s )", whereStatement1, whereStatement2);
+            String result = String.format("( (%s) INTERSECT (%s) )", whereStatement1, whereStatement2);
             return result;
 
         } else if (filter instanceof OrFilterCriteria) {
@@ -145,7 +145,7 @@ public class CharacterisationResultClickhouseRepository {
             String whereStatement1 = convert(orFilter.getCriteria());
             String whereStatement2 = convert(orFilter.getOtherCriteria());
 
-            String result = String.format("( %s UNION %s )", whereStatement1, whereStatement2);
+            String result = String.format("( (%s) UNION ALL (%s) )", whereStatement1, whereStatement2);
             return result;
         } else {
             throw new UnsupportedOperationException("this type of FilterCriteria is not supported");

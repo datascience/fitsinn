@@ -19,6 +19,7 @@ import rocks.artur.api.CharacterisationResultProducer;
 import rocks.artur.api_impl.utils.ByteFile;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
+import rocks.artur.domain.ValueType;
 import rocks.artur.utils.JSONToolkit;
 import rocks.artur.utils.STAXToolkit;
 
@@ -33,10 +34,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 //@ApplicationScoped
@@ -44,6 +47,13 @@ public class FITSClient implements CharacterisationResultProducer {
     private static final Logger LOG = LoggerFactory.getLogger(FITSClient.class);
     List<String> knownProperties = Arrays.stream(FITSPropertyJsonPath.values()).map(Enum::name).collect(Collectors.toList());
     private String FITS_URL = "http://localhost:8888";
+
+
+    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    static DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy:MM:dd HH:mm:ssXXX][yyyy:MM:dd HH:mm:ss][yyyy:MM:dd HH:mmXXX][yyyy-MM-dd HH:mm:ss][yyyy/MM/dd HH:mm:ss]")
+            .toFormatter();
 
     @Override
     public String getVersion(){
@@ -123,10 +133,44 @@ public class FITSClient implements CharacterisationResultProducer {
             }
             result.addAll(extractCharacterisationResultsStax(content));
         } catch (Exception e) {
-            LOG.error("Exception occurred during file processing");
+            LOG.error("Exception occurred during FITS file parsing");
             e.printStackTrace();
         }
+
+        result=this.fixDateTypes(result);
         return result;
+    }
+
+    private ArrayList<CharacterisationResult> fixDateTypes(ArrayList<CharacterisationResult> result) {
+        result.stream().forEach(item -> {
+            if (item.getValueType().equals(ValueType.TIMESTAMP)){
+                String value = item.getValue();
+                LOG.debug(String.format("Parsing Object: %s", item));
+                if (item.getSource().startsWith("OIS File Information")) {
+                    LocalDateTime parsed =
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(value)),
+                                    TimeZone.getDefault().toZoneId());
+                    item.setValue(parsed.format(outputFormatter));
+                } else {
+                    LocalDateTime parsed = tryParseLocalDateTime(value, inputFormatter);
+                    if (parsed != null) {
+                        item.setValue(parsed.format(outputFormatter));
+                    } else {
+                        item.setValue(null);
+                    }
+                }
+                LOG.debug(String.format("Parsed Result: %s", item));
+            }
+        });
+        return result;
+    }
+
+     LocalDateTime tryParseLocalDateTime(String datetimeString, DateTimeFormatter formatter) {
+        try {
+            return LocalDateTime.parse(datetimeString, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     List<CharacterisationResult> extractCharacterisationResults(String fitsResultXML) throws JSONException {

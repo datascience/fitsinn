@@ -21,6 +21,7 @@ services:
     env_file: .env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-router:6446/fitsinn
+      - DB_SELECTOR=mysql
     networks:
       - web
     restart: unless-stopped
@@ -58,7 +59,7 @@ services:
   mysql-server-1:
     container_name: mysql-server-1
     env_file:
-      - mysql-cluster/mysql-server.env
+      - utils/mysql-cluster/mysql-server.env
     image: mysql/mysql-server:8.0.12
     networks:
       - web
@@ -83,7 +84,7 @@ services:
   mysql-server-2:
     container_name: mysql-server-2
     env_file:
-      - mysql-cluster/mysql-server.env
+      - utils/mysql-cluster/mysql-server.env
     image: mysql/mysql-server:8.0.12
     networks:
       - web
@@ -109,7 +110,7 @@ services:
   mysql-server-3:
     container_name: mysql-server-3
     env_file:
-      - mysql-cluster/mysql-server.env
+      - utils/mysql-cluster/mysql-server.env
     image: mysql/mysql-server:8.0.12
     networks:
       - web
@@ -134,7 +135,7 @@ services:
   mysql-shell:
     container_name: mysql-shell
     env_file:
-      - mysql-cluster/mysql-shell.env
+      - utils/mysql-cluster/mysql-shell.env
     image: neumayer/mysql-shell-batch
     networks:
       - web
@@ -148,7 +149,7 @@ services:
   mysql-router:
     container_name: mysql-router
     env_file:
-      - mysql-cluster/mysql-router.env
+      - utils/mysql-cluster/mysql-router.env
     image: mysql/mysql-router:8.0
     networks:
       - web
@@ -166,7 +167,7 @@ services:
     container_name: nginx
     env_file: .env
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./utils/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 8082:80
     networks:

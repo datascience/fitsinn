@@ -21,7 +21,7 @@ import static io.restassured.RestAssured.given;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("h2")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class RestServiceTest {

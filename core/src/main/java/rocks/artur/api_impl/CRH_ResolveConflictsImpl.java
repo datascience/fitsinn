@@ -12,16 +12,16 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ResolveConflictsImpl implements ResolveConflicts {
+public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
 
 
     private CharacterisationResultGateway characterisationResultGateway;
 
-    public ResolveConflictsImpl(CharacterisationResultGateway characterisationResultGateway) {
+    public CRH_ResolveConflictsImpl(CharacterisationResultGateway characterisationResultGateway) {
         this.characterisationResultGateway = characterisationResultGateway;
     }
 
-    @Override
+
     public void run() {
         init();
         System.out.println(sourceWeights);

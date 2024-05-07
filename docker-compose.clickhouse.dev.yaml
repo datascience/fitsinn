@@ -1,0 +1,105 @@
+version: '3'
+
+services:
+
+  fits:
+    build:
+      context: .
+      dockerfile: ./fits/Dockerfile
+    container_name: fits
+    env_file: .env
+    networks:
+      - web
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+
+  rest:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: .env
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - DB_SELECTOR=clickhouse
+    deploy:
+      replicas: 1
+    ports:
+      - 8092:8080
+    depends_on:
+      - fits
+      - db-docker
+
+  web:
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+    container_name: web
+    env_file: .env
+    networks:
+      - web
+    restart: unless-stopped
+    ports:
+      - 8080:3000
+
+  db-docker:
+    image: yandex/clickhouse-server
+    container_name: db-docker
+    networks:
+      - web
+    ports:
+      - 8123:8123
+      - 9000:9000
+      - 9004:9004
+
+
+  db-docker-init:
+    image: yandex/clickhouse-server
+    container_name: db-docker-init
+    volumes:
+      - ./utils/clickhouse:/var/clickhouse
+    depends_on:
+      - db-docker
+    networks:
+      - web
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      while ! clickhouse-client --host db-docker -q \"SHOW databases;\"; do
+          echo waiting for clickhouse up
+          sleep 1
+      done
+
+      clickhouse-client --host db-docker --queries-file /var/clickhouse/initdb.sql
+
+      tail -f /dev/null
+      "
+
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      - web
+    ports:
+      - 8090:8080
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    env_file: .env
+    volumes:
+      - ./utils/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8082:80
+    networks:
+      - web
+    depends_on:
+      - rest
+
+networks:
+  web:

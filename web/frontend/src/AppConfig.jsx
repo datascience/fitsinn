@@ -15,13 +15,34 @@ const AppConfig = () => {
     "globalProperties",
     []
   );
+  const [globalStatistics, setGlobalStatistics] = useSessionStorage(
+    "globalStatistics",
+    []
+  );
+
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    redirect: "follow",
+  };
 
   const fetchGlobalProperties = async () => {
+    await fetch(BACKEND_URL + "/statistics?", requestOptions);
     const response = await fetch(BACKEND_URL + "/properties");
     let data = await response.json();
     let properties = data.map((prop) => prop.property);
     setGlobalProperties(properties);
   };
+
+  const fetchGlobalStatistics = async () => {
+    const response = await fetch(BACKEND_URL + "/statistics?", requestOptions);
+    let data = await response.json();
+    setGlobalStatistics(data);
+  };
+
   const fetchHealth = async () => {
     try {
       const response = await fetch(BACKEND_URL + "/health");
@@ -32,9 +53,14 @@ const AppConfig = () => {
     }
   };
 
+  const fetchInitialData = async () => {
+    await fetchHealth();
+    await fetchGlobalProperties();
+    await fetchGlobalStatistics();
+  };
+
   useEffect(() => {
-    fetchHealth();
-    fetchGlobalProperties();
+    fetchInitialData();
   }, []);
 
   return (

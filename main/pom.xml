@@ -41,15 +41,9 @@
             <artifactId>datasource-proxy</artifactId>
             <version>1.4.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
 
         <!--Deps?-->
 
-
-        <!-- Hibernate ORM specific dependencies -->
 
         <dependency>
             <groupId>junit</groupId>

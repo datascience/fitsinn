@@ -1,5 +1,5 @@
 #!/bin/bash
-source /home/artur/rnd/git/fitsinn/.venv/bin/activate
+source ${PWD}/../.venv/bin/activate
 ./mvnw -pl -web -DskipTests clean install
 
 ./mvnw spring-boot:run -f main/pom.xml &

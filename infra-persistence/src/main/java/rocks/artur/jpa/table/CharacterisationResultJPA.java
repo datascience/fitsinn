@@ -1,12 +1,14 @@
 package rocks.artur.jpa.table;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
 import rocks.artur.domain.ValueType;
-
-import java.util.UUID;
 
 
 @Entity

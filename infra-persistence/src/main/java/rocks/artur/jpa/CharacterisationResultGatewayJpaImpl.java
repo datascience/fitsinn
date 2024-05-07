@@ -2,7 +2,6 @@ package rocks.artur.jpa;
 
 
 import jakarta.transaction.Transactional;
-import org.h2.jdbc.JdbcBatchUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.artur.domain.*;
@@ -72,7 +71,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueTimeStampDistribution(property.name(), filter);
                 collect = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
@@ -82,7 +81,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             case INTEGER:
             case FLOAT: {
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(property.name(), filter);
 
                 List<Float> floats = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
@@ -110,7 +109,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             default:
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        characterisationResultViewRepository.getPropertyValueDistribution(filter);
+                        characterisationResultViewRepository.getPropertyValueDistribution(property.name(), filter);
                 collect = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
@@ -228,7 +227,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
             }
         });
         try {
-            characterisationResultRepository.saveFast(tmp);
+            characterisationResultRepository.saveAll(tmp);
         } catch (RuntimeException e) {
             LOG.error("Some characterisation results have already been persisted. Batch insert is not possible. Uploaded items with NULL values:" );
             List<CharacterisationResultJPA> collect = tmp.stream().filter(item -> item.getSource() == null || item.getProperty() == null || item.getFilePath() == null).collect(Collectors.toList());
@@ -249,6 +248,11 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     @Override
     public void delete(CharacterisationResult characterisationResult) {
         characterisationResultRepository.delete(new CharacterisationResultJPA(characterisationResult));
+    }
+
+    @Override
+    public void resolveConflictsNative() {
+
     }
 
 }

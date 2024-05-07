@@ -85,4 +85,6 @@ public interface CharacterisationResultGateway {
     double getConflictRate();
 
     void delete(CharacterisationResult characterisationResult);
+
+    void resolveConflictsNative();
 }

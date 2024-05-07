@@ -20,8 +20,17 @@ const AppConfig = () => {
     []
   );
 
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  var requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    redirect: "follow",
+  };
+
   const fetchGlobalProperties = async () => {
-    await fetch(BACKEND_URL + "/statistics");
+    await fetch(BACKEND_URL + "/statistics?", requestOptions);
     const response = await fetch(BACKEND_URL + "/properties");
     let data = await response.json();
     let properties = data.map((prop) => prop.property);
@@ -29,7 +38,7 @@ const AppConfig = () => {
   };
 
   const fetchGlobalStatistics = async () => {
-    const response = await fetch(BACKEND_URL + "/statistics");
+    const response = await fetch(BACKEND_URL + "/statistics?", requestOptions);
     let data = await response.json();
     setGlobalStatistics(data);
   };

@@ -10,7 +10,7 @@ public class Native_ResolveConflictsImpl implements ResolveConflicts {
         this.characterisationResultGateway = characterisationResultGateway;
     }
     @Override
-    public void run() {
-        characterisationResultGateway.resolveConflictsNative();
+    public void run(String datasetName) {
+        characterisationResultGateway.resolveConflictsNative(datasetName);
     }
 }

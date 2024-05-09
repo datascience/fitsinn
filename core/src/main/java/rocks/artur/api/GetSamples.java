@@ -15,7 +15,7 @@ public interface GetSamples {
 
     void setProperties(List<Property> properties);
 
-    Iterable<String> getObjects(FilterCriteria filterCriteria);
+    Iterable<String> getObjects(FilterCriteria filterCriteria, String datasetName);
 
-    List<String[]> getSamplingInfo(FilterCriteria filterCriteria);
+    List<String[]> getSamplingInfo(FilterCriteria filterCriteria, String datasetName);
 }

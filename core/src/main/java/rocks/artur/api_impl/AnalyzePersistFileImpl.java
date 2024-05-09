@@ -21,20 +21,20 @@ public class AnalyzePersistFileImpl implements AnalyzePersistFile {
     }
 
     @Override
-    public Long uploadCharacterisationResults(ByteFile file) {
+    public Long uploadCharacterisationResults(ByteFile file, String datasetName) {
         List<CharacterisationResult> characterisationResults = characterisationResultProducer.processFile(file);
-        characterisationResultGateway.addCharacterisationResults(characterisationResults);
+        characterisationResultGateway.addCharacterisationResults(characterisationResults, datasetName);
         return Long.valueOf(characterisationResults.size());
     }
 
     @Override
-    public Long uploadCharacterisationResults(List<ByteFile> files) {
+    public Long uploadCharacterisationResults(List<ByteFile> files, String datasetName) {
         List<CharacterisationResult> characterisationResults = new ArrayList<>();
         files.stream().forEach(file -> {
             List<CharacterisationResult> tmp = characterisationResultProducer.processFile(file);
             characterisationResults.addAll(tmp);
         });
-        characterisationResultGateway.addCharacterisationResults(characterisationResults);
+        characterisationResultGateway.addCharacterisationResults(characterisationResults, datasetName);
         return Long.valueOf(characterisationResults.size());
     }
 }

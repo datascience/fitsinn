@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class CharacterisationResultGatewayJpaImpl implements CharacterisationResultGateway {
+public class CharacterisationResultGatewayJpaImpl {//implements CharacterisationResultGateway {
     private static final Logger LOG = LoggerFactory.getLogger(CharacterisationResultGatewayJpaImpl.class);
     CharacterisationResultRepository characterisationResultRepository;
     CharacterisationResultViewRepository characterisationResultViewRepository;
@@ -30,7 +30,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     }
 
-    @Override
+    //@Override
     @Transactional
     public void addCharacterisationResult(CharacterisationResult characterisationResult) {
         CharacterisationResultJPA toSave = new CharacterisationResultJPA(characterisationResult);
@@ -38,7 +38,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         characterisationResultRepository.save(toSave);
     }
 
-    @Override
+   // @Override
     public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter) {
         List<CharacterisationResultJPA> all = characterisationResultRepository.findAll();
         List<CharacterisationResult> result = all.stream().map(item -> new CharacterisationResult(Property.valueOf(item.getProperty()), item.getValue(),
@@ -46,7 +46,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
-    @Override
+    //@Override
     public List<PropertyStatistic> getPropertyDistribution(FilterCriteria filter) {
 
         //Specification<CharacterisationResultViewJPA> convert = convert(filter);
@@ -119,7 +119,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     }
 
-    @Override
+    //@Override
     public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filepath) {
         List<CharacterisationResultJPA> allJPAByFilePath = characterisationResultRepository.findAllByFilePath(filepath);
         List<CharacterisationResult> result = allJPAByFilePath.stream().map(item -> new CharacterisationResult(Property.valueOf(item.getProperty()), item.getValue(),
@@ -127,7 +127,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
-    @Override
+    //@Override
     public List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry) {
         List<CharacterisationResultJPA> allJPAByFilePath = characterisationResultRepository.findAllByFilePath(entry.getFilepath());
         List<CharacterisationResult> result = allJPAByFilePath.stream().filter(item -> item.getProperty().equals(entry.getProperty().toString())).map(item -> new CharacterisationResult(Property.valueOf(item.getProperty()), item.getValue(),
@@ -135,14 +135,14 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
-    @Override
+    //@Override
     public List<Entry> getConflictEntries() {
         List<String[]> conflictEntries = characterisationResultViewRepository.getConflictEntries();
         List<Entry> result = conflictEntries.stream().map(item -> new Entry(item[0], item[1])).collect(Collectors.toList());
         return result;
     }
 
-    @Override
+    //@Override
     public List<Entry> getEntries() {
         List<Object[]> filepathProperty = characterisationResultRepository.getFilepathProperty();
         List<Entry> result = filepathProperty.stream().map(item -> new Entry(item[0].toString(), item[1].toString())).collect(Collectors.toList());
@@ -157,7 +157,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
-    @Override
+    //@Override
     public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria) {
         Map<String, Double> result = new HashMap<>();
 
@@ -174,13 +174,13 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return result;
     }
 
-    @Override
+   // @Override
     public List<String> getSources() {
         List<String> sources = characterisationResultViewRepository.getSources();
         return sources;
     }
 
-    @Override
+    //@Override
     public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria) {
 
         List<Object[]> propertyValueDistribution =
@@ -193,7 +193,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return collect;
     }
 
-    @Override
+    //@Override
     public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties) {
         switch (algorithm) {
             case RANDOM -> {
@@ -209,7 +209,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         return null;
     }
 
-    @Override
+    //@Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
         List<CharacterisationResultJPA> tmp = new ArrayList<>();
         characterisationResults.stream().forEach(item -> {
@@ -238,19 +238,19 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
         }
     }
 
-    @Override
+    //@Override
     public double getConflictRate() {
         Long totalCount = characterisationResultViewRepository.getTotalCount();
         Long conflictCount = characterisationResultViewRepository.getConflictCount();
         return conflictCount / (double) totalCount;
     }
 
-    @Override
+    //@Override
     public void delete(CharacterisationResult characterisationResult) {
         characterisationResultRepository.delete(new CharacterisationResultJPA(characterisationResult));
     }
 
-    @Override
+    //@Override
     public void resolveConflictsNative() {
 
     }

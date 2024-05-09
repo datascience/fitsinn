@@ -34,10 +34,10 @@ public class CharacterisationResultClickhouseRepository {
         this.template = template;
     }
 
-    public void save(CharacterisationResult characterisationResult) {
+    public void save(CharacterisationResult characterisationResult, String datasetName) {
 
-        int rowsInserted = template.update("insert into characterisationresult (file_path,property, source, property_value, value_type)" +
-                        " values (?,?,?,?,?)",
+        int rowsInserted = template.update(String.format("insert into %s.characterisationresult (file_path,property, source, property_value, value_type)" +
+                        " values (?,?,?,?,?)", datasetName),
                 characterisationResult.getFilePath(),
                 characterisationResult.getProperty().name(),
                 characterisationResult.getSource(),
@@ -47,11 +47,11 @@ public class CharacterisationResultClickhouseRepository {
         System.out.println("Number of rows updated = " + rowsInserted);
     }
 
-    public List<PropertyStatistic> getPropertyDistribution() {
+    public List<PropertyStatistic> getPropertyDistribution(String datasetName) {
         String sql = String.format(
                 "select property, count(property_value) as number " +
-                        "from characterisationresultaggregated " +
-                        "group by property ORDER BY number desc LIMIT 200");
+                        "from %s.characterisationresultaggregated " +
+                        "group by property ORDER BY number desc LIMIT 200", datasetName);
 
         List<PropertyStatistic> result = template.query(sql, (rs, rowNum) -> {
             PropertyStatistic propstat = new PropertyStatistic(rs.getLong("number"), Property.valueOf(rs.getString("property")));
@@ -60,17 +60,17 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public List<Object[]> getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
+    public List<Object[]> getPropertyValueDistribution(String property, FilterCriteria<CharacterisationResult> filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
                 "select property, property_value, count(property_value) as number " +
-                        "from characterisationresultaggregated " +
-                        "where %s property = '%s' group by property, property_value ORDER BY number desc LIMIT 200", subquery, property);
+                        "from %s.characterisationresultaggregated " +
+                        "where %s property = '%s' group by property, property_value ORDER BY number desc LIMIT 200", datasetName, subquery, property);
         LOG.info(sql);
         List<Object[]> result = template.query(sql, (rs, rowNum) -> {
             Object[] item = new Object[3];
@@ -83,10 +83,10 @@ public class CharacterisationResultClickhouseRepository {
     }
 
 
-    public List<Object[]> getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter) {
+    public List<Object[]> getPropertyValueTimeStampDistribution(String property, FilterCriteria<CharacterisationResult> filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
@@ -95,11 +95,11 @@ public class CharacterisationResultClickhouseRepository {
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
                         "END as value, count(property) as number " +
-                        "from characterisationresultaggregated " +
+                        "from %s.characterisationresultaggregated " +
                         "where %s property = '%s' group by property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
-                        "END  ORDER BY number desc LIMIT 200", subquery, property);
+                        "END  ORDER BY number desc LIMIT 200", datasetName, subquery, property);
 
         List<Object[]> result = template.query(sql, (rs, rowNum) -> {
             Object[] item = new Object[3];
@@ -112,7 +112,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
 
-    public String convert(FilterCriteria<CharacterisationResult> filter) {
+    public String convert(FilterCriteria<CharacterisationResult> filter, String datasetName) {
         if (filter instanceof SingleFilterCriteria) {
             Property property = ((SingleFilterCriteria) filter).getSearchKey();
             String operator = ((SingleFilterCriteria) filter).getOperation().getValue();
@@ -121,20 +121,20 @@ public class CharacterisationResultClickhouseRepository {
             switch (property.getValueType()) {
                 case TIMESTAMP:
                     if (!value.equals("CONFLICT")) {
-                        result = String.format("select file_path from characterisationresult where property = '%s' and cast(property_value as DATETIME) %s cast('%s' as DATE)", property, operator, value);
+                        result = String.format("select file_path from %s.characterisationresult where property = '%s' and cast(property_value as DATETIME) %s cast('%s' as DATE)", datasetName, property, operator, value);
                     } else {
-                        result = String.format("select file_path from characterisationresultaggregated where property = '%s' and property_value %s '%s'", property, operator, value);
+                        result = String.format("select file_path from %s.characterisationresultaggregated where property = '%s' and property_value %s '%s'", datasetName, property, operator, value);
                     }
                     break;
                 default:
-                    result = String.format("select file_path from characterisationresultaggregated where property = '%s' and property_value %s '%s'", property, operator, value);
+                    result = String.format("select file_path from %s.characterisationresultaggregated where property = '%s' and property_value %s '%s'", datasetName, property, operator, value);
             }
             return result;
         } else if (filter instanceof AndFilterCriteria) {
             AndFilterCriteria andFilter = (AndFilterCriteria) filter;
 
-            String whereStatement1 = convert(andFilter.getCriteria());
-            String whereStatement2 = convert(andFilter.getOtherCriteria());
+            String whereStatement1 = convert(andFilter.getCriteria(), datasetName);
+            String whereStatement2 = convert(andFilter.getOtherCriteria(), datasetName);
 
             String result = String.format("( (%s) INTERSECT (%s) )", whereStatement1, whereStatement2);
             return result;
@@ -142,8 +142,8 @@ public class CharacterisationResultClickhouseRepository {
         } else if (filter instanceof OrFilterCriteria) {
             OrFilterCriteria orFilter = (OrFilterCriteria) filter;
 
-            String whereStatement1 = convert(orFilter.getCriteria());
-            String whereStatement2 = convert(orFilter.getOtherCriteria());
+            String whereStatement1 = convert(orFilter.getCriteria(), datasetName);
+            String whereStatement2 = convert(orFilter.getOtherCriteria(), datasetName);
 
             String result = String.format("( (%s) UNION ALL (%s) )", whereStatement1, whereStatement2);
             return result;
@@ -152,14 +152,14 @@ public class CharacterisationResultClickhouseRepository {
         }
     }
 
-    public void saveAll(List<CharacterisationResult> characterisationResults) {
+    public void saveAll(List<CharacterisationResult> characterisationResults, String datasetName) {
 
         List<CharacterisationResult> filtered = characterisationResults.stream()
                 .filter(item -> item.getFilePath() != null)
                 .filter(item -> item.getValue() != null && item.getValue().length() < 300).collect(Collectors.toList());
 
-        template.batchUpdate("insert into characterisationresult (file_path,property, source, property_value, value_type)" +
-                        " values (?,?,?,?,?)",
+        template.batchUpdate(String.format("insert into %s.characterisationresult (file_path,property, source, property_value, value_type)" +
+                        " values (?,?,?,?,?)", datasetName),
                 filtered,
                 10000,
                 new ParameterizedPreparedStatementSetter<CharacterisationResult>() {
@@ -175,18 +175,18 @@ public class CharacterisationResultClickhouseRepository {
 
     }
 
-    public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter) {
+    public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format("where file_path in (%s) ", subquery);
         }
 
 
         String sql = String.format(
                 "select file_path,property, source, property_value, value_type " +
-                        "from characterisationresult " +
-                        "%s", subquery);
+                        "from %s.characterisationresult " +
+                        "%s", datasetName, subquery);
 
         List<CharacterisationResult> result = template.query(sql, (rs, rowNum) -> {
             CharacterisationResult item = new CharacterisationResult();
@@ -200,25 +200,25 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public Long getDigitalObjectCount() {
+    public Long getDigitalObjectCount(String datasetName) {
         String query = String.format(
-                "select count(distinct file_path) from characterisationresultaggregated  ");
+                "select count(distinct file_path) from %s.characterisationresultaggregated  ", datasetName);
 
         Long result = template.queryForObject(query, Long.class);
         return result;
     }
 
-    public Long getConflictCount() {
+    public Long getConflictCount(String datasetName) {
         String query = String.format(
-                "select count(distinct file_path) from characterisationresultaggregated where property_value = 'CONFLICT' ");
+                "select count(distinct file_path) from %s.characterisationresultaggregated where property_value = 'CONFLICT' ", datasetName);
 
         Long result = template.queryForObject(query, Long.class);
         return result;
     }
 
-    public List<String> getSources() {
+    public List<String> getSources(String datasetName) {
         String sql = String.format(
-                "select distinct source from characterisationresult ");
+                "select distinct source from %s.characterisationresult ", datasetName);
 
         List<String> result = template.query(sql, (rs, rowNum) -> {
             return rs.getString(1);
@@ -226,11 +226,11 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath) {
+    public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath, String datasetName) {
         String sql = String.format(
                 "select file_path, property, source, property_value, value_type " +
-                        "from characterisationresult " +
-                        "where file_path='%s' ", filePath);
+                        "from %s.characterisationresult " +
+                        "where file_path='%s' ", datasetName, filePath);
 
         List<CharacterisationResult> result = template.query(sql, (rs, rowNum) -> {
             CharacterisationResult item = new CharacterisationResult();
@@ -244,10 +244,10 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public double[] getSizeStatistics(FilterCriteria filter) {
+    public double[] getSizeStatistics(FilterCriteria filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
@@ -257,8 +257,8 @@ public class CharacterisationResultClickhouseRepository {
                         "max(toInt32(property_value)) as maxsize, " +
                         "avg(toInt32(property_value)) as avgsize, " +
                         "count(property_value) as count " +
-                        "from characterisationresultaggregated " +
-                        "where %s property='SIZE'", subquery);
+                        "from %s.characterisationresultaggregated " +
+                        "where %s property='SIZE'", datasetName, subquery);
 
         List<double[]> result = template.query(sql, (rs, rowNum) -> {
             double sum = rs.getDouble(1);
@@ -273,31 +273,31 @@ public class CharacterisationResultClickhouseRepository {
 
     }
 
-    public double[] getConflictStatistics(FilterCriteria filter) {
+    public double[] getConflictStatistics(FilterCriteria filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
         String sql = String.format(
                 "select count(distinct file_path) as count " +
-                        "from characterisationresultaggregated " +
-                        "where %s property_value='CONFLICT'", subquery);
+                        "from %s.characterisationresultaggregated " +
+                        "where %s property_value='CONFLICT'", datasetName, subquery);
 
         Long conflictsCount = template.queryForObject(sql, Long.class);
 
 
         String subquery2 = "";
         if (filter != null) {
-            subquery2 = convert(filter);
+            subquery2 = convert(filter, datasetName);
             subquery2 = String.format("where file_path in (%s) ", subquery2);
         }
 
         String sql2 = String.format(
                 "select count(distinct file_path) as count " +
-                        "from characterisationresultaggregated " +
-                        "%s", subquery2);
+                        "from %s.characterisationresultaggregated " +
+                        "%s", datasetName, subquery2);
 
         Long totalCount = template.queryForObject(sql2, Long.class);
 
@@ -309,18 +309,18 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filter) {
+    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filter, String datasetName) {
         String subquery = "";
         if (filter != null) {
-            subquery = convert(filter);
+            subquery = convert(filter, datasetName);
             subquery = String.format(" where file_path in (%s) ", subquery);
         }
 
         String sql = String.format(
                 "select file_path, count(*) " +
-                        "from characterisationresultaggregated " +
+                        "from %s.characterisationresultaggregated " +
                         " %s" +
-                        "group by file_path", subquery);
+                        "group by file_path", datasetName, subquery);
 
         List<PropertiesPerObjectStatistic> result = template.query(sql, (rs, rowNum) -> {
             PropertiesPerObjectStatistic statistic = new PropertiesPerObjectStatistic(rs.getLong(2), rs.getString(1));
@@ -331,18 +331,18 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-    public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize) {
+    public List<String[]> getRandomSamples(FilterCriteria filterCriteria, int sampleSize, String datasetName) {
         String subquery = "";
         if (filterCriteria != null) {
-            subquery = convert(filterCriteria);
+            subquery = convert(filterCriteria, datasetName);
             subquery = String.format(" where file_path in (%s) ", subquery);
         }
 
         String sql = String.format(
                 "select file_path " +
-                        "from characterisationresultaggregated " +
+                        "from %s.characterisationresultaggregated " +
                         " %s" +
-                        "group by file_path ORDER BY RAND() LIMIT %d  ", subquery, sampleSize);
+                        "group by file_path ORDER BY RAND() LIMIT %d  ", datasetName, subquery, sampleSize);
 
         List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
         List<String[]> collect = resultList.stream().map(item -> new String[]{"1", item}).collect(Collectors.toList());
@@ -351,10 +351,10 @@ public class CharacterisationResultClickhouseRepository {
 
     }
 
-    public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties) {
+    public List<String[]> getSelectiveFeatureDistributionSamples(FilterCriteria filterCriteria, List<Property> properties, String datasetName) {
         String subquery = "";
         if (filterCriteria != null) {
-            subquery = convert(filterCriteria);
+            subquery = convert(filterCriteria, datasetName);
             subquery = String.format(" where file_path in (%s) ", subquery);
         }
 
@@ -377,11 +377,11 @@ public class CharacterisationResultClickhouseRepository {
             String currProperty = properties.get(i).name();
             if (i == 0) {
 
-                from.append(String.format(" (SELECT v.property_value, v.file_path FROM characterisationresultaggregated v\n" +
-                        "where %s v.property='%s' ) as %s ", subquery, currProperty, currProperty));
+                from.append(String.format(" (SELECT v.property_value, v.file_path FROM %s.characterisationresultaggregated v\n" +
+                        "where %s v.property='%s' ) as %s ", datasetName, subquery, currProperty, currProperty));
             } else {
-                from.append(String.format(" join (SELECT v.property_value, v.file_path FROM characterisationresultaggregated v\n" +
-                        "where %s v.property='%s') as %s on %s.file_path=%s.file_path ", subquery, currProperty, currProperty, properties.get(0).name(), currProperty));
+                from.append(String.format(" join (SELECT v.property_value, v.file_path FROM %s.characterisationresultaggregated v\n" +
+                        "where %s v.property='%s') as %s on %s.file_path=%s.file_path ", datasetName, subquery, currProperty, currProperty, properties.get(0).name(), currProperty));
             }   //TODO: Probably, the join is not required. Check if it is true.
         }
 
@@ -412,7 +412,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
 
-    public void resolveConflictsSimple(){
+    public void resolveConflictsSimple(String datasetName){
         /*
         DROP TABLE IF EXISTS to_delete;
 
@@ -449,51 +449,51 @@ public class CharacterisationResultClickhouseRepository {
          */
 
 
-        String sql =  String.format("DROP TABLE IF EXISTS to_delete;");
+        String sql =  String.format("DROP TABLE IF EXISTS %s.to_delete;", datasetName);
         int update = template.update(sql);
 
 
         sql =  String.format("" +
-                    "       CREATE TABLE to_delete\n" +
+                    "       CREATE TABLE %s.to_delete\n" +
                     "        (\n" +
                     "            file_path      String,\n" +
                     "            property       String,\n" +
                     "            source         String\n" +
-                    "        ) ENGINE = Memory;");
+                    "        ) ENGINE = Memory;", datasetName);
         update = template.update(sql);
 
         sql =  String.format("" +
-                "        insert into to_delete\n" +
+                "        insert into %s.to_delete\n" +
                 "        with weights as (\n" +
                 "            SELECT source,\n" +
                 "                   property,\n" +
                 "                   COUNT(property_value) as count,\n" +
-                "                   COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated\n" +
+                "                   COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM %s.characterisationresultaggregated\n" +
                 "                                                 WHERE property_value != 'CONFLICT' ) as weight\n" +
-                "            FROM characterisationresult\n" +
-                "            WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )\n" +
+                "            FROM %s.characterisationresult\n" +
+                "            WHERE file_path in (SELECT file_path FROM %s.characterisationresultaggregated WHERE property_value != 'CONFLICT' )\n" +
                 "            GROUP BY source, property\n" +
                 "        ),\n" +
                 "             tmp_table as (\n" +
-                "                 SELECT file_path, property, source, property_value, weight FROM characterisationresult\n" +
-                "                                                                                     JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source\n" +
-                "                 WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')\n" +
+                "                 SELECT file_path, property, source, property_value, weight FROM %s.characterisationresult\n" +
+                "                                                                                     JOIN weights on %s.characterisationresult.property == weights.property and %s.characterisationresult.source == weights.source\n" +
+                "                 WHERE (file_path, property) in (SELECT file_path, property from %s.characterisationresultaggregated WHERE property_value == 'CONFLICT')\n" +
                 "             )\n" +
                 "        SELECT file_path,property,source FROM tmp_table\n" +
-                "        WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);");
+                "        WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);", datasetName, datasetName, datasetName, datasetName, datasetName, datasetName, datasetName, datasetName);
         update = template.update(sql);
 
         sql =  String.format("" +
-                "       delete from characterisationresult\n" +
-                "        where (file_path, property, source) in (select file_path,property,source from to_delete);");
+                "       delete from %s.characterisationresult\n" +
+                "        where (file_path, property, source) in (select file_path,property,source from %s.to_delete);", datasetName, datasetName);
         update = template.update(sql);
 
-        this.cleanAggregation();
+        this.cleanAggregation(datasetName);
     }
 
 
 
-     void aggregateResults(){
+     void aggregateResults(String datasetName){
         /*
             CREATE TABLE IF NOT EXISTS characterisationresultaggregated
             ENGINE = AggregatingMergeTree
@@ -507,7 +507,7 @@ public class CharacterisationResultClickhouseRepository {
             GROUP BY property, file_path;
          */
         String sql  = String.format("" +
-                "CREATE TABLE IF NOT EXISTS characterisationresultaggregated\n" +
+                "CREATE TABLE IF NOT EXISTS %s.characterisationresultaggregated\n" +
                 "ENGINE = AggregatingMergeTree\n" +
                 "      ORDER BY (property, file_path) AS\n" +
                 "SELECT file_path, property,\n" +
@@ -515,15 +515,48 @@ public class CharacterisationResultClickhouseRepository {
                 "           WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)\n" +
                 "           ELSE 'CONFLICT'\n" +
                 "           END AS property_value\n" +
-                "FROM characterisationresult\n" +
-                "GROUP BY property, file_path;"
+                "FROM %s.characterisationresult\n" +
+                "GROUP BY property, file_path;", datasetName, datasetName
         );
         template.update(sql);
     }
 
-    void cleanAggregation(){
-        String sql =  String.format("drop table IF EXISTS characterisationresultaggregated");
+    void cleanAggregation(String datasetName){
+        String sql =  String.format("drop table IF EXISTS %s.characterisationresultaggregated", datasetName);
         int update = template.update(sql);
     }
 
+
+    void createDb(String datasetName) {
+        String sql =  String.format("create database if not exists %s", datasetName);
+        int update = template.update(sql);
+
+
+
+        /*
+
+        CREATE TABLE newdb.characterisationresult
+        (
+            file_path String,
+            property String,
+            source String,
+            property_value String,
+            value_type String
+        ) ENGINE = ReplacingMergeTree
+              PRIMARY KEY (source, property, file_path)
+              ORDER BY (source, property, file_path);
+
+         */
+        sql =  String.format("CREATE TABLE %s.characterisationresult\n" +
+                "(\n" +
+                "    file_path String,\n" +
+                "    property String,\n" +
+                "    source String,\n" +
+                "    property_value String,\n" +
+                "    value_type String\n" +
+                ") ENGINE = ReplacingMergeTree\n" +
+                "      PRIMARY KEY (source, property, file_path)\n" +
+                "      ORDER BY (source, property, file_path);", datasetName);
+        update = template.update(sql);
+    }
 }

@@ -11,5 +11,5 @@ import java.util.List;
  * This interface enables getting a property value distribution given a property name.
  */
 public interface GetPropertyValueDistribution {
-    List<PropertyValueStatistic> getPropertyValueDistribution(Property propertyName, FilterCriteria<CharacterisationResult> filterCriteria);
+    List<PropertyValueStatistic> getPropertyValueDistribution(Property propertyName, FilterCriteria<CharacterisationResult> filterCriteria, String datasetName);
 }

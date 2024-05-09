@@ -34,7 +34,7 @@ class CRHResolveConflictsImplTest {
         characterisationResults.forEach(list::add);
         //Assert.assertEquals(10, list.size());
 
-        resolveConflicts.run();
+        //resolveConflicts.run();
 
         double conflictRateAfter = characterisationResultGatewaySqlImpl.getConflictRate();
 

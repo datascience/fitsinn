@@ -18,14 +18,14 @@ public interface CharacterisationResultGateway {
      *
      * @param characterisationResult
      */
-    void addCharacterisationResult(CharacterisationResult characterisationResult);
+    void addCharacterisationResult(CharacterisationResult characterisationResult, String datasetName);
 
     /**
      * gets all characterisation results
      *
      * @return an iterable of all results stored in the DB.
      */
-    List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter);
+    List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter, String datasetName);
 
     /**
      * gets a distribution of all properties that match the given filter criteria.
@@ -33,58 +33,58 @@ public interface CharacterisationResultGateway {
      * @param filter a filter criteria
      * @return a list of property statistics
      */
-    List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter);
+    List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter, String datasetName);
 
     /**
      * gets characterisation results describing a digital object identified by the given file path.
      *
      * @return an iterable of characterisation results.
      */
-    List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath);
+    List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath, String datasetName);
 
-    List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry);
+    List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry, String datasetName);
 
-    List<Entry> getConflictEntries();
+    List<Entry> getConflictEntries(String datasetName);
 
-    List<Entry> getEntries();
+    List<Entry> getEntries(String datasetName);
 
     /**
      * gets a list of characterisation results with conflicts for a given digital object.
      *
      * @return an iterable of characterisation results.
      */
-    List<CharacterisationResult> getConflictsByFilepath(String filepath);
+    List<CharacterisationResult> getConflictsByFilepath(String filepath, String datasetName);
 
-    Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria);
+    Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria, String datasetName);
 
-    List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter);
+    List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter, String datasetName);
 
     /**
      * gets a list of sources of characterisation results.
      *
      * @return an iterable of characterisation result sources.
      */
-    List<String> getSources();
+    List<String> getSources(String datasetName);
 
     /**
      * gets a list of objects.
      *
      * @return an iterable of PropertiesPerObjectStatistic.
      */
-    List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria);
+    List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria, String datasetName);
 
     /**
      * gets a list of samples.
      *
      * @return an iterable of PropertiesPerObjectStatistic.
      */
-    List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties);
+    List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties, String datasetName);
 
-    void addCharacterisationResults(List<CharacterisationResult> characterisationResults);
+    void addCharacterisationResults(List<CharacterisationResult> characterisationResults, String datasetName);
 
-    double getConflictRate();
+    double getConflictRate(String datasetName);
 
-    void delete(CharacterisationResult characterisationResult);
+    void delete(CharacterisationResult characterisationResult, String datasetName);
 
-    void resolveConflictsNative();
+    void resolveConflictsNative(String datasetName);
 }

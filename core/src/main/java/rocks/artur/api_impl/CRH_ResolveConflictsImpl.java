@@ -22,33 +22,33 @@ public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
     }
 
 
-    public void run() {
-        init();
+    public void run(String datasetName) {
+        init(datasetName);
         System.out.println(sourceWeights);
         //System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
-        updateTruth();
+        updateTruth(datasetName);
         System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
         //System.out.println(truth);
         for (int i = 0; i < 3; i++) {
-            updateWeights();
+            updateWeights(datasetName);
             System.out.println(sourceWeights);
             System.out.println("sum of weights: " +  sourceWeights.values().stream().reduce(0d, Double::sum));
-            updateTruth();
+            updateTruth(datasetName);
             //System.out.println(truth);
         }
 
-        resolveConflicts();
+        resolveConflicts(datasetName);
     }
 
-    private void resolveConflicts() {
+    private void resolveConflicts(String datasetName) {
         truth.entrySet().stream().forEach( entry -> {
             Entry key = entry.getKey();
             String value = entry.getValue();
 
-            List<CharacterisationResult> characterisationResultsByEntry = characterisationResultGateway.getCharacterisationResultsByEntry(key);
+            List<CharacterisationResult> characterisationResultsByEntry = characterisationResultGateway.getCharacterisationResultsByEntry(key, datasetName);
             for (CharacterisationResult characterisationResult : characterisationResultsByEntry) {
                 if (!characterisationResult.getValue().equals(value)) {
-                    characterisationResultGateway.delete(characterisationResult);
+                    characterisationResultGateway.delete(characterisationResult, datasetName);
                 }
             }
 
@@ -56,7 +56,7 @@ public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
         });
     }
 
-    private void updateWeights() {
+    private void updateWeights(String datasetName) {
         Map<String, Double> score = sources.stream().collect(Collectors.toMap(
                 Function.identity(),
                 s -> 0.0));
@@ -66,10 +66,10 @@ public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
                 s -> 0.0));
 
 
-        List<Entry> entries = characterisationResultGateway.getEntries();
+        List<Entry> entries = characterisationResultGateway.getEntries(datasetName);
 
         for (Entry entry : entries) {
-            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry);
+            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry, datasetName);
 
             for (CharacterisationResult characterisationResult : characterisationResults) {
 
@@ -112,10 +112,10 @@ public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
         }
     }
 
-    private void updateTruth() {
-        List<Entry> entries = characterisationResultGateway.getEntries();
+    private void updateTruth(String datasetName) {
+        List<Entry> entries = characterisationResultGateway.getEntries(datasetName);
         for (Entry entry : entries) {
-            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry);
+            List<CharacterisationResult> characterisationResults = characterisationResultGateway.getCharacterisationResultsByEntry(entry, datasetName);
 
             if (characterisationResults.size() > 0) {
                 CharacterisationResult firstResult = characterisationResults.get(0);
@@ -140,9 +140,9 @@ public class CRH_ResolveConflictsImpl {//implements ResolveConflicts {
     Map<String, Double> sourceWeights;
     Map<Entry, String> truth;
 
-    void init() {
+    void init(String datasetName) {
 
-        sources = characterisationResultGateway.getSources();
+        sources = characterisationResultGateway.getSources(datasetName);
         sourceWeights = sources.stream().collect(Collectors.toMap(
                 Function.identity(),
                 s -> 1.0 / sources.size()));

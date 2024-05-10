@@ -38,6 +38,7 @@ public class RestService {
     GetPropertyValueDistribution getPropertyValueDistribution;
     AnalyzePersistFile analyzePersistFile;
     GetCollectionStatistics getCollectionStatistics;
+    GetDatasetInfo getDatasetInfo;
 
     ResolveConflicts resolveConflicts;
 
@@ -45,7 +46,7 @@ public class RestService {
                        GetPropertyValueDistribution getPropertyValueDistribution,
                        AnalyzePersistFile analyzePersistFile,
                        GetObjects getObjects, GetCollectionStatistics getCollectionStatistics,
-                       GetSources getSources, GetSamples getSamples, ResolveConflicts resolveConflicts) {
+                       GetSources getSources, GetSamples getSamples, ResolveConflicts resolveConflicts, GetDatasetInfo getDatasetInfo) {
         this.getProperties = getProperties;
         this.getObjects = getObjects;
         this.getPropertyValueDistribution = getPropertyValueDistribution;
@@ -54,6 +55,7 @@ public class RestService {
         this.getSources = getSources;
         this.getSamples = getSamples;
         this.resolveConflicts = resolveConflicts;
+        this.getDatasetInfo = getDatasetInfo;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/health")
@@ -220,7 +222,13 @@ public class RestService {
 
     @RequestMapping(method = RequestMethod.POST, value = "/resolveconflicts")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void resolveConflicts() throws ParseException {
-        //resolveConflicts.run();
+    public void resolveConflicts(@RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+        resolveConflicts.run(datasetName);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/datasets")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<String> listDatasets() {
+        return getDatasetInfo.listDatasets();
     }
 }

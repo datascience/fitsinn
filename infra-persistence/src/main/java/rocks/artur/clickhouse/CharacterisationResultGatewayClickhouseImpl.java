@@ -197,4 +197,9 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
         repository.resolveConflictsSimple(datasetName);
         repository.aggregateResults(datasetName);
     }
+
+    @Override
+    public List<String> listDatasets() {
+        return repository.listDatasets();
+    }
 }

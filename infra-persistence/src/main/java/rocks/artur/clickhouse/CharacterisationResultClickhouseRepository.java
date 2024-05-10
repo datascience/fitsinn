@@ -559,4 +559,12 @@ public class CharacterisationResultClickhouseRepository {
                 "      ORDER BY (source, property, file_path);", datasetName);
         update = template.update(sql);
     }
+
+    public List<String> listDatasets() {
+        String sql = String.format("SELECT name FROM system.databases");
+
+        List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
+        List<String> list = resultList.stream().filter(item -> !item.equalsIgnoreCase("information_schema") || !item.equalsIgnoreCase("system")).toList();
+        return list;
+    }
 }

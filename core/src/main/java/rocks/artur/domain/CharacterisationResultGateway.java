@@ -87,4 +87,6 @@ public interface CharacterisationResultGateway {
     void delete(CharacterisationResult characterisationResult, String datasetName);
 
     void resolveConflictsNative(String datasetName);
+
+    List<String> listDatasets();
 }

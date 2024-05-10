@@ -1,6 +1,5 @@
 package rocks.artur.api_impl.filter;
 
-import rocks.artur.domain.ValueType;
 
 public enum FilterOperation {
     LESS("<"), LESS_OR_EQUAL ("<="),

@@ -15,8 +15,8 @@ public class GetCollectionStatisticsImpl implements GetCollectionStatistics {
     }
 
     @Override
-    public Map<String, Double> getStatistics(FilterCriteria filterCriteria) {
-        Map<String, Double> sizeStatistics = characterisationResultGateway.getCollectionStatistics(filterCriteria);
+    public Map<String, Double> getStatistics(FilterCriteria filterCriteria, String datasetName) {
+        Map<String, Double> sizeStatistics = characterisationResultGateway.getCollectionStatistics(filterCriteria, datasetName);
         return sizeStatistics;
     }
 

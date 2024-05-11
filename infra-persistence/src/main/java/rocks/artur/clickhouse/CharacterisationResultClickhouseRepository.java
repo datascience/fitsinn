@@ -16,6 +16,7 @@ import rocks.artur.domain.statistics.PropertyStatistic;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public void save(CharacterisationResult characterisationResult, String datasetName) {
-
+        this.createDb(datasetName);
         int rowsInserted = template.update(String.format("insert into %s.characterisationresult (file_path,property, source, property_value, value_type)" +
                         " values (?,?,?,?,?)", datasetName),
                 characterisationResult.getFilePath(),
@@ -153,7 +154,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public void saveAll(List<CharacterisationResult> characterisationResults, String datasetName) {
-
+        this.createDb(datasetName);
         List<CharacterisationResult> filtered = characterisationResults.stream()
                 .filter(item -> item.getFilePath() != null)
                 .filter(item -> item.getValue() != null && item.getValue().length() < 300).collect(Collectors.toList());
@@ -547,7 +548,7 @@ public class CharacterisationResultClickhouseRepository {
               ORDER BY (source, property, file_path);
 
          */
-        sql =  String.format("CREATE TABLE %s.characterisationresult\n" +
+        sql =  String.format("CREATE TABLE IF NOT EXISTS %s.characterisationresult\n" +
                 "(\n" +
                 "    file_path String,\n" +
                 "    property String,\n" +
@@ -564,7 +565,8 @@ public class CharacterisationResultClickhouseRepository {
         String sql = String.format("SELECT name FROM system.databases");
 
         List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
-        List<String> list = resultList.stream().filter(item -> !item.equalsIgnoreCase("information_schema") || !item.equalsIgnoreCase("system")).toList();
-        return list;
+        List<String> to_remove = Arrays.asList("system", "information_schema", "INFORMATION_SCHEMA");
+        resultList.removeAll(to_remove);
+        return resultList;
     }
 }

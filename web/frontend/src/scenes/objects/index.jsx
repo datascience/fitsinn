@@ -19,6 +19,10 @@ const Objects = () => {
     "selectedObject",
     ""
   );
+  const [dataset, setDataset] = useSessionStorage(
+      "dataset",
+      ""
+  );
   const [filter, setFilter] = useSessionStorage("filterString", "");
   const navigate = useNavigate();
   useEffect(() => {
@@ -44,6 +48,7 @@ const Objects = () => {
             "/objects?" +
             new URLSearchParams({
               filter: filter,
+              datasetName: dataset
             }),
           requestOptions
         );

@@ -18,7 +18,10 @@ const Dashboard = () => {
 
   const [filter, setFilter] = useSessionStorage("filterString", "");
 
-
+  const [dataset, setDataset] = useSessionStorage(
+      "dataset",
+      ""
+  );
   const [globalStatistics, setGlobalStatistics] = useSessionStorage(
     "globalStatistics",
     [
@@ -69,6 +72,7 @@ const Dashboard = () => {
         "/statistics?" +
         new URLSearchParams({
           filter: filter,
+          datasetName: dataset
         }),
       requestOptions
     );

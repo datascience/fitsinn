@@ -3,8 +3,7 @@ import React, {useContext, useEffect, useState} from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
 import { ColorModeContext, tokens } from "../../theme";
 
 import Filter, {uniqueProperties} from "../../components/Filter";
@@ -18,6 +17,12 @@ const Topbar = () => {
         "datasets",
         []
     );
+
+    const [dataset, setDataset] = useSessionStorage(
+        "dataset",
+        ""
+    );
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var requestGETOptions = {
@@ -46,7 +51,10 @@ const Topbar = () => {
 
 
 
-
+    const handleChange = (event) => {
+        setDataset(event.target.value);
+        console.log(event.target.value);
+    };
 
 
 
@@ -58,7 +66,7 @@ const Topbar = () => {
         <Box>
           <FormControl sx={{minWidth: 120 }}>
             <InputLabel>Dataset</InputLabel>
-            <Select label="Dataset">
+            <Select label="Dataset" value="default" onChange={handleChange}>
                 {datasets.map((item) => {
                    return  <MenuItem value={item}>{item}</MenuItem>
                 })}

@@ -31,12 +31,15 @@ const AppConfig = () => {
     redirect: "follow",
   };
 
-
+  const [dataset, setDataset] = useSessionStorage(
+      "dataset",
+      ""
+  );
 
   const fetchGlobalProperties = async () => {
     await fetch(BACKEND_URL + "/statistics?"  +
         new URLSearchParams({
-          datasetName: "default",
+          datasetName: dataset,
         }), requestOptions);
     const response = await fetch(BACKEND_URL + "/properties?"  +
         new URLSearchParams({
@@ -50,7 +53,7 @@ const AppConfig = () => {
   const fetchGlobalStatistics = async () => {
     const response = await fetch(BACKEND_URL + "/statistics?"  +
         new URLSearchParams({
-          datasetName: "default",
+          datasetName: dataset,
         }), requestOptions);
     let data = await response.json();
     setGlobalStatistics(data);

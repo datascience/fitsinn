@@ -53,7 +53,6 @@ const Topbar = () => {
 
     const handleChange = (event) => {
         setDataset(event.target.value);
-        console.log(event.target.value);
     };
 
 
@@ -66,7 +65,7 @@ const Topbar = () => {
         <Box>
           <FormControl sx={{minWidth: 120 }}>
             <InputLabel>Dataset</InputLabel>
-            <Select label="Dataset" value="default" onChange={handleChange}>
+            <Select label="Dataset" defaultValue={dataset} onChange={handleChange}>
                 {datasets.map((item) => {
                    return  <MenuItem value={item}>{item}</MenuItem>
                 })}

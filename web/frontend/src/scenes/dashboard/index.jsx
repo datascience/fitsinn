@@ -88,7 +88,7 @@ const Dashboard = () => {
   useEffect(() => {
     console.log("loading the dashboard");
     fetchData();
-  }, [filter]);
+  }, [filter, dataset]);
 
   const handleClick = () => {
     console.log("Conflict resolution started");

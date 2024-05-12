@@ -7,12 +7,16 @@ import "@uppy/dashboard/dist/style.css";
 import XHRUpload from "@uppy/xhr-upload";
 import { BACKEND_URL } from "../AppConfig";
 
-const Upload = () => {
+const Upload = ({dataset}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const uppy = new Uppy().use(XHRUpload, {
+  const uppy = new Uppy({
+    debug: true,
+    meta: { datasetName: dataset },
+  }) .use(XHRUpload, {
     endpoint: BACKEND_URL + "/upload",
+    allowedMetaFields: ['datasetName']
   });
   return (
     <Box

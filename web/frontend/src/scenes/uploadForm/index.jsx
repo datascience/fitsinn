@@ -7,14 +7,11 @@ import {useContext, useState} from "react";
 
 
 const UploadForm = () => {
-   const createDataset = (name) => {
-       console.log(textInput);
-   }
 
-    const [textInput, setTextInput] = useState('');
+    const [newDataset, setNewDataset] = useState('');
 
     const handleTextInputChange = event => {
-        setTextInput(event.target.value);
+        setNewDataset(event.target.value);
     };
 
 
@@ -28,15 +25,12 @@ const UploadForm = () => {
       ></Header>
 
         <Box  marginBottom="20px" display="flex" justifyContent="left">
-            <TextField id="outlined-basic" label="Name"  value= {textInput}
-                       onChange= {handleTextInputChange}/>
-            <Button onClick={createDataset} color="secondary" variant="contained">
-                Create Dataset
-            </Button>
+            <TextField id="outlined-basic" label="Target Dataset"  defaultValue="default"
+                       onChange = {handleTextInputChange}/>
         </Box>
 
       <Box height="75vh">
-        <Upload />
+        <Upload dataset={newDataset} />
       </Box>
     </Box>
   );

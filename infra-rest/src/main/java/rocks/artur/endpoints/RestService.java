@@ -65,7 +65,7 @@ public class RestService {
 
     @RequestMapping(method = RequestMethod.GET, value = "/sources")
     public List<String> getSources(
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
         List<String> sources = getSources.getSources(datasetName);
         return sources;
     }
@@ -78,7 +78,7 @@ public class RestService {
 
     @RequestMapping(method = RequestMethod.GET, value = "/properties")
     public List<PropertyStatistic> getProperties(@RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-                                                 @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+                                                 @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria filterCriteria = parser.parse(filter);
         List<PropertyStatistic> propertyDistribution = getProperties.getProperties(filterCriteria, datasetName);
@@ -90,7 +90,7 @@ public class RestService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Iterable<CharacterisationResult> getObject(
             @RequestParam(name = "filepath", required = true) @Parameter(name = "filepath", description = "Filepath of a digital object", example = "/home/user/file1") String filepath,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
         Iterable<CharacterisationResult> objects = getObjects.getObject(filepath, datasetName);
         return objects;
     }
@@ -99,7 +99,7 @@ public class RestService {
     @Consumes(MediaType.APPLICATION_JSON)
     public List<Property> getConflictsPerObject(
             @RequestParam(name = "filepath", required = true) @Parameter(name = "filepath", description = "Filepath of a digital object", example = "/home/user/file1") String filepath,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) {
         List<CharacterisationResult> objects = getObjects.getConflictsFromObject(filepath, datasetName);
         List<Property> collect = objects.stream().map(item -> item.getProperty()).collect(Collectors.toList());
         return collect;
@@ -109,7 +109,7 @@ public class RestService {
     @RequestMapping(method = RequestMethod.POST, value = "/statistics")
     @Consumes(MediaType.APPLICATION_JSON)
     public Map<String, Double> getCollectionStatistics(@RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-                                                       @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+                                                       @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria filterCriteria = parser.parse(filter);
         Map<String, Double> sizeStatistics = getCollectionStatistics.getStatistics(filterCriteria, datasetName);
@@ -119,7 +119,7 @@ public class RestService {
     @RequestMapping(method = RequestMethod.POST, value = "/objects")
     @Consumes(MediaType.APPLICATION_JSON)
     public List<PropertiesPerObjectStatistic> getObjects(@RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-                                                         @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+                                                         @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
 
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria filterCriteria = parser.parse(filter);
@@ -133,7 +133,7 @@ public class RestService {
     public List<PropertyValueStatistic> getPropertyValueDistribution(
             @RequestParam(name = "property", required = true) @Parameter(name = "property", description = "Property of a digital object", example = "FORMAT") Property property,
             @RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
 
         LOG.debug("filter: " + filter);
 
@@ -154,7 +154,7 @@ public class RestService {
             @RequestParam(name = "algorithm", required = true) @Parameter(name = "algorithm", description = "Sampling algorithm", example = "RANDOM") SamplingAlgorithms algorithm,
             @RequestParam(name = "properties", required = false) @Parameter(name = "properties", description = "A list of properties") List<Property> properties,
             @RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
 
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria filterCriteria = parser.parse(filter);
@@ -172,7 +172,7 @@ public class RestService {
             @RequestParam(name = "algorithm", required = true) @Parameter(name = "algorithm", description = "Sampling algorithm", example = "RANDOM") SamplingAlgorithms algorithm,
             @RequestParam(name = "properties", required = false) @Parameter(name = "properties", description = "A list of properties") List<Property> properties,
             @RequestParam(name = "filter", required = false) @Parameter(name = "filter", description = "Filter", example = "FORMAT=\"Portable Document Format\"") String filter,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
 
         CriteriaParser parser = new CriteriaParser();
         FilterCriteria filterCriteria = parser.parse(filter);
@@ -189,7 +189,7 @@ public class RestService {
             "multipart/form-data"})
     public Response ProcessFile(
             @RequestParam(name = "file", required = true) @Parameter(name = "file", description = "Please select a digital object to upload") MultipartFile file,
-            @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws IOException {
+            @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws IOException {
         String filename = file.getOriginalFilename();
         byte[] bytes = file.getBytes();
         LOG.debug(String.format("Processing file { %s }", file.getOriginalFilename()));
@@ -206,7 +206,7 @@ public class RestService {
     @RequestMapping(method = RequestMethod.POST, value = "/multipleupload", consumes = {
             "multipart/form-data"})
     public Response ProcessFiles(@RequestPart(name = "files", required = true) @Parameter(name = "files", description = "A list of digital objects to upload") MultipartFile[] files,
-                                 @RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws IOException {
+                                 @RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws IOException {
         Long totalCount = 0L;
         List<ByteFile> byteFiles = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -222,7 +222,7 @@ public class RestService {
 
     @RequestMapping(method = RequestMethod.POST, value = "/resolveconflicts")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void resolveConflicts(@RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
+    public void resolveConflicts(@RequestParam(name = "datasetName", required = true, defaultValue = "default") @Parameter(name = "datasetName", description = "dataset name", example = "default") String datasetName) throws ParseException {
         resolveConflicts.run(datasetName);
     }
 

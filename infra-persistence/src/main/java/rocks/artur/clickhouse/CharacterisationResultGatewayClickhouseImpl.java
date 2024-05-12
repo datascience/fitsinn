@@ -35,6 +35,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter, String datasetName) {
+        repository.aggregateResults(datasetName);
         return repository.getPropertyDistribution(datasetName);
     }
 
@@ -76,6 +77,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria, String datasetName) {
+
         repository.aggregateResults(datasetName);
         Map<String, Double> result = new HashMap<>();
 

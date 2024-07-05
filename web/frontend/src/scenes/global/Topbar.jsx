@@ -1,15 +1,15 @@
-import {Box, Button, IconButton, Typography, useTheme} from "@mui/material";
-import React, {useContext, useEffect, useState} from "react";
+import {Box, useTheme} from "@mui/material";
+import React, {useContext, useEffect} from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { ColorModeContext, tokens } from "../../theme";
+import {ColorModeContext, tokens} from "../../theme";
 
-import Filter, {uniqueProperties} from "../../components/Filter";
+import Filter from "../../components/Filter";
 import {BACKEND_URL} from "../../AppConfig";
 import {useSessionStorage} from "@uidotdev/usehooks";
-import Histogram from "../dashboard/histogram";
+
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -39,7 +39,7 @@ const Topbar = () => {
 
 
 
-  const colorMode = useContext(ColorModeContext);
+    const colorMode = useContext(ColorModeContext);
 
     const fetchData = async () => {
         await fetchDatasets();
@@ -55,6 +55,9 @@ const Topbar = () => {
         setDataset(event.target.value);
     };
 
+    const handleClick = (event) => {
+        fetchDatasets();
+    };
 
 
     return (
@@ -65,7 +68,7 @@ const Topbar = () => {
         <Box>
           <FormControl sx={{minWidth: 120 }}>
             <InputLabel>Dataset</InputLabel>
-            <Select label="Dataset" defaultValue={dataset} onChange={handleChange}>
+            <Select label="Dataset" defaultValue={dataset} onClick={handleClick} onChange={handleChange}>
                 {datasets.map((item) => {
                    return  <MenuItem value={item}>{item}</MenuItem>
                 })}

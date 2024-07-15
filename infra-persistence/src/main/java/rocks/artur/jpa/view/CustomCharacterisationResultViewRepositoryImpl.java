@@ -56,7 +56,7 @@ public class CustomCharacterisationResultViewRepositoryImpl implements CustomCha
                 "select property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +
                         "ELSE SUBSTRING(property_value,1,4) " +
-                        "END as value, count(property) as number " +
+                        "END, count(property) as number " +
                         "from characterisationresultview " +
                         "where %s property = '%s' group by property, CASE " +
                         "WHEN property_value = 'CONFLICT' THEN property_value " +

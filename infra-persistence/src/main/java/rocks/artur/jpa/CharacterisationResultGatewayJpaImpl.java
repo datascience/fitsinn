@@ -258,7 +258,7 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
 
     @Override
     public List<String> listDatasets() {
-        return List.of();
+        return List.of("default");
     }
 
 }

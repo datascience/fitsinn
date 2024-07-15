@@ -34,8 +34,8 @@ public class GetSamplesImpl implements GetSamples {
     }
 
     @Override
-    public List<String> getObjects(FilterCriteria filterCriteria) {
-        List<String[]> samplingResults = characterisationResultGateway.getSamples(filterCriteria, algorithm, properties);
+    public List<String> getObjects(FilterCriteria filterCriteria, String datasetName) {
+        List<String[]> samplingResults = characterisationResultGateway.getSamples(filterCriteria, algorithm, properties, datasetName);
         List<String> results = new ArrayList<>();
         switch (algorithm) {
 
@@ -50,8 +50,8 @@ public class GetSamplesImpl implements GetSamples {
     }
 
     @Override
-    public List<String[]> getSamplingInfo(FilterCriteria filterCriteria) {
-        List<String[]> samplingResults = characterisationResultGateway.getSamples(filterCriteria, algorithm, properties);
+    public List<String[]> getSamplingInfo(FilterCriteria filterCriteria, String datasetName) {
+        List<String[]> samplingResults = characterisationResultGateway.getSamples(filterCriteria, algorithm, properties, datasetName);
 
         return samplingResults;
     }

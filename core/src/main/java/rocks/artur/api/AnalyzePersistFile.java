@@ -11,8 +11,8 @@ import java.util.List;
  */
 public interface AnalyzePersistFile {
 
-    Long uploadCharacterisationResults(ByteFile file);
+    Long uploadCharacterisationResults(ByteFile file, String datasetName);
 
-    Long uploadCharacterisationResults(List<ByteFile> files);
+    Long uploadCharacterisationResults(List<ByteFile> files, String datasetName);
 
 }

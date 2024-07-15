@@ -18,7 +18,10 @@ const Dashboard = () => {
 
   const [filter, setFilter] = useSessionStorage("filterString", "");
 
-
+  const [dataset, setDataset] = useSessionStorage(
+      "dataset",
+      ""
+  );
   const [globalStatistics, setGlobalStatistics] = useSessionStorage(
     "globalStatistics",
     [
@@ -45,7 +48,10 @@ const Dashboard = () => {
   );
 
   const fetchGlobalProperties = async () => {
-    const response = await fetch(BACKEND_URL + "/properties");
+    const response = await fetch(BACKEND_URL + "/properties?"  +
+        new URLSearchParams({
+          datasetName: "default",
+        }));
     let data = await response.json();
     let properties = data.map((prop) => prop.property);
     setGlobalProperties(properties);
@@ -66,6 +72,7 @@ const Dashboard = () => {
         "/statistics?" +
         new URLSearchParams({
           filter: filter,
+          datasetName: dataset
         }),
       requestOptions
     );
@@ -81,7 +88,7 @@ const Dashboard = () => {
   useEffect(() => {
     console.log("loading the dashboard");
     fetchData();
-  }, [filter]);
+  }, [filter, dataset]);
 
   const handleClick = () => {
     console.log("Conflict resolution started");

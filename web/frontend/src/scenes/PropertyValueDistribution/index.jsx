@@ -6,7 +6,10 @@ import { dateProperties } from "../../components/Filter";
 
 const PropertyValueDistribution = (payload) => {
   const [filter, setFilter] = useSessionStorage("filterString", "");
-
+  const [dataset, setDataset] = useSessionStorage(
+    "dataset",
+    ""
+  );
   const [data, setData] = useState([]);
   // GET with fetch API
   useEffect(() => {
@@ -34,6 +37,7 @@ const PropertyValueDistribution = (payload) => {
             new URLSearchParams({
               property: payload["property"],
               filter: filter,
+              datasetName: dataset
             }),
           requestOptions
         );
@@ -60,7 +64,7 @@ const PropertyValueDistribution = (payload) => {
       }
     };
     fetchPost();
-  }, [filter]);
+  }, [filter, dataset]);
 
   let filterClick = (property, event) => {
     if (event.indexValue == ".etc") {

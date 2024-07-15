@@ -16,20 +16,20 @@ public class GetObjectsImpl implements GetObjects {
     }
 
     @Override
-    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria) {
-        List<PropertiesPerObjectStatistic> objects = characterisationResultGateway.getObjects(filterCriteria);
+    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria, String datasetName) {
+        List<PropertiesPerObjectStatistic> objects = characterisationResultGateway.getObjects(filterCriteria, datasetName);
         return objects;
     }
 
     @Override
-    public Iterable<CharacterisationResult> getObject(String filePath) {
-        Iterable<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getCharacterisationResultsByFilepath(filePath);
+    public Iterable<CharacterisationResult> getObject(String filePath, String datasetName) {
+        Iterable<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getCharacterisationResultsByFilepath(filePath, datasetName);
         return characterisationResultsByFilepath;
     }
 
     @Override
-    public List<CharacterisationResult> getConflictsFromObject(String filePath) {
-        List<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getConflictsByFilepath(filePath);
+    public List<CharacterisationResult> getConflictsFromObject(String filePath, String datasetName) {
+        List<CharacterisationResult> characterisationResultsByFilepath = characterisationResultGateway.getConflictsByFilepath(filePath, datasetName);
         return characterisationResultsByFilepath;
     }
 

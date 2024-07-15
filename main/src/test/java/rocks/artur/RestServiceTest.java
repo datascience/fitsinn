@@ -102,6 +102,7 @@ class RestServiceTest {
     @Test
     void getCollectionStatisticsTest() {
         String str = given().port(port)
+                .param("datasetName", "default")
                 .when().post("/statistics")
                 .then()
                 .statusCode(200).extract().asString();
@@ -112,6 +113,7 @@ class RestServiceTest {
     @Test
     void getPropertiesTest() {
         String str = given().port(port)
+                .param("datasetName", "default")
                 .when().get("/properties")
                 .then()
                 .statusCode(200).extract().asString();
@@ -122,6 +124,7 @@ class RestServiceTest {
     @Test
     void getSourcesTest() {
         String str = given().port(port)
+                .param("datasetName", "default")
                 .when().get("/sources")
                 .then()
                 .statusCode(200).extract().asString();
@@ -139,6 +142,7 @@ class RestServiceTest {
     @Test
     void getObjectTest() {
         String str = given().port(port).param("filepath","/home/artur/file1")
+                .param("datasetName", "default")
                 .when().post("/object")
                 .then()
                 .statusCode(200).extract().asString();
@@ -148,6 +152,7 @@ class RestServiceTest {
     @Test
     void getObjectsTest() {
         String str = given().port(port).param("filter", " format='docx' OR format='pdf'")
+                .param("datasetName", "default")
                 .when().post("/objects")
                 .then()
                 .statusCode(200).extract().asString();
@@ -157,6 +162,7 @@ class RestServiceTest {
     @Test
     void getObjectConflictsTest() {
         String str = given().port(port).param("filepath","/home/artur/file1")
+                .param("datasetName", "default")
                 .when().post("/objectconflicts")
                 .then()
                 .statusCode(200).extract().asString();
@@ -169,6 +175,7 @@ class RestServiceTest {
         String str = given().port(port)
                 .param("filter", "FORMAT=\"Portable Document Format\"")
                 .param("property", "FORMAT")
+                .param("datasetName", "default")
                 .when().post("/propertyvalues")
                 .then()
                 .statusCode(200).extract().asString();
@@ -179,6 +186,7 @@ class RestServiceTest {
     void getPropertyDistributionWithoutFilterTest() {
         String str = given().port(port)
                 .param("property", "FORMAT")
+                .param("datasetName", "default")
                 .when().post("/propertyvalues")
                 .then()
                 .statusCode(200).extract().asString();
@@ -211,7 +219,7 @@ class RestServiceTest {
 
         //Then, I call my /upload endpoint, where a FITS XML is generated and the char results uploaded into DB
 
-        given().port(port).multiPart("file",file)
+        given().port(port).param("datasetName", "default").multiPart("file",file)
                 .when().post("/upload")
                 .then()
                 .statusCode(200).extract().asString();
@@ -223,6 +231,7 @@ class RestServiceTest {
 
                 given().port(port)
                 .param("filepath", "/usr/local/tomcat/webapps/fits/upload/1582118786085/README.md")
+                .param("datasetName", "default")
                 .when().post("/object")
                 .then()
                 .statusCode(200).extract().asString();
@@ -234,6 +243,7 @@ class RestServiceTest {
     @Test
     void resolveConflictsTest() {
         String str = given().port(port)
+                .param("datasetName", "default")
                 .when().post("/resolveconflicts")
                 .then()
                 .statusCode(200).extract().asString();

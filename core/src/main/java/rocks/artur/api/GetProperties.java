@@ -9,6 +9,6 @@ import java.util.List;
  * This interface enables getting a property distribution.
  */
 public interface GetProperties {
-    List<PropertyStatistic> getProperties();
-    List<PropertyStatistic> getProperties(FilterCriteria filter);
+    List<PropertyStatistic> getProperties(String datasetName);
+    List<PropertyStatistic> getProperties(FilterCriteria filter, String datasetName);
 }

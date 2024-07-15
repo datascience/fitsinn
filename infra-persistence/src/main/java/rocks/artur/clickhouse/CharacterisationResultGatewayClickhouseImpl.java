@@ -23,46 +23,47 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
 
     @Override
-    public void addCharacterisationResult(CharacterisationResult characterisationResult) {
-        repository.save(characterisationResult);
-        repository.cleanAggregation();
+    public void addCharacterisationResult(CharacterisationResult characterisationResult, String datasetName) {
+        repository.save(characterisationResult, datasetName);
+        repository.cleanAggregation(datasetName);
     }
 
     @Override
-    public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter) {
-        return repository.getCharacterisationResults(filter);
+    public List<CharacterisationResult> getCharacterisationResults(FilterCriteria<CharacterisationResult> filter, String datasetName) {
+        return repository.getCharacterisationResults(filter, datasetName);
     }
 
     @Override
-    public List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter) {
-        return repository.getPropertyDistribution();
+    public List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter, String datasetName) {
+        repository.aggregateResults(datasetName);
+        return repository.getPropertyDistribution(datasetName);
     }
 
     @Override
-    public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath) {
-        return repository.getCharacterisationResultsByFilepath(filePath);
+    public List<CharacterisationResult> getCharacterisationResultsByFilepath(String filePath, String datasetName) {
+        return repository.getCharacterisationResultsByFilepath(filePath,datasetName);
     }
 
     @Override
-    public List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry) {
+    public List<CharacterisationResult> getCharacterisationResultsByEntry(Entry entry, String datasetName) {
         return null;
     }
 
     @Override
-    public List<Entry> getConflictEntries() {
+    public List<Entry> getConflictEntries(String datasetName) {
         return null;
     }
 
     @Override
-    public List<Entry> getEntries() {
+    public List<Entry> getEntries(String datasetName) {
         return null;
     }
 
     @Override
-    public List<CharacterisationResult> getConflictsByFilepath(String filepath) {
-        repository.aggregateResults();
+    public List<CharacterisationResult> getConflictsByFilepath(String filepath, String datasetName) {
+        repository.aggregateResults(datasetName);
         List<CharacterisationResult> results = new ArrayList<>();
-        List<CharacterisationResult> allJPAByFilePath = getCharacterisationResultsByFilepath(filepath);
+        List<CharacterisationResult> allJPAByFilePath = getCharacterisationResultsByFilepath(filepath, datasetName);
         List<Property> properties = allJPAByFilePath.stream().map(item -> item.getProperty()).collect(Collectors.toList());
 
         for (Property property : properties) {
@@ -75,31 +76,32 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     }
 
     @Override
-    public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria) {
-        repository.aggregateResults();
+    public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria, String datasetName) {
+
+        repository.aggregateResults(datasetName);
         Map<String, Double> result = new HashMap<>();
 
-        double[] sizeStatistics = repository.getSizeStatistics(filterCriteria);
+        double[] sizeStatistics = repository.getSizeStatistics(filterCriteria, datasetName);
         result.put("totalSize", sizeStatistics[0]);
         result.put("minSize", sizeStatistics[1]);
         result.put("maxSize", sizeStatistics[2]);
         result.put("avgSize", sizeStatistics[3]);
         result.put("totalCount", sizeStatistics[4]);
 
-        double[] conflictStatistics = repository.getConflictStatistics(filterCriteria);
+        double[] conflictStatistics = repository.getConflictStatistics(filterCriteria, datasetName);
         result.put("conflictRate", conflictStatistics[1]);
         result.put("conflictCount", conflictStatistics[0]);
         return result;
     }
 
     @Override
-    public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter) {
-        repository.aggregateResults();
+    public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter, String datasetName) {
+        repository.aggregateResults(datasetName);
         switch (property.getValueType()) {
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        repository.getPropertyValueTimeStampDistribution(property.name(), filter);
+                        repository.getPropertyValueTimeStampDistribution(property.name(), filter, datasetName);
                 collect = propertyValueDistribution.stream().filter(stat ->  property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
@@ -109,7 +111,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
             case INTEGER:
             case FLOAT: {
                 List<Object[]> propertyValueDistribution =
-                        repository.getPropertyValueDistribution(property.name(), filter);
+                        repository.getPropertyValueDistribution(property.name(), filter, datasetName);
 
                 List<Float> floats = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]) && !(stat[1].equals("CONFLICT")))
                         .map(stat -> {
@@ -137,7 +139,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
             default:
                 List<PropertyValueStatistic> collect = null;
                 List<Object[]> propertyValueDistribution =
-                        repository.getPropertyValueDistribution(property.name(), filter);
+                        repository.getPropertyValueDistribution(property.name(), filter, datasetName);
                 collect = propertyValueDistribution.stream().filter(stat -> property.name().equalsIgnoreCase((String) stat[0]))
                         .map(stat -> new PropertyValueStatistic((Long) stat[2], (String) stat[1]))
                         .collect(Collectors.toList());
@@ -147,25 +149,25 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     }
 
     @Override
-    public List<String> getSources() {
-        return repository.getSources();
+    public List<String> getSources(String datasetName) {
+        return repository.getSources(datasetName);
     }
 
     @Override
-    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria) {
-        return repository.getObjects(filterCriteria);
+    public List<PropertiesPerObjectStatistic> getObjects(FilterCriteria filterCriteria, String datasetName) {
+        return repository.getObjects(filterCriteria, datasetName);
     }
 
     @Override
-    public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties) {
-        repository.aggregateResults();
+    public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties, String datasetName) {
+        repository.aggregateResults(datasetName);
         switch (algorithm) {
             case RANDOM -> {
-                List<String[]> samples = repository.getRandomSamples(filterCriteria, 10);
+                List<String[]> samples = repository.getRandomSamples(filterCriteria, 10, datasetName);
                 return samples;
             }
             case SELECTIVE_FEATURE_DISTRIBUTION -> {
-                List<String[]> selectiveFeatureDistributionSamples = repository.getSelectiveFeatureDistributionSamples(filterCriteria, properties);
+                List<String[]> selectiveFeatureDistributionSamples = repository.getSelectiveFeatureDistributionSamples(filterCriteria, properties, datasetName);
                 //List<String> examples = selectiveFeatureDistributionSamples.stream().map(arr -> arr[1]).collect(Collectors.toList());
                 return selectiveFeatureDistributionSamples;
             }
@@ -174,27 +176,32 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     }
 
     @Override
-    public void addCharacterisationResults(List<CharacterisationResult> characterisationResults) {
-        repository.saveAll(characterisationResults);
-        repository.cleanAggregation();
+    public void addCharacterisationResults(List<CharacterisationResult> characterisationResults, String datasetName) {
+        repository.saveAll(characterisationResults, datasetName);
+        repository.cleanAggregation(datasetName);
     }
 
     @Override
-    public double getConflictRate() {
-        repository.aggregateResults();
-        Long totalCount = repository.getDigitalObjectCount();
-        Long conflictCount = repository.getConflictCount();
+    public double getConflictRate(String datasetName) {
+        repository.aggregateResults(datasetName);
+        Long totalCount = repository.getDigitalObjectCount(datasetName);
+        Long conflictCount = repository.getConflictCount(datasetName);
         return conflictCount / (double) totalCount;
     }
 
     @Override
-    public void delete(CharacterisationResult characterisationResult) {
+    public void delete(CharacterisationResult characterisationResult, String datasetName) {
 
     }
 
     @Override
-    public void resolveConflictsNative() {
-        repository.resolveConflictsSimple();
-        repository.aggregateResults();
+    public void resolveConflictsNative(String datasetName) {
+        repository.resolveConflictsSimple(datasetName);
+        repository.aggregateResults(datasetName);
+    }
+
+    @Override
+    public List<String> listDatasets() {
+        return repository.listDatasets();
     }
 }

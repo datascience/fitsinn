@@ -25,6 +25,12 @@ const ObjectDetails = () => {
     "selectedObject",
     ""
   );
+
+  const [dataset, setDataset] = useSessionStorage(
+      "dataset",
+      ""
+  );
+
   useEffect(() => {
     console.log("loading the object details list");
     var myHeaders = new Headers();
@@ -48,6 +54,7 @@ const ObjectDetails = () => {
             "/object?" +
             new URLSearchParams({
               filepath: selectedObject,
+              datasetName: dataset
             }),
           requestOptions
         );
@@ -58,6 +65,7 @@ const ObjectDetails = () => {
             "/objectconflicts?" +
             new URLSearchParams({
               filepath: selectedObject,
+              datasetName: dataset
             }),
           requestOptions
         );

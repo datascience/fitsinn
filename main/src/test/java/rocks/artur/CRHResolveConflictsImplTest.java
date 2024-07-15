@@ -28,15 +28,15 @@ class CRHResolveConflictsImplTest {
     void getAllTest() {
 
         Iterable<CharacterisationResult> characterisationResults =
-                characterisationResultGatewaySqlImpl.getCharacterisationResults(null);
-        double conflictRateBefore = characterisationResultGatewaySqlImpl.getConflictRate();
+                characterisationResultGatewaySqlImpl.getCharacterisationResults(null, "");
+        double conflictRateBefore = characterisationResultGatewaySqlImpl.getConflictRate("");
         List<CharacterisationResult> list = new ArrayList<>();
         characterisationResults.forEach(list::add);
         //Assert.assertEquals(10, list.size());
 
-        resolveConflicts.run();
+        //resolveConflicts.run();
 
-        double conflictRateAfter = characterisationResultGatewaySqlImpl.getConflictRate();
+        double conflictRateAfter = characterisationResultGatewaySqlImpl.getConflictRate("");
 
         System.out.println(String.format("Conflict rate: before - %4.3f, after - %4.3f", conflictRateBefore, conflictRateAfter));
     }

@@ -6,5 +6,5 @@ import java.util.List;
  * This interface enables getting a property distribution.
  */
 public interface GetSources {
-    List<String> getSources();
+    List<String> getSources(String datasetName);
 }

@@ -18,8 +18,8 @@ public class GetPropertyValueDistributionImpl implements GetPropertyValueDistrib
 
 
     @Override
-    public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filterCriteria) {
-        List<PropertyValueStatistic> valueDistributionByProperty = characterisationResultGateway.getPropertyValueDistribution(property, filterCriteria);
+    public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filterCriteria, String datasetName) {
+        List<PropertyValueStatistic> valueDistributionByProperty = characterisationResultGateway.getPropertyValueDistribution(property, filterCriteria, datasetName);
         return valueDistributionByProperty;
     }
 }

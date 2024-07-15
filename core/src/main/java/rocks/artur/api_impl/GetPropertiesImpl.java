@@ -15,14 +15,14 @@ public class GetPropertiesImpl implements GetProperties {
     }
 
     @Override
-    public List<PropertyStatistic> getProperties() {
-        List<PropertyStatistic> propertyDistribution = characterisationResultGateway.getPropertyDistribution(null);
+    public List<PropertyStatistic> getProperties(String datasetName) {
+        List<PropertyStatistic> propertyDistribution = characterisationResultGateway.getPropertyDistribution(null, datasetName);
         return propertyDistribution;
     }
 
     @Override
-    public List<PropertyStatistic> getProperties(FilterCriteria filter) {
-        List<PropertyStatistic> propertyDistribution = characterisationResultGateway.getPropertyDistribution(filter);
+    public List<PropertyStatistic> getProperties(FilterCriteria filter, String datasetName) {
+        List<PropertyStatistic> propertyDistribution = characterisationResultGateway.getPropertyDistribution(filter, datasetName);
         return propertyDistribution;
     }
 }

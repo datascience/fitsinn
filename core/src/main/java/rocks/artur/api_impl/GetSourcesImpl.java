@@ -13,8 +13,8 @@ public class GetSourcesImpl implements GetSources {
     }
 
     @Override
-    public List<String> getSources() {
-        List<String> sources = characterisationResultGateway.getSources();
+    public List<String> getSources(String datasetName) {
+        List<String> sources = characterisationResultGateway.getSources(datasetName);
         return sources;
     }
 }

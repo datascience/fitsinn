@@ -96,6 +96,22 @@ class CriteriaParserTest {
 
         System.out.println(parse);
     }
+
+
+    @Test
+    void BrokenCaseTest() throws ParseException {
+
+        String s = "FORMAT == \"Hypertext Markup Language\" && FORMAT_VERSION == \"Hypertext Markup Language HTML 3.2\"";
+
+        CriteriaParser parser = new CriteriaParser();
+
+        FilterCriteria parse = parser.parse(s);
+
+        System.out.println(parse);
+
+        Assert.assertEquals("AndFilterCriteria{criteria=SingleFilterCriteria{searchKey=MIMETYPE, operation=EQUAL, searchValue='image/jpeg'}, otherCriteria=SingleFilterCriteria{searchKey=FORMAT, operation=EQUAL, searchValue='JPEG File Interchange Format'}}", parse.toString());
+    }
+
 }
 
 

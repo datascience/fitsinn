@@ -99,7 +99,10 @@ const Dashboard = () => {
         redirect: "follow",
       };
       const response = await fetch(
-        BACKEND_URL + "/resolveconflicts",
+        BACKEND_URL + "/resolveconflicts?" +
+          new URLSearchParams({
+            datasetName: dataset
+          }),
         requestOptions
       );
       setConflictResolution({

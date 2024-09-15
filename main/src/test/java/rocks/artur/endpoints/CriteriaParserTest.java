@@ -109,7 +109,7 @@ class CriteriaParserTest {
 
         System.out.println(parse);
 
-        Assert.assertEquals("AndFilterCriteria{criteria=SingleFilterCriteria{searchKey=MIMETYPE, operation=EQUAL, searchValue='image/jpeg'}, otherCriteria=SingleFilterCriteria{searchKey=FORMAT, operation=EQUAL, searchValue='JPEG File Interchange Format'}}", parse.toString());
+        Assert.assertEquals("AndFilterCriteria{criteria=SingleFilterCriteria{searchKey=FORMAT_VERSION, operation=EQUAL, searchValue='Hypertext Markup Language HTML 3.2'}, otherCriteria=SingleFilterCriteria{searchKey=FORMAT, operation=EQUAL, searchValue='Hypertext Markup Language'}}", parse.toString());
     }
 
 }

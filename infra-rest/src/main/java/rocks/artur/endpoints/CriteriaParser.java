@@ -161,7 +161,9 @@ public class CriteriaParser {
             String group1 = matcher.group(1);
             String tokenKey="quote__"+index++;
             tokens.put(tokenKey, group1);
-            searchString = searchString.replace(group1,tokenKey);
+            String regexPattern = String.format("%s%s%s",quoteSign, group1, quoteSign);
+            searchString = searchString.replaceAll(regexPattern, String.format("%s%s%s",quoteSign, tokenKey, quoteSign));
+            //searchString = searchString.replace(group1,tokenKey); // Don't use this, as it replaces all matching strings.
         }
         return searchString;
     }

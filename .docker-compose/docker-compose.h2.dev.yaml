@@ -5,7 +5,7 @@ services:
   fits:
     image: artourkin/fits-web:main
     container_name: fits
-    env_file: .env
+    env_file: ../.env
     networks:
       - web
     restart: unless-stopped
@@ -16,9 +16,9 @@ services:
   rest:
     container_name: rest
     build:
-      context: .
-      dockerfile: ./Dockerfile
-    env_file: .env
+      context: ..
+      dockerfile: ../Dockerfile
+    env_file: ../.env
     networks:
       - web
     restart: unless-stopped
@@ -33,10 +33,10 @@ services:
 
   web:
     build:
-      context: .
-      dockerfile: ./web/Dockerfile
+      context: ..
+      dockerfile: ../web/Dockerfile
     container_name: web
-    env_file: .env
+    env_file: ../.env
     networks:
       - web
     restart: unless-stopped
@@ -47,7 +47,7 @@ services:
   db-docker:
     image: oscarfonts/h2
     container_name: db-docker
-    env_file: .env
+    env_file: ../.env
     environment:
       - H2_OPTIONS=-ifNotExists
     networks:

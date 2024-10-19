@@ -36,7 +36,7 @@ const FAQ = () => {
           <Typography>
             It is a set of activities within Digital Preservation to study
             digital collections based on characterisation results. Such results
-            are obtained by proccesing the digital object using characterisation
+            are obtained by processing the digital object using characterisation
             tools.
           </Typography>
         </AccordionDetails>

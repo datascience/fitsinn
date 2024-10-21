@@ -39,6 +39,13 @@ jobs:
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
           echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
+      - name: Print GitHub ref and other variables
+        run: |
+          echo "GitHub ref: $GITHUB_REF"
+          echo "Git tag: ${{ steps.vars.outputs.GIT_TAG }}"
+          echo "Branch name: ${{ steps.vars.outputs.BRANCH_NAME }}"
+          echo "Commit SHA: ${{ steps.vars.outputs.GIT_SHA_SHORT }}"
+
       - name: Build and push FITSInn REST
         run: |
           IMAGE_NAME=artourkin/fitsinn-rest

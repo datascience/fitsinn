@@ -35,9 +35,9 @@ jobs:
       - name: Extract Git metadata
         id: vars
         run: |
-          echo "GIT_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
-          echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "GIT_SHA_SHORT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> "$GITHUB_ENV"
+          echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
       - name: Print GitHub ref and other variables
         run: |

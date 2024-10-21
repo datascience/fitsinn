@@ -40,10 +40,13 @@ jobs:
           echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
       - name: Print GitHub ref and other variables
+        env:
+          GIT_TAG: ${{ steps.vars.outputs.GIT_TAG }}
+          BRANCH_NAME: ${{ steps.vars.outputs.BRANCH_NAME }}
         run: |
           echo "GitHub ref: $GITHUB_REF"
-          echo "Git tag: ${{ steps.vars.outputs.GIT_TAG }}"
-          echo "Branch name: ${{ steps.vars.outputs.BRANCH_NAME }}"
+          echo "Git tag: $GIT_TAG"
+          echo "Branch name: $BRANCH_NAME"
           echo "Commit SHA: ${{ steps.vars.outputs.GIT_SHA_SHORT }}"
 
       - name: Build and push FITSInn REST

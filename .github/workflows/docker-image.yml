@@ -53,9 +53,9 @@ jobs:
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$GIT_TAG $CONTEXT
           else
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$BRANCH_NAME-$GIT_SHA_SHORT $CONTEXT
           fi
 
       - name: Cache node modules
@@ -83,9 +83,9 @@ jobs:
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$GIT_TAG $CONTEXT
           else
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$BRANCH_NAME-$GIT_SHA_SHORT $CONTEXT
           fi
 
       - name: Build and push FITS WEB
@@ -95,9 +95,9 @@ jobs:
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$GIT_TAG $CONTEXT
           else
-            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+            docker buildx build --push --tag $IMAGE_NAME:$BRANCH_NAME-$GIT_SHA_SHORT $CONTEXT
           fi
     
 

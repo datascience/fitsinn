@@ -3,6 +3,8 @@ name: Docker Image CI
 on:
   push:
     branches: [main, dev, release/*]
+    tags:
+      - 'v*'
   pull_request:
     branches: [main]
 
@@ -29,13 +31,26 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      - name: Extract Git metadata
+        id: vars
+        run: |
+          echo "GIT_SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
       - name: Build and push FITSInn REST
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: artourkin/fitsinn-rest:${{ github.ref_name }}
+        run: |
+          IMAGE_NAME=artourkin/fitsinn-rest
+          CONTEXT=.
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+          else
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+          fi
+
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
@@ -53,17 +68,29 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: npm list
+
       - name: Build and push FITSInn WEB
-        uses: docker/build-push-action@v5
-        with:
-          file: ./web/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: artourkin/fitsinn-web:${{ github.ref_name }}
+        run: |
+          IMAGE_NAME=artourkin/fitsinn-web
+          CONTEXT=./web
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+          else
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+          fi
+
       - name: Build and push FITS WEB
-        uses: docker/build-push-action@v5
-        with:
-          file: ./fits/Dockerfile
-          platforms: linux/amd64,linux/arm64/v8
-          push: true
-          tags: artourkin/fits-web:${{ github.ref_name }}
+        run: |
+          IMAGE_NAME=artourkin/fits-web
+          CONTEXT=./fits
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            docker buildx build --push --tag $IMAGE_NAME:latest $CONTEXT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.GIT_TAG }} $CONTEXT
+          else
+            docker buildx build --push --tag $IMAGE_NAME:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.GIT_SHA_SHORT }} $CONTEXT
+          fi
+    
+

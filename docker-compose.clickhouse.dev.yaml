@@ -4,8 +4,8 @@ services:
 
   fits:
     build:
-      context: .
-      dockerfile: ./fits/Dockerfile
+      context: ./fits
+      dockerfile: ./Dockerfile
     container_name: fits
     env_file: .env
     networks:
@@ -34,8 +34,8 @@ services:
 
   web:
     build:
-      context: .
-      dockerfile: ./web/Dockerfile
+      context: ./web
+      dockerfile: ./Dockerfile
     container_name: web
     env_file: .env
     networks:

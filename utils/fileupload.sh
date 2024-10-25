@@ -9,7 +9,7 @@ do
     (( COUNTER++ ))
     (( t=t%PARALLEL_TASKS )); ((t++==0)) && wait
     curl --silent --output /dev/null --show-error -X "POST" \
-      "${1}/upload" \
+      "${1}/upload?datasetName=${3}" \
       -H "accept: */*" \
       -H "Content-Type: multipart/form-data" \
       -F "file=@${i}" &

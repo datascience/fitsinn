@@ -41,12 +41,12 @@ docker-compose -f docker-compose.dev.yaml up --build
 
 File uploading using bash:
 ```
-bash ./utils/fileupload.sh http://localhost:8082 ~/rnd/data/govdocs_fits/govdocs1/000/
+bash ./utils/fileupload.sh http://localhost:8082 ~/path/to/files collection_name
 ```
 
 File uploading using python (pip package requests in necessary):
 ```
-python ./utils/fileupload.py http://localhost:8082/multipleupload ~/rnd/data/govdocs_fits/govdocs1/000/ 100 3
+python ./utils/fileupload.py http://localhost:8082/multipleupload ~/path/to/files 100 3 collection_name
 ```
 
 ## Issues

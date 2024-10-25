@@ -19,7 +19,7 @@ def upload_chunk(url, chunk_files, chunk_count):
 
     return end_time - start_time
 
-def upload_files_in_chunks_parallel(url, folder_path, chunk_size=100, num_parallel_requests=10):
+def upload_files_in_chunks_parallel(url, folder_path, chunk_size=100, num_parallel_requests=10, collection_name="dataset"):
     headers = {
         'accept': '*/*',
     }
@@ -37,7 +37,7 @@ def upload_files_in_chunks_parallel(url, folder_path, chunk_size=100, num_parall
 
                 if len(chunk_files) == chunk_size:
                     with ThreadPoolExecutor(max_workers=num_parallel_requests) as executor:
-                        future = executor.submit(upload_chunk, url, chunk_files, (chunk_count+1)*chunk_size)
+                        future = executor.submit(upload_chunk, url + f"?datasetName={collection_name}", chunk_files, (chunk_count+1)*chunk_size)
                         duration = future.result()
 
                         total_duration += duration
@@ -47,25 +47,25 @@ def upload_files_in_chunks_parallel(url, folder_path, chunk_size=100, num_parall
 
     if chunk_files:
         with ThreadPoolExecutor(max_workers=num_parallel_requests) as executor:
-            future = executor.submit(upload_chunk, url, chunk_files, chunk_count)
+            future = executor.submit(upload_chunk, url + f"?datasetName={collection_name}", chunk_files, chunk_count)
             duration = future.result()
             total_duration += duration
 
     return total_duration
 
 if __name__ == "__main__":
-    if len(sys.argv) != 5:
-        print("Usage: python script.py <upload_url> <folder_path> <chunk_size> <num_parallel_requests>")
+    if len(sys.argv) != 6:
+        print("Usage: python script.py <upload_url> <folder_path> <chunk_size> <num_parallel_requests> <collection_name>")
         sys.exit(1)
 
     upload_url = sys.argv[1]
     folder_to_upload = sys.argv[2]
     chunk_size = int(sys.argv[3])
     num_parallel_requests = int(sys.argv[4])
-
+    collection_name = sys.argv[5]
     start_script_time = time.time()
 
-    total_duration = upload_files_in_chunks_parallel(upload_url, folder_to_upload, chunk_size, num_parallel_requests)
+    total_duration = upload_files_in_chunks_parallel(upload_url, folder_to_upload, chunk_size, num_parallel_requests, collection_name)
 
     end_script_time = time.time()
     script_duration = end_script_time - start_script_time

@@ -1,58 +1,82 @@
 # FITSInn
+
 Place where your FITS files feel good.
+
 ## Purpose
 
-FITSInn is a tool to store and analyse technical metadata extracted by characterisation tools such as [FITS](https://projects.iq.harvard.edu/fits/).
-![img.png](docs/img.png)
+FITSInn is an easy-to-use tool for storing and analyzing technical metadata extracted by characterisation tools
+like [FITS](https://projects.iq.harvard.edu/fits/).
 
-The features include:
-* Improved user experience through an intuitive UI.
-* Running file characterisation using FITS on the uploaded files.
-  * The original files are not stored.
-* Slice and dice:
-  * Filtering,
-  * Drill-down,
-  * Property value aggregations,
-  * Distribution visualisations,
-  * Sampling.
-* Built-in metadata conflict resolution.
-* REST API for workflow automation.
+![FITSInn Screenshot](docs/img.png)
 
+### Key Features:
+
+- **Intuitive User Interface**: Enhanced user experience through a sleek and streamlined interface.
+- **File Characterisation**: Analyze uploaded files using FITS without storing the original files.
+- **Data Analysis Tools**:
+    - Advanced filtering,
+    - Drill-down capabilities,
+    - Property value aggregations,
+    - Distribution visualizations,
+    - Sampling options.
+- **Conflict Management**: Resolve metadata conflicts effortlessly.
+- **Automation Support**: Comes with a REST API to integrate into your workflows.
+
+---
 
 ## Installation
 
-### Deployment
+### Deployment (Production)
 
-The artifacts are released as Docker images. You can install FITSInn using Docker-compose:
+To deploy FITSInn, use the Docker images provided:
 
-```
+```bash
 docker-compose -f docker-compose.yaml up --pull
 ```
 
-Installation of FITSInn to Docker Swarm or K8S is possible, but is not currently addressed. 
+> **Note**:
+> - Deployment to Docker Swarm or Kubernetes (K8S) is possible but not covered in this guide.
 
+### Local Development Build
 
-### Local build
+To build the Docker images from scratch and start FITSInn locally:
 
-Building the Docker images from scratch and starting FITSInn is executed via:
-```
+```bash
 docker-compose -f docker-compose.dev.yaml up --build
 ```
 
-File uploading using bash:
-```
+---
+
+### Uploading Files to FITSInn
+
+#### Using Bash:
+
+```bash
 bash ./utils/fileupload.sh http://localhost:8082 ~/path/to/files collection_name
 ```
 
-File uploading using python (pip package requests in necessary):
-```
+#### Using Python:
+
+Ensure you have the `requests` library installed. Then run:
+
+```python
 python ./utils/fileupload.py http://localhost:8082/multipleupload ~/path/to/files 100 3 collection_name
 ```
 
-## Issues
+- **URL**: `http://localhost:8082` is suitable for local deployments.
+- **Path to Files**: Replace `~/path/to/files` with the actual directory path containing the files.
+- **Collection Name**: Replace `collection_name` with a name for your collection.
 
-If you have any issue regarding FITSInn, please use [https://github.com/datascience/fitsinn/issues](https://github.com/datascience/fitsinn/issues).
+---
+
+## Reporting Issues
+
+If you encounter any issues while using FITSInn, please report them on GitHub:
+
+[Submit an Issue](https://github.com/datascience/fitsinn/issues)
+
+---
 
 ## License
 
-FITSInn is released under MIT license. See the [LICENSE](LICENSE) for details.
+FITSInn is released under the MIT license. For more details, see the [LICENSE](LICENSE) file.

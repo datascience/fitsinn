@@ -33,7 +33,7 @@ public class ClickhouseTest {
 
     @Container
     private static final ClickHouseContainer clickHouseContainer =
-            new ClickHouseContainer("clickhouse/clickhouse-server:latest");
+            new ClickHouseContainer("clickhouse/clickhouse-server:24.12");
 
     @DynamicPropertySource
     static void registerClickHouseProperties(DynamicPropertyRegistry registry) {
@@ -79,10 +79,10 @@ public class ClickhouseTest {
     @Test
     public void testDatabaseConnection() throws Exception {
         Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE test_table (id Int32, name String) ENGINE = Memory;");
-        statement.execute("INSERT INTO test_table (id, name) VALUES (1, 'Test');");
+        statement.execute("CREATE TABLE test_table2 (id Int32, name String) ENGINE = Memory;");
+        statement.execute("INSERT INTO test_table2 (id, name) VALUES (1, 'Test');");
 
-        ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM test_table;");
+        ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM test_table2;");
         resultSet.next();
         int count = resultSet.getInt(1);
 

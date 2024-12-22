@@ -28,7 +28,7 @@ public class App {
     }
     void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
-        String profile = System.getenv("DB_SELECTOR") == null ? System.getProperty("spring.profiles.active", "h2") : System.getenv("DB_SELECTOR");
+        String profile = System.getenv("DB_SELECTOR") == null ? System.getProperty("spring.profiles.active", "clickhouse") : System.getenv("DB_SELECTOR");
         System.out.println(profile);
         beanDefinitionScanner.addIncludeFilter(App::match);
         String[] packages;

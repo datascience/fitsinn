@@ -1,5 +1,6 @@
-package rocks.artur.clickhouse;
+package rocks.artur;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,18 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.ClickHouseContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import rocks.artur.clickhouse.CharacterisationResultGatewayClickhouseImpl;
+import rocks.artur.domain.CharacterisationResult;
+import rocks.artur.domain.Property;
+import rocks.artur.utils.CharacterisationResultGenerator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,6 +48,7 @@ public class ClickhouseTest {
         registry.add("spring.datasource.url", clickHouseContainer::getJdbcUrl);
         registry.add("spring.datasource.username", clickHouseContainer::getUsername);
         registry.add("spring.datasource.password", clickHouseContainer::getPassword);
+        registry.add("spring.profiles.active", () -> "clickhouse");
     }
 
 
@@ -66,6 +75,27 @@ public class ClickhouseTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    CharacterisationResultGatewayClickhouseImpl characterisationResultGatewaySqlImpl;
+
+
+    @Test
+    void getAllTest() {
+
+        List<CharacterisationResult> generated = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            generated.add(CharacterisationResultGenerator.generate());
+        }
+        long count = generated.stream().filter(item -> item.getProperty().equals(Property.SIZE)).count();
+
+        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "generated");
+
+        Map<String, Double> statistics = characterisationResultGatewaySqlImpl.getCollectionStatistics(null, "generated");
+        Double totalCount = statistics.get("totalCount");
+        Assert.assertEquals(0, count - totalCount.intValue());
+    }
+
 
     @Test
     public void testInsertAndSelect() {

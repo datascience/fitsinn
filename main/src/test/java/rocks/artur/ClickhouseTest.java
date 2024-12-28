@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import rocks.artur.clickhouse.CharacterisationResultGatewayClickhouseImpl;
 import rocks.artur.domain.CharacterisationResult;
 import rocks.artur.domain.Property;
+import rocks.artur.domain.statistics.PropertyValueStatistic;
 import rocks.artur.utils.CharacterisationResultGenerator;
 
 import java.sql.Connection;
@@ -96,6 +97,22 @@ public class ClickhouseTest {
         Assert.assertEquals(0, count - totalCount.intValue());
     }
 
+    @Test
+    void propValDistributionTest() {
+
+        List<CharacterisationResult> generated = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            generated.add(CharacterisationResultGenerator.generate());
+        }
+        long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
+        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "generated");
+
+        List<PropertyValueStatistic> distribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, null, "generated");
+        Long reduce = distribution.stream().map(item -> item.getCount()).reduce(0L, Long::sum);
+        Assert.assertEquals(0L, count - reduce);
+    }
+
+
 
     @Test
     public void testInsertAndSelect() {
@@ -117,5 +134,14 @@ public class ClickhouseTest {
         int count = resultSet.getInt(1);
 
         assertEquals(1, count);
+    }
+
+
+    @Test
+    public void deleteDatasetTest() {
+
+        List<String> strings = characterisationResultGatewaySqlImpl.listDatasets();
+        assertEquals(0, strings.size());
+
     }
 }

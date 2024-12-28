@@ -1,17 +1,13 @@
 package rocks.artur.clickhouse;
 
-import org.springdoc.core.customizers.ActuatorOperationCustomizer;
-import rocks.artur.api_impl.filter.SingleFilterCriteria;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
-import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CharacterisationResultGatewayClickhouseImpl implements CharacterisationResultGateway {
 
@@ -203,5 +199,10 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public List<String> listDatasets() {
         return repository.listDatasets();
+    }
+
+    @Override
+    public Boolean removeDataset(String datasetName) {
+        return repository.removeDataset(datasetName);
     }
 }

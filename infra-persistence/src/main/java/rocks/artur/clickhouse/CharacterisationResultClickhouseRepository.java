@@ -569,4 +569,10 @@ public class CharacterisationResultClickhouseRepository {
         resultList.removeAll(to_remove);
         return resultList;
     }
+
+    public Boolean removeDataset(String datasetName) {
+        String sql =  String.format("drop database if not exists %s", datasetName);
+        int update = template.update(sql);
+        return update == 1;
+    }
 }

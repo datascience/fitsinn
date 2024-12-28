@@ -571,7 +571,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Boolean removeDataset(String datasetName) {
-        String sql =  String.format("drop database if not exists %s", datasetName);
+        String sql =  String.format("drop database if exists %s", datasetName);
         int update = template.update(sql);
         return update == 1;
     }

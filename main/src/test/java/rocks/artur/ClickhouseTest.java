@@ -105,9 +105,9 @@ public class ClickhouseTest {
             generated.add(CharacterisationResultGenerator.generate());
         }
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
-        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "generated");
+        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "propVal");
 
-        List<PropertyValueStatistic> distribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, null, "generated");
+        List<PropertyValueStatistic> distribution = characterisationResultGatewaySqlImpl.getPropertyValueDistribution(Property.FORMAT, null, "propVal");
         Long reduce = distribution.stream().map(item -> item.getCount()).reduce(0L, Long::sum);
         Assert.assertEquals(0L, count - reduce);
     }
@@ -141,7 +141,26 @@ public class ClickhouseTest {
     public void deleteDatasetTest() {
 
         List<String> strings = characterisationResultGatewaySqlImpl.listDatasets();
-        assertEquals(0, strings.size());
+        System.out.println(strings);
+        assertEquals(1, strings.size());
+
+        List<CharacterisationResult> generated = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            generated.add(CharacterisationResultGenerator.generate());
+        }
+        long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
+        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "todelete");
+
+        strings = characterisationResultGatewaySqlImpl.listDatasets();
+        System.out.println(strings);
+        assertEquals(2, strings.size());
+
+
+        characterisationResultGatewaySqlImpl.removeDataset("todelete");
+
+        strings = characterisationResultGatewaySqlImpl.listDatasets();
+        System.out.println(strings);
+        assertEquals(1, strings.size());
 
     }
 }

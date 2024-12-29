@@ -80,14 +80,20 @@ public class ClickhouseTest {
     @Autowired
     CharacterisationResultGatewayClickhouseImpl characterisationResultGatewaySqlImpl;
 
+    void generate() {
+        if (generated == null) {
+            generated = new ArrayList<>();
+            for (int i = 0; i < 1000000; i++) {
+                generated.add(CharacterisationResultGenerator.generate());
+            }
+        }
+    }
 
+    List<CharacterisationResult> generated;
     @Test
     void getAllTest() {
+        generate();
 
-        List<CharacterisationResult> generated = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            generated.add(CharacterisationResultGenerator.generate());
-        }
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.SIZE)).count();
 
         characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "generated");
@@ -99,11 +105,7 @@ public class ClickhouseTest {
 
     @Test
     void propValDistributionTest() {
-
-        List<CharacterisationResult> generated = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            generated.add(CharacterisationResultGenerator.generate());
-        }
+        generate();
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
         characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "propVal");
 
@@ -144,9 +146,11 @@ public class ClickhouseTest {
         System.out.println(strings);
         assertEquals(1, strings.size());
 
-        List<CharacterisationResult> generated = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            generated.add(CharacterisationResultGenerator.generate());
+        if (generated == null) {
+            generated = new ArrayList<>();
+            for (int i = 0; i < 1000000; i++) {
+                generated.add(CharacterisationResultGenerator.generate());
+            }
         }
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
         characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "todelete");

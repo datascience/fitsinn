@@ -495,6 +495,7 @@ public class CharacterisationResultClickhouseRepository {
 
 
      void aggregateResults(String datasetName){
+         this.cleanAggregation(datasetName);
         /*
             CREATE TABLE IF NOT EXISTS characterisationresultaggregated
             ENGINE = AggregatingMergeTree

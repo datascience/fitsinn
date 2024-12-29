@@ -15,6 +15,11 @@ public class CharacterisationResultGenerator {
         return nextInt.toString();
     }
 
+    public static String generateRandomString(int length) {
+        Integer nextInt = new Random().nextInt(length);
+        return nextInt.toString();
+    }
+
     public static CharacterisationResult generate(){
         CharacterisationResult characterisationResult = new CharacterisationResult();
         characterisationResult.setFilePath(generateRandomString());
@@ -28,7 +33,7 @@ public class CharacterisationResultGenerator {
     private static String generateValue(ValueType valueType) {
         switch (valueType) {
             case STRING -> {
-                return generateRandomString();
+                return generateRandomString(100);
             }
             case BOOL -> {
                 return new Random().nextBoolean() ? "true" : "false";

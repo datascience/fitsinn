@@ -21,7 +21,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void addCharacterisationResult(CharacterisationResult characterisationResult, String datasetName) {
         repository.save(characterisationResult, datasetName);
-        repository.cleanAggregation(datasetName);
+
     }
 
     @Override

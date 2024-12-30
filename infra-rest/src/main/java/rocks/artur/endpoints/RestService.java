@@ -39,6 +39,7 @@ public class RestService {
     AnalyzePersistFile analyzePersistFile;
     GetCollectionStatistics getCollectionStatistics;
     GetDatasetInfo getDatasetInfo;
+    RemoveDataset removeDataset;
 
     ResolveConflicts resolveConflicts;
 
@@ -46,7 +47,7 @@ public class RestService {
                        GetPropertyValueDistribution getPropertyValueDistribution,
                        AnalyzePersistFile analyzePersistFile,
                        GetObjects getObjects, GetCollectionStatistics getCollectionStatistics,
-                       GetSources getSources, GetSamples getSamples, ResolveConflicts resolveConflicts, GetDatasetInfo getDatasetInfo) {
+                       GetSources getSources, GetSamples getSamples, ResolveConflicts resolveConflicts, GetDatasetInfo getDatasetInfo, RemoveDataset removeDataset) {
         this.getProperties = getProperties;
         this.getObjects = getObjects;
         this.getPropertyValueDistribution = getPropertyValueDistribution;
@@ -56,6 +57,7 @@ public class RestService {
         this.getSamples = getSamples;
         this.resolveConflicts = resolveConflicts;
         this.getDatasetInfo = getDatasetInfo;
+        this.removeDataset = removeDataset;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/health")
@@ -230,5 +232,13 @@ public class RestService {
     @Consumes(MediaType.APPLICATION_JSON)
     public List<String> listDatasets() {
         return getDatasetInfo.listDatasets();
+    }
+
+
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/datasets")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void removeDataset(@RequestParam(name = "datasetName", required = true) @Parameter(name = "datasetName", description = "dataset name to delete", example = "default") String datasetName) {
+        removeDataset.removeDataset(datasetName);
     }
 }

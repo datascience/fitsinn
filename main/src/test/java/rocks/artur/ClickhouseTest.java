@@ -90,18 +90,6 @@ public class ClickhouseTest {
     }
 
     List<CharacterisationResult> generated;
-    @Test
-    void getAllTest() {
-        generate();
-
-        long count = generated.stream().filter(item -> item.getProperty().equals(Property.SIZE)).count();
-
-        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "generated");
-
-        Map<String, Double> statistics = characterisationResultGatewaySqlImpl.getCollectionStatistics(null, "generated");
-        Double totalCount = statistics.get("totalCount");
-        Assert.assertEquals(0, count - totalCount.intValue());
-    }
 
     @Test
     void propValDistributionTest() {

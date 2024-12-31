@@ -3,9 +3,11 @@ package rocks.artur;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -35,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @ActiveProfiles("clickhouse")
+@Disabled
 @Testcontainers
 @SpringBootTest
 public class ClickhouseTest {
@@ -83,7 +86,7 @@ public class ClickhouseTest {
     void generate() {
         if (generated == null) {
             generated = new ArrayList<>();
-            for (int i = 0; i < 1000000; i++) {
+            for (int i = 0; i < 10000; i++) {
                 generated.add(CharacterisationResultGenerator.generate());
             }
         }

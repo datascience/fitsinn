@@ -8,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 
@@ -23,12 +24,20 @@ public class App {
     }
 
     @Bean
-    BeanFactoryPostProcessor beanFactoryPostProcessor() {
-        return beanFactory -> genericApplicationContext((BeanDefinitionRegistry) beanFactory);
+    @Profile({"h2","mysql"})
+    static BeanFactoryPostProcessor beanFactoryPostProcessorH2() {
+        return beanFactory -> genericApplicationContext((BeanDefinitionRegistry) beanFactory, "h2");
     }
-    void genericApplicationContext(BeanDefinitionRegistry beanRegistry) {
+
+    @Bean
+    @Profile("clickhouse")
+    static BeanFactoryPostProcessor beanFactoryPostProcessorClickhouse() {
+        return beanFactory -> genericApplicationContext((BeanDefinitionRegistry) beanFactory, "clickhouse");
+    }
+
+    static void genericApplicationContext(BeanDefinitionRegistry beanRegistry, String profile) {
         ClassPathBeanDefinitionScanner beanDefinitionScanner = new ClassPathBeanDefinitionScanner(beanRegistry);
-        String profile = System.getenv("DB_SELECTOR") == null ? System.getProperty("spring.profiles.active", "clickhouse") : System.getenv("DB_SELECTOR");
+        //String profile = System.getenv("DB_SELECTOR") == null ? System.getProperty("spring.profiles.active", "clickhouse") : System.getenv("DB_SELECTOR");
         System.out.println(profile);
         beanDefinitionScanner.addIncludeFilter(App::match);
         String[] packages;
@@ -42,6 +51,7 @@ public class App {
         }
         beanDefinitionScanner.scan(packages);
     }
+
     private static boolean match(MetadataReader mr, MetadataReaderFactory mrf) {
         String className = mr.getClassMetadata().getClassName();
         LOG.debug(className);

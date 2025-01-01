@@ -412,44 +412,46 @@ public class CharacterisationResultClickhouseRepository {
         return result;
     }
 
-
+    /**
+     * This method executes conflict resolution based on a simple approximation.
+     * @param datasetName
+     *
+     *
+     * DROP TABLE IF EXISTS to_delete;
+     *
+     * CREATE TABLE to_delete
+     * (
+     *     file_path      String,
+     *     property       String,
+     *     source         String
+     * ) ENGINE = Memory;
+     *
+     * insert into to_delete
+     * with weights as (
+     *     SELECT source,
+     *            property,
+     *            COUNT(property_value) as count,
+     *            COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated
+     *                                          WHERE property_value != 'CONFLICT' ) as weight
+     *     FROM characterisationresult
+     *     WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )
+     *     GROUP BY source, property
+     * ),
+     *      tmp_table as (
+     *          SELECT file_path, property, source, property_value, weight FROM characterisationresult
+     *                                                                              JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source
+     *          WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')
+     *      )
+     * SELECT file_path,property,source FROM tmp_table
+     * WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);
+     *
+     * delete from characterisationresult
+     * where (file_path, property, source) in (select file_path,property,source from to_delete);
+     *
+     * drop table IF EXISTS characterisationresultaggregated;
+     *
+     */
     public void resolveConflictsSimple(String datasetName){
-        /*
-        DROP TABLE IF EXISTS to_delete;
-
-        CREATE TABLE to_delete
-        (
-            file_path      String,
-            property       String,
-            source         String
-        ) ENGINE = Memory;
-
-        insert into to_delete
-        with weights as (
-            SELECT source,
-                   property,
-                   COUNT(property_value) as count,
-                   COUNT(property_value) * 1.0/ (SELECT count(property_value) FROM characterisationresultaggregated
-                                                 WHERE property_value != 'CONFLICT' ) as weight
-            FROM characterisationresult
-            WHERE file_path in (SELECT file_path FROM characterisationresultaggregated WHERE property_value != 'CONFLICT' )
-            GROUP BY source, property
-        ),
-             tmp_table as (
-                 SELECT file_path, property, source, property_value, weight FROM characterisationresult
-                                                                                     JOIN weights on characterisationresult.property == weights.property and characterisationresult.source == weights.source
-                 WHERE (file_path, property) in (SELECT file_path, property from characterisationresultaggregated WHERE property_value == 'CONFLICT')
-             )
-        SELECT file_path,property,source FROM tmp_table
-        WHERE (file_path, property, weight)  not in (SELECT file_path, property, MAX(weight) FROM tmp_table GROUP BY file_path, property);
-
-        delete from characterisationresult
-        where (file_path, property, source) in (select file_path,property,source from to_delete);
-
-        drop table IF EXISTS characterisationresultaggregated;
-         */
-
-
         String sql =  String.format("DROP TABLE IF EXISTS %s.to_delete;", datasetName);
         int update = template.update(sql);
 
@@ -488,27 +490,28 @@ public class CharacterisationResultClickhouseRepository {
                 "       delete from %s.characterisationresult\n" +
                 "        where (file_path, property, source) in (select file_path,property,source from %s.to_delete);", datasetName, datasetName);
         update = template.update(sql);
-
-        this.cleanAggregation(datasetName);
     }
 
-
-
-     void aggregateResults(String datasetName){
-         this.cleanAggregation(datasetName);
-        /*
-            CREATE TABLE IF NOT EXISTS characterisationresultaggregated
-            ENGINE = AggregatingMergeTree
-                  ORDER BY (property, file_path) AS
-            SELECT file_path, property,
-                   CASE
-                       WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)
-                       ELSE 'CONFLICT'
-                       END AS property_value
-            FROM characterisationresult
-            GROUP BY property, file_path;
-         */
-        String sql  = String.format("" +
+    /**
+     *
+     * This method creates a required projection for a given database name.
+     *
+     * @param datasetName
+     *
+      CREATE TABLE IF NOT EXISTS characterisationresultaggregated
+      ENGINE = AggregatingMergeTree
+            ORDER BY (property, file_path) AS
+      SELECT file_path, property,
+             CASE
+                 WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)
+                 ELSE 'CONFLICT'
+                 END AS property_value
+      FROM characterisationresult
+      GROUP BY property, file_path;
+     */
+     void createAggregation(String datasetName){
+         //this.cleanAggregation(datasetName);
+         String sql  = String.format("" +
                 "CREATE TABLE IF NOT EXISTS %s.characterisationresultaggregated\n" +
                 "ENGINE = AggregatingMergeTree\n" +
                 "      ORDER BY (property, file_path) AS\n" +
@@ -529,26 +532,30 @@ public class CharacterisationResultClickhouseRepository {
     }
 
 
+
+
+    /**
+     *
+     * This creates a new database with a given name.
+     *
+     * @param datasetName
+     *
+          CREATE TABLE newdb.characterisationresult
+          (
+              file_path String,
+              property String,
+              source String,
+              property_value String,
+              value_type String
+          ) ENGINE = ReplacingMergeTree
+                PRIMARY KEY (source, property, file_path)
+                ORDER BY (source, property, file_path);
+     *
+     */
     void createDb(String datasetName) {
         String sql =  String.format("create database if not exists %s", datasetName);
         int update = template.update(sql);
 
-
-
-        /*
-
-        CREATE TABLE newdb.characterisationresult
-        (
-            file_path String,
-            property String,
-            source String,
-            property_value String,
-            value_type String
-        ) ENGINE = ReplacingMergeTree
-              PRIMARY KEY (source, property, file_path)
-              ORDER BY (source, property, file_path);
-
-         */
         sql =  String.format("CREATE TABLE IF NOT EXISTS %s.characterisationresult\n" +
                 "(\n" +
                 "    file_path String,\n" +
@@ -572,7 +579,7 @@ public class CharacterisationResultClickhouseRepository {
     }
 
     public Boolean removeDataset(String datasetName) {
-        String sql =  String.format("drop database if exists %s", datasetName);
+        String sql =  String.format("drop database if exists %s SYNC", datasetName);
         int update = template.update(sql);
         return update == 1;
     }

@@ -498,36 +498,32 @@ public class CharacterisationResultClickhouseRepository {
      *
      * @param datasetName
      *
-      CREATE TABLE IF NOT EXISTS characterisationresultaggregated
-      ENGINE = AggregatingMergeTree
-            ORDER BY (property, file_path) AS
-      SELECT file_path, property,
-             CASE
-                 WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)
-                 ELSE 'CONFLICT'
-                 END AS property_value
-      FROM characterisationresult
-      GROUP BY property, file_path;
+INSERT INTO %s.agg_characterisationresult
+SELECT
+    property,
+    file_path,
+    uniqState(property_value) AS unique_values,
+    anyState(property_value)  AS any_value
+    FROM %s.characterisationresult
+GROUP BY property, file_path;
      */
      void createAggregation(String datasetName){
          //this.cleanAggregation(datasetName);
          String sql  = String.format("" +
-                "CREATE TABLE IF NOT EXISTS %s.characterisationresultaggregated\n" +
-                "ENGINE = AggregatingMergeTree\n" +
-                "      ORDER BY (property, file_path) AS\n" +
-                "SELECT file_path, property,\n" +
-                "       CASE\n" +
-                "           WHEN COUNT(distinct property_value) = 1 THEN MIN(property_value)\n" +
-                "           ELSE 'CONFLICT'\n" +
-                "           END AS property_value\n" +
-                "FROM %s.characterisationresult\n" +
-                "GROUP BY property, file_path;", datasetName, datasetName
+            "INSERT INTO %s.agg_characterisationresult\n" +
+             "SELECT\n" +
+             "    property,\n" +
+             "    file_path,\n" +
+             "    uniqState(property_value) AS unique_values,\n" +
+             "    anyState(property_value)  AS any_value\n" +
+             "    FROM %s.characterisationresult\n" +
+             "GROUP BY property, file_path;", datasetName, datasetName
         );
         template.update(sql);
     }
 
     void cleanAggregation(String datasetName){
-        String sql =  String.format("drop table IF EXISTS %s.characterisationresultaggregated", datasetName);
+        String sql =  String.format("truncate table IF EXISTS %s.agg_characterisationresult", datasetName);
         int update = template.update(sql);
     }
 
@@ -540,16 +536,52 @@ public class CharacterisationResultClickhouseRepository {
      *
      * @param datasetName
      *
-          CREATE TABLE newdb.characterisationresult
-          (
-              file_path String,
-              property String,
-              source String,
-              property_value String,
-              value_type String
-          ) ENGINE = ReplacingMergeTree
-                PRIMARY KEY (source, property, file_path)
-                ORDER BY (source, property, file_path);
+CREATE TABLE IF NOT EXISTS %s.characterisationresult
+(
+    file_path String,
+    property String,
+    source String,
+    property_value String,
+    value_type String
+)
+    ENGINE = ReplacingMergeTree
+    PRIMARY KEY (source, property, file_path)
+    ORDER BY (source, property, file_path);
+
+
+CREATE TABLE IF NOT EXISTS %s.agg_characterisationresult
+(
+    property String,
+    file_path String,
+    unique_values AggregateFunction(uniq, String),
+    any_value AggregateFunction(any, String)
+)
+    ENGINE = AggregatingMergeTree
+    ORDER BY (property, file_path);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS %s.mv_characterisationresult
+    TO %s.agg_characterisationresult
+AS
+    SELECT
+    property,
+    file_path,
+    uniqState(property_value) AS unique_values,
+    anyState(property_value)  AS any_value
+    FROM %s.characterisationresult
+    GROUP BY property, file_path;
+
+CREATE VIEW IF NOT EXISTS %s.characterisationresultaggregated
+AS
+    SELECT
+        property,
+        file_path,
+        CASE
+        WHEN finalizeAggregation(unique_values) = 1
+        THEN finalizeAggregation(any_value)
+        ELSE 'CONFLICT'
+        END AS property_value
+    FROM %s.agg_characterisationresult;
+
      *
      */
     void createDb(String datasetName) {
@@ -557,15 +589,50 @@ public class CharacterisationResultClickhouseRepository {
         int update = template.update(sql);
 
         sql =  String.format("CREATE TABLE IF NOT EXISTS %s.characterisationresult\n" +
-                "(\n" +
-                "    file_path String,\n" +
-                "    property String,\n" +
-                "    source String,\n" +
-                "    property_value String,\n" +
-                "    value_type String\n" +
-                ") ENGINE = ReplacingMergeTree\n" +
-                "      PRIMARY KEY (source, property, file_path)\n" +
-                "      ORDER BY (source, property, file_path);", datasetName);
+            "(\n" +
+            "    file_path String,\n" +
+            "    property String,\n" +
+            "    source String,\n" +
+            "    property_value String,\n" +
+            "    value_type String\n" +
+            ") \n" +
+            "    ENGINE = ReplacingMergeTree\n" +
+            "    PRIMARY KEY (source, property, file_path)\n" +
+            "    ORDER BY (source, property, file_path);\n" +
+            "\n" +
+            "\n" +
+            "CREATE TABLE IF NOT EXISTS %s.agg_characterisationresult\n" +
+            "(\n" +
+            "    property String,\n" +
+            "    file_path String,\n" +
+            "    unique_values AggregateFunction(uniq, String),\n" +
+            "    any_value AggregateFunction(any, String)\n" +
+            ")\n" +
+            "    ENGINE = AggregatingMergeTree\n" +
+            "    ORDER BY (property, file_path);\n" +
+            "\n" +
+            "CREATE MATERIALIZED VIEW IF NOT EXISTS %s.mv_characterisationresult\n" +
+            "    TO %s.agg_characterisationresult\n" +
+            "AS\n" +
+            "    SELECT\n" +
+            "    property,\n" +
+            "    file_path,\n" +
+            "    uniqState(property_value) AS unique_values,\n" +
+            "    anyState(property_value)  AS any_value\n" +
+            "    FROM %s.characterisationresult\n" +
+            "    GROUP BY property, file_path;\n" +
+            "\n" +
+            "CREATE VIEW IF NOT EXISTS %s.characterisationresultaggregated\n" +
+            "AS\n" +
+            "    SELECT\n" +
+            "        property,\n" +
+            "        file_path,\n" +
+            "        CASE\n" +
+            "        WHEN finalizeAggregation(unique_values) = 1\n" +
+            "        THEN finalizeAggregation(any_value)\n" +
+            "        ELSE 'CONFLICT'\n" +
+            "        END AS property_value\n" +
+            "    FROM %s.agg_characterisationresult;", datasetName, datasetName, datasetName, datasetName, datasetName, datasetName, datasetName);
         update = template.update(sql);
     }
 

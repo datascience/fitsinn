@@ -585,7 +585,7 @@ AS
      *
      */
     void createDb(String datasetName) {
-        String sql =  String.format("create database if not exists %s", datasetName);
+        String sql =  String.format("CREATE DATABASE IF NOT EXISTS %s", datasetName);
         int update = template.update(sql);
 
         sql =  String.format("CREATE TABLE IF NOT EXISTS %s.characterisationresult\n" +
@@ -640,7 +640,7 @@ AS
         String sql = String.format("SELECT name FROM system.databases");
 
         List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
-        List<String> to_remove = Arrays.asList("system", "information_schema", "INFORMATION_SCHEMA");
+        List<String> to_remove = Arrays.asList("system", "information_schema", "INFORMATION_SCHEMA", "default");
         resultList.removeAll(to_remove);
         return resultList;
     }

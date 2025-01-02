@@ -135,14 +135,19 @@ public class ClickhouseTest {
 
         List<String> strings = characterisationResultGatewaySqlImpl.listDatasets();
         System.out.println(strings);
+        assertEquals( 0, strings.size());
+
+
+        characterisationResultGatewaySqlImpl.removeDataset("current");
+
+        strings = characterisationResultGatewaySqlImpl.listDatasets();
+        System.out.println(strings);
         assertEquals(1, strings.size());
 
-        if (generated == null) {
-            generated = new ArrayList<>();
-            for (int i = 0; i < 1000000; i++) {
-                generated.add(CharacterisationResultGenerator.generate());
-            }
-        }
+
+
+
+        generate();
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
         characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "todelete");
 

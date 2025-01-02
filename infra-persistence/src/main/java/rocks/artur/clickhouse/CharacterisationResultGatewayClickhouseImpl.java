@@ -196,6 +196,12 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public Boolean removeDataset(String datasetName) {
-        return repository.removeDataset(datasetName);
+        List<String> datasets = repository.listDatasets();
+        Boolean b = repository.removeDataset(datasetName);
+        datasets.remove(datasetName);
+        if (datasets.isEmpty()) {
+            repository.createDb("current");
+        }
+        return b;
     }
 }

@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS characterisationresult
+CREATE DATABASE IF NOT EXISTS current;
+
+CREATE TABLE IF NOT EXISTS current.characterisationresult
 (
     file_path String,
     property String,
@@ -10,7 +12,7 @@ CREATE TABLE IF NOT EXISTS characterisationresult
     PRIMARY KEY (source, property, file_path)
     ORDER BY (source, property, file_path);
 
-CREATE TABLE IF NOT EXISTS agg_characterisationresult
+CREATE TABLE IF NOT EXISTS current.agg_characterisationresult
 (
     property String,
     file_path String,
@@ -20,18 +22,18 @@ CREATE TABLE IF NOT EXISTS agg_characterisationresult
     ENGINE = AggregatingMergeTree
     ORDER BY (property, file_path);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mv_characterisationresult
-    TO agg_characterisationresult
+CREATE MATERIALIZED VIEW IF NOT EXISTS current.mv_characterisationresult
+    TO current.agg_characterisationresult
 AS
 SELECT
     property,
     file_path,
     uniqState(property_value) AS unique_values,
     anyState(property_value)  AS any_value
-FROM characterisationresult
+FROM current.characterisationresult
 GROUP BY property, file_path;
 
-CREATE VIEW IF NOT EXISTS characterisationresultaggregated
+CREATE VIEW IF NOT EXISTS current.characterisationresultaggregated
 AS
 SELECT
     property,
@@ -41,4 +43,4 @@ SELECT
             THEN finalizeAggregation(any_value)
         ELSE 'CONFLICT'
         END AS property_value
-FROM agg_characterisationresult;
+FROM current.agg_characterisationresult;

@@ -20,8 +20,6 @@ const AppConfig = () => {
     []
   );
 
-
-
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -31,30 +29,38 @@ const AppConfig = () => {
     redirect: "follow",
   };
 
-  const [dataset, setDataset] = useSessionStorage(
-      "dataset",
-      ""
-  );
+  const [dataset, setDataset] = useSessionStorage("dataset", "");
 
   const fetchGlobalProperties = async () => {
-    await fetch(BACKEND_URL + "/statistics?"  +
+    await fetch(
+      BACKEND_URL +
+        "/statistics?" +
         new URLSearchParams({
           datasetName: dataset,
-        }), requestOptions);
-    const response = await fetch(BACKEND_URL + "/properties?"  +
+        }),
+      requestOptions
+    );
+    const response = await fetch(
+      BACKEND_URL +
+        "/properties?" +
         new URLSearchParams({
-          datasetName: "default",
-        }));
+          datasetName: dataset,
+        })
+    );
     let data = await response.json();
     let properties = data.map((prop) => prop.property);
     setGlobalProperties(properties);
   };
 
   const fetchGlobalStatistics = async () => {
-    const response = await fetch(BACKEND_URL + "/statistics?"  +
+    const response = await fetch(
+      BACKEND_URL +
+        "/statistics?" +
         new URLSearchParams({
           datasetName: dataset,
-        }), requestOptions);
+        }),
+      requestOptions
+    );
     let data = await response.json();
     setGlobalStatistics(data);
   };
@@ -67,9 +73,7 @@ const AppConfig = () => {
       console.log(error);
       setErrorMessage("REST API is not accessible!");
     }
-  }
-
-
+  };
 
   const fetchInitialData = async () => {
     await fetchHealth();

@@ -17,14 +17,18 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import rocks.artur.clickhouse.CharacterisationResultGatewayClickhouseImpl;
 import rocks.artur.domain.CharacterisationResult;
+import rocks.artur.domain.FilterCriteria;
 import rocks.artur.domain.Property;
+import rocks.artur.domain.SamplingAlgorithms;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
+import rocks.artur.endpoints.CriteriaParser;
 import rocks.artur.utils.CharacterisationResultGenerator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -145,8 +149,6 @@ public class ClickhouseTest {
         assertEquals(1, strings.size());
 
 
-
-
         generate();
         long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
         characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "todelete");
@@ -161,6 +163,22 @@ public class ClickhouseTest {
         strings = characterisationResultGatewaySqlImpl.listDatasets();
         System.out.println(strings);
         assertEquals(1, strings.size());
+
+    }
+
+
+    @Test
+    public void getSamplesTest() throws ParseException {
+
+        generate();
+        long count = generated.stream().filter(item -> item.getProperty().equals(Property.FORMAT)).count();
+        characterisationResultGatewaySqlImpl.addCharacterisationResults(generated, "samples");
+
+        CriteriaParser parser = new CriteriaParser();
+        FilterCriteria filterCriteria = parser.parse("FORMAT=\"Portable Document Format\"");
+        List<String[]> samples = characterisationResultGatewaySqlImpl.getSamples(filterCriteria, SamplingAlgorithms.SELECTIVE_FEATURE_DISTRIBUTION, List.of(Property.FORMAT, Property.MIMETYPE, Property.FORMAT_VERSION), "samples");
+
+        assertEquals(0, samples.size());
 
     }
 }

@@ -336,14 +336,14 @@ public class CharacterisationResultClickhouseRepository {
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria, datasetName);
-            subquery = String.format(" where file_path in (%s) ", subquery);
+            subquery = String.format(" file_path in (%s) ", subquery);
         }
 
         String sql = String.format(
                 "select file_path " +
-                        "from %s.characterisationresultaggregated " +
-                        " %s" +
-                        "group by file_path ORDER BY RAND() LIMIT %d  ", datasetName, subquery, sampleSize);
+                "from %s.characterisationresultaggregated " +
+                "where %s" +
+                "group by file_path ORDER BY RAND() LIMIT %d  ", datasetName, subquery, sampleSize);
 
         List<String> resultList = template.query(sql, (rs, rowNum) -> rs.getString(1));
         List<String[]> collect = resultList.stream().map(item -> new String[]{"1", item}).collect(Collectors.toList());
@@ -356,7 +356,7 @@ public class CharacterisationResultClickhouseRepository {
         String subquery = "";
         if (filterCriteria != null) {
             subquery = convert(filterCriteria, datasetName);
-            subquery = String.format(" where file_path in (%s) ", subquery);
+            subquery = String.format(" file_path in (%s) and ", subquery);
         }
 
 

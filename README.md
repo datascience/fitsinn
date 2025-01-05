@@ -28,7 +28,7 @@ like [FITS](https://projects.iq.harvard.edu/fits/).
 
 ### Deployment (Production)
 
-To deploy FITSInn, use the Docker images provided:
+To deploy FITSInn, use the Docker images provided and execute the following docker-compose command:
 
 ```bash
 docker-compose -f docker-compose.yaml up --pull
@@ -36,6 +36,21 @@ docker-compose -f docker-compose.yaml up --pull
 
 > **Note**:
 > - Deployment to Docker Swarm or Kubernetes (K8S) is possible but not covered in this guide.
+
+
+### Upgrade (Production)
+
+To upgrade FITSInn, use the Docker images provided:
+
+```bash
+docker-compose -f docker-compose.yaml down
+docker-compose -f docker-compose.yaml up --pull
+```
+
+> **Note**:
+> - The first command will remove all previously created containers. This will cause deletion of all ingested collections.
+
+
 
 ### Local Development Build
 

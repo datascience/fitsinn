@@ -1,17 +1,13 @@
 package rocks.artur.clickhouse;
 
-import org.springdoc.core.customizers.ActuatorOperationCustomizer;
-import rocks.artur.api_impl.filter.SingleFilterCriteria;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
 import rocks.artur.domain.statistics.PropertyStatistic;
 import rocks.artur.domain.statistics.PropertyValueStatistic;
-import rocks.artur.jpa.view.CharacterisationResultViewJPA;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CharacterisationResultGatewayClickhouseImpl implements CharacterisationResultGateway {
 
@@ -25,7 +21,7 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void addCharacterisationResult(CharacterisationResult characterisationResult, String datasetName) {
         repository.save(characterisationResult, datasetName);
-        repository.cleanAggregation(datasetName);
+
     }
 
     @Override
@@ -35,7 +31,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<PropertyStatistic> getPropertyDistribution(FilterCriteria<CharacterisationResult> filter, String datasetName) {
-        repository.aggregateResults(datasetName);
         return repository.getPropertyDistribution(datasetName);
     }
 
@@ -61,7 +56,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<CharacterisationResult> getConflictsByFilepath(String filepath, String datasetName) {
-        repository.aggregateResults(datasetName);
         List<CharacterisationResult> results = new ArrayList<>();
         List<CharacterisationResult> allJPAByFilePath = getCharacterisationResultsByFilepath(filepath, datasetName);
         List<Property> properties = allJPAByFilePath.stream().map(item -> item.getProperty()).collect(Collectors.toList());
@@ -77,8 +71,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public Map<String, Double> getCollectionStatistics(FilterCriteria filterCriteria, String datasetName) {
-
-        repository.aggregateResults(datasetName);
         Map<String, Double> result = new HashMap<>();
 
         double[] sizeStatistics = repository.getSizeStatistics(filterCriteria, datasetName);
@@ -96,7 +88,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<PropertyValueStatistic> getPropertyValueDistribution(Property property, FilterCriteria<CharacterisationResult> filter, String datasetName) {
-        repository.aggregateResults(datasetName);
         switch (property.getValueType()) {
             case TIMESTAMP: {
                 List<PropertyValueStatistic> collect = null;
@@ -160,7 +151,6 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
 
     @Override
     public List<String[]> getSamples(FilterCriteria filterCriteria, SamplingAlgorithms algorithm, List<Property> properties, String datasetName) {
-        repository.aggregateResults(datasetName);
         switch (algorithm) {
             case RANDOM -> {
                 List<String[]> samples = repository.getRandomSamples(filterCriteria, 10, datasetName);
@@ -178,12 +168,10 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void addCharacterisationResults(List<CharacterisationResult> characterisationResults, String datasetName) {
         repository.saveAll(characterisationResults, datasetName);
-        repository.cleanAggregation(datasetName);
     }
 
     @Override
     public double getConflictRate(String datasetName) {
-        repository.aggregateResults(datasetName);
         Long totalCount = repository.getDigitalObjectCount(datasetName);
         Long conflictCount = repository.getConflictCount(datasetName);
         return conflictCount / (double) totalCount;
@@ -197,11 +185,23 @@ public class CharacterisationResultGatewayClickhouseImpl implements Characterisa
     @Override
     public void resolveConflictsNative(String datasetName) {
         repository.resolveConflictsSimple(datasetName);
-        repository.aggregateResults(datasetName);
+        repository.cleanAggregation(datasetName);
+        repository.createAggregation(datasetName);
     }
 
     @Override
     public List<String> listDatasets() {
         return repository.listDatasets();
+    }
+
+    @Override
+    public Boolean removeDataset(String datasetName) {
+        List<String> datasets = repository.listDatasets();
+        Boolean b = repository.removeDataset(datasetName);
+        datasets.remove(datasetName);
+        if (datasets.isEmpty()) {
+            repository.createDb("current");
+        }
+        return b;
     }
 }

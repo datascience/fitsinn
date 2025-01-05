@@ -4,7 +4,6 @@ package rocks.artur.jpa;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.tags.EditorAwareTag;
 import rocks.artur.domain.*;
 import rocks.artur.domain.statistics.BinningAlgorithms;
 import rocks.artur.domain.statistics.PropertiesPerObjectStatistic;
@@ -259,6 +258,11 @@ public class CharacterisationResultGatewayJpaImpl implements CharacterisationRes
     @Override
     public List<String> listDatasets() {
         return List.of("default");
+    }
+
+    @Override
+    public Boolean removeDataset(String datasetName) {
+        return true;
     }
 
 }

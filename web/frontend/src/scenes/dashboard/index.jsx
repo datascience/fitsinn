@@ -50,7 +50,7 @@ const Dashboard = () => {
   const fetchGlobalProperties = async () => {
     const response = await fetch(BACKEND_URL + "/properties?"  +
         new URLSearchParams({
-          datasetName: "default",
+          datasetName: "current",
         }));
     let data = await response.json();
     let properties = data.map((prop) => prop.property);
